@@ -1,0 +1,10 @@
+{
+  "name": "tower-defense",
+  "minGameVersion": "145.1",
+  "displayName": "Tower Defense",
+  "author": "Darkness6030",
+  "description": "Defend your tower!",
+  "version": "1.0",
+  "main": "tower.Main",
+  "repo": "Darkdustry-Coders/TowerDefense"
+}
