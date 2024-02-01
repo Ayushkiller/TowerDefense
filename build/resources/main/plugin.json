@@ -1,10 +1,10 @@
 {
-  "name": "Tower Defense",
-  "minGameVersion": "146",
+  "name": "tower-defense",
+  "minGameVersion": "145.1",
   "displayName": "Tower Defense",
-  "author": "AYUSHkiller",
-  "description": "no need",
+  "author": "Darkness6030",
+  "description": "Defend your tower!",
   "version": "1.0",
-  "repo": "Ayushkiller/YES",
-  "hidden": true 
+  "main": "tower.Main",
+  "repo": "Darkdustry-Coders/TowerDefense"
 }
