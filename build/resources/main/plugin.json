@@ -5,5 +5,6 @@
   "author": "AYUSHkiller",
   "description": "no need",
   "version": "1.0",
-  "repo": "Ayushkiller/YES"
+  "repo": "Ayushkiller/YES",
+  "hidden": true 
 }

@@ -116,6 +116,23 @@ public class Main extends Plugin {
             type.aiController = type.flying ? FlyingAI::new : GroundAI::new;
             type.targetFlags = new BlockFlag[]{BlockFlag.core};
         });
+        netServer.admins.addActionFilter(action -> {
+            if (action.tile == null) return true;
+
+            if (action.type == ActionType.placeBlock || action.type == ActionType.breakBlock) {
+                if (!(canBePlaced(action.tile, action.block) || action.block instanceof ShockMine || action.block instanceof CoreBlock)) {
+                    Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
+                    return false;
+                }
+            }
+
+            if ((action.type == ActionType.depositItem || action.type == ActionType.withdrawItem) && action.tile.block() instanceof CoreBlock) {
+                Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
+                return false;
+            }
+
+            return true;
+        });
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
@@ -155,7 +172,7 @@ public class Main extends Plugin {
             drop.each(stack -> {
                 int amount = Mathf.random(stack.amount - stack.amount / 2, stack.amount + stack.amount / 2);
 
-                builder.append("[accent]+").append(amount).append(" [white]").append(stack.item.emoji()).append("  ");
+                builder.append("[accent]+").append(amount).append(" [red]").append(stack.item.emoji()).append("  ");
                 Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
             });
 
