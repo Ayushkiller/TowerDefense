@@ -1,9 +1,9 @@
 {
-  "name": "YES-0.0.1",
-  "minGameVersion": "145.1",
+  "name": "Tower Defense",
+  "minGameVersion": "146",
   "displayName": "Tower Defense",
   "author": "AYUSHkiller",
   "description": "no need",
-  "version": "0.0.1",
+  "version": "1.0",
   "repo": "Ayushkiller/YES"
 }
