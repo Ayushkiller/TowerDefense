@@ -1,4 +1,4 @@
-name: Компиляция плагина
+name: Dont know fu
 
 on: [push]
 
@@ -12,7 +12,7 @@ jobs:
 
       - uses: actions/checkout@v1
 
-      - name: Подключение Java 16
+      - name: Magic Java 16
 
         uses: actions/setup-java@v1
 
@@ -20,15 +20,15 @@ jobs:
 
           java-version: 16
 
-      - name: Настройка доступа к gradlew
+      - name: lol gradlew
 
         run: chmod +x ./gradlew
 
-      - name: Сборка плагина в jar
+      - name: magic jar
 
         run: ./gradlew jar
 
-      - name: Выгрузка jar
+      - name: magic jar
 
         uses: actions/upload-artifact@v2
 
