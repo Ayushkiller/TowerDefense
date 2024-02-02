@@ -140,7 +140,7 @@ public class Main extends Plugin {
         }), 0f, 1f);
 
         Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
-        Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.ARMOR", Color.HSVtoRGB(ARMOR* 120f, 100f, 100f), Strings.autoFixed(ARMOR, 2)), 0f, 1f);
+        Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 500, 0, "ui.ARMOR", Color.HSVtoRGB(240f, 100f, 100f), Strings.autoFixed(ARMOR, 2)), 0f, 1f);
 
         Events.on(WorldLoadEvent.class, event -> multiplier = 1f);
         Events.on(WorldLoadEvent.class, event -> ARMOR = 1f);
