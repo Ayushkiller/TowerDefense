@@ -119,14 +119,16 @@ public class Main extends Plugin {
         });
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null) return true;
-
+        
             if (action.type == ActionType.placeBlock || action.type == ActionType.breakBlock) {
-                if (!(canBePlaced(action.tile, action.block)|| action.block instanceof CoreBlock)) {
+                if (!(canBePlaced(action.tile, action.block) || action.block instanceof CoreBlock)) {
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
-                    return false;
+                    return false; // Explicitly return false here
                 }
             }
+            return true; // Return true if no conditions are met that would return false
         });
+        
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
