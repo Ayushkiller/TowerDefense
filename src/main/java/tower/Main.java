@@ -116,23 +116,6 @@ public class Main extends Plugin {
             type.aiController = type.flying ? FlyingAI::new : GroundAI::new;
             type.targetFlags = new BlockFlag[]{BlockFlag.core};
         });
-        netServer.admins.addActionFilter(action -> {
-            if (action.tile == null) return true;
-
-            if (action.type == ActionType.placeBlock || action.type == ActionType.breakBlock) {
-                if (!(canBePlaced(action.tile, action.block) || action.block instanceof ShockMine || action.block instanceof CoreBlock)) {
-                    Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
-                    return false;
-                }
-            }
-
-            if ((action.type == ActionType.depositItem || action.type == ActionType.withdrawItem) && action.tile.block() instanceof CoreBlock) {
-                Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
-                return false;
-            }
-
-            return true;
-        });
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
@@ -146,19 +129,6 @@ public class Main extends Plugin {
 
         Events.on(WorldLoadEvent.class, event -> multiplier = 1f);
         Events.on(WaveEvent.class, event -> multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), multiplier, 100f));
-
-        Events.on(PlayEvent.class, event -> {
-            state.rules.bannedBlocks.addAll(content.blocks().select(UnitBlock.class::isInstance));
-            state.rules.bannedBlocks.remove(Blocks.airFactory);
-            state.rules.bannedBlocks.remove(Blocks.additiveReconstructor);
-            state.rules.bannedBlocks.remove(Blocks.multiplicativeReconstructor);
-
-            state.rules.bannedUnits.addAll(content.units().select(type -> !type.hidden));
-            state.rules.bannedUnits.remove(UnitTypes.mono);
-            state.rules.bannedUnits.remove(UnitTypes.poly);
-            state.rules.bannedUnits.remove(UnitTypes.mega);
-        });
-
         Events.on(UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam) return;
 
@@ -184,7 +154,7 @@ public class Main extends Plugin {
 
             event.unit.health(event.unit.maxHealth * multiplier);
             event.unit.maxHealth(event.unit.maxHealth * multiplier);
-
+            event.unit.armor(event.unit.armor * multiplier);
             event.unit.damageMultiplier(0f);
             event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
         });
