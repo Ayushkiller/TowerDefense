@@ -25,6 +25,7 @@ public class Main extends Plugin {
 
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
     public static float multiplier = 1f;
+    public static float ARMOR = 1f;
 
     public static boolean isPath(Tile tile) {
         return tile.floor() == Blocks.darkPanel4 || tile.floor() == Blocks.darkPanel5;
@@ -116,19 +117,33 @@ public class Main extends Plugin {
             type.aiController = type.flying ? FlyingAI::new : GroundAI::new;
             type.targetFlags = new BlockFlag[]{BlockFlag.core};
         });
+        netServer.admins.addActionFilter(action -> {
+            if (action.tile == null) return true;
+
+            if (action.type == ActionType.placeBlock || action.type == ActionType.breakBlock) {
+                if (!(canBePlaced(action.tile, action.block)|| action.block instanceof CoreBlock)) {
+                    Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
+                    return false;
+                }
+            }
+        });
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
             if (core == null || unit.dst(core) > 80f) return;
 
             core.damage(unit.health / Mathf.sqrt(multiplier), true);
+            core.damage(unit.armor / Mathf.sqrt(ARMOR), true);
             unit.kill();
         }), 0f, 1f);
 
         Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
+        Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.ARMOR", Color.HSVtoRGB(ARMOR* 120f, 100f, 100f), Strings.autoFixed(ARMOR, 2)), 0f, 1f);
 
         Events.on(WorldLoadEvent.class, event -> multiplier = 1f);
+        Events.on(WorldLoadEvent.class, event -> ARMOR = 1f);
         Events.on(WaveEvent.class, event -> multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), multiplier, 100f));
+        Events.on(WaveEvent.class, event -> ARMOR = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), ARMOR, 100f));
         Events.on(UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam) return;
 
@@ -154,7 +169,8 @@ public class Main extends Plugin {
 
             event.unit.health(event.unit.maxHealth * multiplier);
             event.unit.maxHealth(event.unit.maxHealth * multiplier);
-            event.unit.armor(event.unit.armor * multiplier);
+            event.unit.armor(event.unit.armor * ARMOR);
+
             event.unit.damageMultiplier(0f);
             event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
         });
