@@ -1,9 +1,10 @@
 {
-  "name": "Tower Defense",
+  "name": "tower-defense",
   "minGameVersion": "146",
   "displayName": "Tower Defense",
-  "author": "AYUSHkiller",
-  "description": "no need",
-  "version": "1.0" ,
-  
+  "author": "Ayush Kumar(Alpfha)",
+  "description": "You are ded",
+  "version": "1.0",
+  "main": "tower.Main",
+  "repo": "Ayushkiller/YES"
 }
