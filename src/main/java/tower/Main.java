@@ -181,7 +181,7 @@ public class Main extends Plugin {
         Events.on(UnitSpawnEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam) return;
 
-            event.unit.health(event.unit.maxHealth * multiplier);
+            event.unit.health(event.unit.health * multiplier);
             event.unit.maxHealth(event.unit.maxHealth * multiplier);
             event.unit.armor(event.unit.armor * ARMOR);
 
