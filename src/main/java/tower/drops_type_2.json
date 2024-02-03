@@ -1,0 +1,55 @@
+[
+    {
+        "tier":"1",
+        "items": [
+            {"item": "copper", "amount": 20},
+            {"item": "lead", "amount": 10},
+            {"item": "silicon", "amount": 3}
+        ]
+    },
+    {
+        "tier":"2",
+        "items": [
+            {"item": "copper", "amount": 30},
+            {"item": "lead", "amount": 40},
+            {"item": "graphite", "amount": 10},
+            {"item": "titanium", "amount": 5}
+        ]
+    },
+    {
+        "tier":"3",
+        "items": [
+            {"item": "lead", "amount": 100},
+            {"item": "graphite", "amount": 40},
+            {"item": "silicon", "amount": 40},
+            {"item": "thorium", "amount": 10}
+        ]
+    },
+    {
+        "tier":"4",
+        "items": [
+            {"item": "beryllium", "amount": 250},
+            {"item": "graphite", "amount": 225},
+            {"item": "silicon", "amount": 125},
+            {"item": "tungsten", "amount": 140},
+            {"item": "oxide", "amount": 120},
+            {"item": "carbide", "amount": 240},
+            {"item": "surgeAlloy", "amount": 250},
+            {"item": "thorium", "amount": 240},
+            {"item": "phaseFabric", "amount": 120}
+        ]
+    },
+    {
+        "tier":"5",
+        "items": [
+            {"item": "copper", "amount": 400},
+            {"item": "lead", "amount": 400},
+            {"item": "graphite", "amount": 120},
+            {"item": "silicon", "amount": 120},
+            {"item": "thorium", "amount": 40},
+            {"item": "plastanium", "amount": 40},
+            {"item": "surgeAlloy", "amount": 15},
+            {"item": "phaseFabric", "amount": 5}
+        ]
+    }
+]
