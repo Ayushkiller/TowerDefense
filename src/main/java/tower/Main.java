@@ -21,6 +21,7 @@ import useful.Bundle;
 
 import static mindustry.Vars.*;
 
+@SuppressWarnings("unused")
 public class Main extends Plugin {
 
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
@@ -71,21 +72,22 @@ public class Main extends Plugin {
                 UnitTypes.quad, ItemStack.list(Items.copper, 300, Items.silicon, 80, Items.metaglass, 80, Items.titanium, 80, Items.thorium, 20, Items.phaseFabric, 10),
                 UnitTypes.oct, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 120, Items.silicon, 120, Items.thorium, 40, Items.plastanium, 40, Items.surgeAlloy, 15, Items.phaseFabric, 5),
 
-                UnitTypes.risso, ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3),
-                UnitTypes.minke, ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10),
-                UnitTypes.bryde, ItemStack.list(Items.lead, 100, Items.metaglass, 40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10),
-                UnitTypes.sei, ItemStack.list(Items.copper, 300, Items.metaglass, 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5),
-                UnitTypes.omura, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 100, Items.silicon, 100, Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10, Items.phaseFabric, 10),
-
-                UnitTypes.retusa, ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3),
-                UnitTypes.oxynoe, ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10),
-                UnitTypes.cyerce, ItemStack.list(Items.lead, 100, Items.metaglass, 40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10),
-                UnitTypes.aegires, ItemStack.list(Items.copper, 300, Items.metaglass, 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5),
-                UnitTypes.navanax, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 100, Items.silicon, 100, Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10, Items.phaseFabric, 10),
-
-                UnitTypes.alpha, ItemStack.list(Items.copper, 30, Items.lead, 30, Items.graphite, 20, Items.silicon, 20, Items.metaglass, 20),
-                UnitTypes.beta, ItemStack.list(Items.titanium, 40, Items.thorium, 20),
-                UnitTypes.gamma, ItemStack.list(Items.plastanium, 20, Items.surgeAlloy, 10, Items.phaseFabric, 10),
+                // These units are ships, and need water to be placed and work
+                // UnitTypes.risso, ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3),
+                // UnitTypes.minke, ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10),
+                // UnitTypes.bryde, ItemStack.list(Items.lead, 100, Items.metaglass, 40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10),
+                // UnitTypes.sei, ItemStack.list(Items.copper, 300, Items.metaglass, 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5),
+                // UnitTypes.omura, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 100, Items.silicon, 100, Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10, Items.phaseFabric, 10),
+                // UnitTypes.retusa, ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3),
+                // UnitTypes.oxynoe, ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10),
+                // UnitTypes.cyerce, ItemStack.list(Items.lead, 100, Items.metaglass, 40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10),
+                // UnitTypes.aegires, ItemStack.list(Items.copper, 300, Items.metaglass, 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5),
+                // UnitTypes.navanax, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 100, Items.silicon, 100, Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10, Items.phaseFabric, 10),
+                
+                // Player Units
+                // UnitTypes.alpha, ItemStack.list(Items.copper, 30, Items.lead, 30, Items.graphite, 20, Items.silicon, 20, Items.metaglass, 20),
+                // UnitTypes.beta, ItemStack.list(Items.titanium, 40, Items.thorium, 20),
+                // UnitTypes.gamma, ItemStack.list(Items.plastanium, 20, Items.surgeAlloy, 10, Items.phaseFabric, 10),
 
                 UnitTypes.stell, ItemStack.list(Items.beryllium, 20, Items.silicon, 25),
                 UnitTypes.locus, ItemStack.list(Items.beryllium, 20, Items.graphite, 20, Items.silicon, 20, Items.tungsten, 15),
@@ -103,11 +105,11 @@ public class Main extends Plugin {
                 UnitTypes.cleroi, ItemStack.list(Items.beryllium, 35, Items.graphite, 20, Items.silicon, 25, Items.tungsten, 20, Items.oxide, 20),
                 UnitTypes.anthicus, ItemStack.list(Items.beryllium, 50, Items.graphite, 25, Items.silicon, 50, Items.tungsten, 65, Items.oxide, 75, Items.thorium, 40),
                 UnitTypes.tecta, ItemStack.list(Items.beryllium, 100, Items.graphite, 50, Items.silicon, 140, Items.tungsten, 120, Items.oxide, 125, Items.surgeAlloy, 60, Items.thorium, 100, Items.phaseFabric, 125),
-                UnitTypes.collaris, ItemStack.list(Items.beryllium, 135, Items.graphite, 90, Items.silicon, 175, Items.tungsten, 155, Items.oxide, 250, Items.carbide, 240, Items.surgeAlloy, 120, Items.thorium, 240, Items.phaseFabric, 120),
-
-                UnitTypes.evoke, ItemStack.list(Items.beryllium, 50, Items.graphite, 50, Items.silicon, 50),
-                UnitTypes.incite, ItemStack.list(Items.tungsten, 25, Items.oxide, 25, Items.carbide, 50),
-                UnitTypes.emanate, ItemStack.list(Items.surgeAlloy, 25, Items.thorium, 25, Items.phaseFabric, 50)
+                UnitTypes.collaris, ItemStack.list(Items.beryllium, 135, Items.graphite, 90, Items.silicon, 175, Items.tungsten, 155, Items.oxide, 250, Items.carbide, 240, Items.surgeAlloy, 120, Items.thorium, 240, Items.phaseFabric, 120)
+                // These units cannot harm
+                // UnitTypes.evoke, ItemStack.list(Items.beryllium, 50, Items.graphite, 50, Items.silicon, 50),
+                // UnitTypes.incite, ItemStack.list(Items.tungsten, 25, Items.oxide, 25, Items.carbide, 50),
+                // UnitTypes.emanate, ItemStack.list(Items.surgeAlloy, 25, Items.thorium, 25, Items.phaseFabric, 50)
         );
 
         content.units().each(type -> {
