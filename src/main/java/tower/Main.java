@@ -18,6 +18,7 @@ import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitBlock;
 import mindustry.world.meta.BlockFlag;
 import useful.Bundle;
+import org.json.JSONObject;
 
 import static mindustry.Vars.*;
 
@@ -112,6 +113,7 @@ public class Main extends Plugin {
                 // UnitTypes.incite, ItemStack.list(Items.tungsten, 25, Items.oxide, 25, Items.carbide, 50),
                 // UnitTypes.emanate, ItemStack.list(Items.surgeAlloy, 25, Items.thorium, 25, Items.phaseFabric, 50)
         );
+        // test_drops from json
 
         content.units().each(type -> {
             type.mineWalls = type.mineFloor = type.targetAir = type.targetGround = false;

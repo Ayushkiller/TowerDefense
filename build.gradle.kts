@@ -21,6 +21,8 @@ dependencies {
     compileOnly("com.github.Anuken.Mindustry:core:v$mindustryVersion")
 
     implementation("com.github.xzxADIxzx.useful-stuffs:bundle:$usefulHash")
+    // Add the json library
+    implementation("com.github.xzxADIxzx.useful-stuffs:json:$usefulHash")
 }
 
 tasks.jar {
