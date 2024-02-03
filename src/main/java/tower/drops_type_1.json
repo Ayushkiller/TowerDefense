@@ -1,0 +1,411 @@
+[
+    {
+        "unitType": "crawler",
+        "items": [
+            {"item": "copper", "amount": 20},
+            {"item": "lead", "amount": 10},
+            {"item": "silicon", "amount": 3}
+        ]
+    },
+    {
+        "unitType": "atrax",
+        "items": [
+            {"item": "copper", "amount": 30},
+            {"item": "lead", "amount": 40},
+            {"item": "graphite", "amount": 10},
+            {"item": "titanium", "amount": 5}
+        ]
+    },
+    {
+        "unitType": "spiroct",
+        "items": [
+            {"item": "lead", "amount": 100},
+            {"item": "graphite", "amount": 40},
+            {"item": "silicon", "amount": 40},
+            {"item": "thorium", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "arkyid",
+        "items": [
+            {"item": "copper", "amount": 300},
+            {"item": "graphite", "amount": 80},
+            {"item": "metaglass", "amount": 80},
+            {"item": "titanium", "amount": 80},
+            {"item": "thorium", "amount": 20},
+            {"item": "phaseFabric", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "toxopid",
+        "items": [
+            {"item": "copper", "amount": 400},
+            {"item": "lead", "amount": 400},
+            {"item": "graphite", "amount": 120},
+            {"item": "silicon", "amount": 120},
+            {"item": "thorium", "amount": 40},
+            {"item": "plastanium", "amount": 40},
+            {"item": "surgeAlloy", "amount": 15},
+            {"item": "phaseFabric", "amount": 5}
+        ]
+    },
+    {
+        "unitType": "dagger",
+        "items": [
+            {"item": "copper", "amount": 20},
+            {"item": "lead", "amount": 10},
+            {"item": "silicon", "amount": 3}
+        ]
+    },
+    {
+        "unitType": "mace",
+        "items": [
+            {"item": "copper", "amount": 30},
+            {"item": "lead", "amount": 40},
+            {"item": "graphite", "amount": 10},
+            {"item": "titanium", "amount": 5}
+        ]
+    },
+    {
+        "unitType": "fortress",
+        "items": [
+            {"item": "lead", "amount": 100},
+            {"item": "graphite", "amount":40},
+            {"item": "silicon", "amount": 40},
+            {"item": "thorium", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "reign",
+        "items": [
+            {"item": "copper", "amount": 400},
+            {"item": "lead", "amount": 400},
+            {"item": "graphite", "amount": 120},
+            {"item": "silicon", "amount": 120},
+            {"item": "thorium", "amount": 40},
+            {"item": "plastanium", "amount": 40},
+            {"item": "surgeAlloy", "amount": 15},
+            {"item": "phaseFabric", "amount": 5}
+        ]
+    },
+    {
+        "unitType": "nova",
+        "items": [
+            {"item": "copper", "amount": 20},
+            {"item": "lead", "amount": 10},
+            {"item": "metaglass", "amount": 3}
+        ]
+    },
+    {
+        "unitType": "pulsar",
+        "items": [
+            {"item": "copper", "amount": 30},
+            {"item": "lead", "amount": 40},
+            {"item": "metaglass", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "quasar",
+        "items": [
+            {"item": "lead", "amount": 100},
+            {"item": "metaglass", "amount": 40},
+            {"item": "silicon", "amount": 40},
+            {"item": "titanium", "amount": 80},
+            {"item": "thorium", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "vela",
+        "items": [
+            {"item": "copper", "amount": 300},
+            {"item": "metaglass", "amount": 80},
+            {"item": "graphite", "amount": 80},
+            {"item": "titanium", "amount": 60},
+            {"item": "plastanium", "amount": 20},
+            {"item": "surgeAlloy", "amount": 5}
+        ]
+    },
+    {
+        "unitType": "corvus",
+        "items": [
+            {"item": "copper", "amount": 400},
+            {"item": "lead", "amount": 400},
+            {"item": "graphite", "amount": 100},
+            {"item": "silicon", "amount": 100},
+            {"item": "metaglass", "amount": 120},
+            {"item": "titanium", "amount": 120},
+            {"item": "thorium", "amount": 60},
+            {"item": "surgeAlloy", "amount": 10},
+            {"item": "phaseFabric", "amount": 10}
+            ]
+    },
+    {
+        "unitType": "flare",
+        "items": [
+            {"item": "copper", "amount": 20},
+            {"item": "lead", "amount": 10},
+            {"item": "graphite", "amount": 3}
+        ]
+    },
+    {
+        "unitType": "horizon",
+        "items": [
+            {"item": "copper", "amount": 30},
+            {"item": "lead", "amount": 40},
+            {"item": "graphite", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "zenith",
+        "items": [
+            {"item": "lead", "amount": 100},
+            {"item": "graphite", "amount": 40},
+            {"item": "silicon", "amount": 40},
+            {"item": "titanium", "amount": 30},
+            {"item": "plastanium", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "antumbra",
+        "items": [
+            {"item": "copper", "amount": 300},
+            {"item": "graphite", "amount": 80},
+            {"item": "metaglass", "amount": 80},
+            {"item": "titanium", "amount": 60},
+            {"item": "surgeAlloy", "amount": 15}
+        ]
+    },
+    {
+        "unitType": "eclipse",
+        "items": [
+            {"item": "copper", "amount": 400},
+            {"item": "lead", "amount": 400},
+            {"item": "graphite", "amount": 120},
+            {"item": "silicon", "amount": 120},
+            {"item": "titanium", "amount": 120},
+            {"item": "thorium", "amount": 40},
+            {"item": "plastanium", "amount": 40},
+            {"item": "surgeAlloy", "amount": 5},
+            {"item": "phaseFabric", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "mono",
+        "items": [
+            {"item": "copper", "amount": 20},
+            {"item": "lead", "amount": 10},
+            {"item": "silicon", "amount": 3}
+        ]
+    },
+    {
+        "unitType": "poly",
+        "items": [
+            {"item": "copper", "amount": 30},
+            {"item": "lead", "amount": 40},
+            {"item": "silicon", "amount": 10},
+            {"item": "titanium", "amount": 5}
+        ]
+    },
+    {
+        "unitType": "mega",
+        "items": [
+            {"item": "lead", "amount": 100},
+            {"item": "silicon", "amount": 40},
+            {"item": "graphite", "amount": 40},
+            {"item": "thorium", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "quad",
+        "items": [
+            {"item": "copper", "amount": 300},
+            {"item": "silicon", "amount": 80},
+            {"item": "metaglass", "amount": 80},
+            {"item": "titanium", "amount": 80},
+            {"item": "thorium", "amount": 20},
+            {"item": "phaseFabric", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "oct",
+        "items": [
+            {"item": "copper", "amount": 400},
+            {"item": "lead", "amount": 400},
+            {"item": "graphite", "amount": 120},
+            {"item": "silicon", "amount": 120},
+            {"item": "thorium", "amount": 40},
+            {"item": "plastanium", "amount": 40},
+            {"item": "surgeAlloy", "amount": 15},
+            {"item": "phaseFabric", "amount": 5}
+        ]
+    },
+    {
+        "unitType": "stell",
+        "items": [
+            {"item": "beryllium", "amount": 20},
+            {"item": "silicon", "amount": 25}
+        ]
+    },
+    {
+        "unitType": "locus",
+        "items": [
+            {"item": "beryllium", "amount": 20},
+            {"item": "graphite", "amount": 20},
+            {"item": "silicon", "amount": 20},
+            {"item": "tungsten", "amount": 15}
+        ]
+    },
+    {
+        "unitType": "precept",
+        "items": [
+            {"item": "beryllium", "amount": 45},
+            {"item": "graphite", "amount": 25},
+            {"item": "silicon", "amount": 50},
+            {"item": "tungsten", "amount": 50},
+            {"item": "surgeAlloy", "amount": 75},
+            {"item": "thorium", "amount": 40}
+        ]
+    },
+    {
+        "unitType": "vanquish",
+        "items": [
+            {"item": "beryllium", "amount": 80},
+            {"item": "graphite", "amount": 50},
+            {"item": "silicon", "amount": 100},
+            {"item": "tungsten", "amount": 120},
+            {"item": "oxide", "amount": 60},
+            {"item": "surgeAlloy", "amount": 125},
+            {"item": "thorium", "amount": 100},
+            {"item": "phaseFabric", "amount":60}
+        ]
+    },
+    {
+        "unitType": "conquer",
+        "items": [
+            {"item": "beryllium", "amount": 250},
+            {"item": "graphite", "amount": 225},
+            {"item": "silicon", "amount": 125},
+            {"item": "tungsten", "amount": 140},
+            {"item": "oxide", "amount": 120},
+            {"item": "carbide", "amount": 240},
+            {"item": "surgeAlloy", "amount": 250},
+            {"item": "thorium", "amount": 240},
+            {"item": "phaseFabric", "amount": 120}
+        ]
+    },
+    {
+        "unitType": "elude",
+        "items": [
+            {"item": "beryllium", "amount": 6},
+            {"item": "graphite", "amount": 25},
+            {"item": "silicon", "amount": 35}
+        ]
+    },
+    {
+        "unitType": "avert",
+        "items": [
+            {"item": "beryllium", "amount": 24},
+            {"item": "graphite", "amount": 50},
+            {"item": "silicon", "amount": 30},
+            {"item": "tungsten", "amount": 20},
+            {"item": "oxide", "amount": 20}
+        ]
+    },
+    {
+        "unitType": "obviate",
+        "items": [
+            {"item": "beryllium", "amount": 48},
+            {"item": "graphite", "amount": 75},
+            {"item": "silicon", "amount": 50},
+            {"item": "tungsten", "amount": 45},
+            {"item": "carbide", "amount": 50},
+            {"item": "thorium", "amount": 40},
+            {"item": "phaseFabric", "amount": 75}
+        ]
+    },
+    {
+        "unitType": "quell",
+        "items": [
+            {"item": "beryllium", "amount": 250},
+            {"item": "graphite", "amount": 225},
+            {"item": "silicon", "amount": 125},
+            {"item": "tungsten", "amount": 140},
+            {"item": "oxide", "amount": 120},
+            {"item": "carbide", "amount": 240},
+            {"item": "surgeAlloy", "amount": 250},
+            {"item": "thorium", "amount": 240},
+            {"item": "phaseFabric", "amount": 120}
+        ]
+    },
+    {
+        "unitType": "disrupt",
+        "items": [
+            {"item": "beryllium", "amount": 122},
+            {"item": "graphite", "amount": 125},
+            {"item": "silicon", "amount": 155},
+            {"item": "tungsten", "amount": 100},
+            {"item": "oxide", "amount": 120},
+            {"item": "carbide", "amount": 240},
+            {"item": "surgeAlloy", "amount": 120},
+            {"item": "thorium", "amount": 240},
+            {"item": "phaseFabric", "amount": 250}
+        ]
+    },
+    {
+        "unitType": "merui",
+        "items": [
+            {"item": "beryllium", "amount": 25},
+            {"item": "silicon", "amount": 35},
+            {"item": "tungsten", "amount": 10}
+        ]
+    },
+    {
+        "unitType": "cleroi",
+        "items": [
+            {"item": "beryllium", "amount": 35},
+            {"item": "graphite", "amount": 20},
+            {"item": "silicon", "amount": 25},
+            {"item": "tungsten", "amount": 20},
+            {"item": "oxide", "amount": 20}
+        ]
+    },
+    {
+        "unitType": "anthicus",
+        "items": [
+            {"item": "beryllium", "amount": 50},
+            {"item": "graphite", "amount": 25},
+            {"item": "silicon", "amount": 50},
+            {"item": "tungsten", "amount": 65},
+            {"item": "oxide", "amount": 75},
+            {"item": "thorium", "amount": 40}
+        ]
+    },
+    {
+        "unitType": "tecta",
+        "items": [
+            {"item": "beryllium", "amount": 250},
+            {"item": "graphite", "amount": 225},
+            {"item": "silicon", "amount": 125},
+            {"item": "tungsten", "amount": 140},
+            {"item": "oxide", "amount": 120},
+            {"item": "carbide", "amount": 240},
+            {"item": "surgeAlloy", "amount": 250},
+            {"item": "thorium", "amount": 240},
+            {"item": "phaseFabric", "amount": 120}
+        ]
+    },
+    {
+        "unitType": "collaris",
+        "items": [
+            {"item": "beryllium", "amount": 135},
+            {"item": "graphite", "amount": 90},
+            {"item": "silicon", "amount": 175},
+            {"item": "tungsten", "amount": 155},
+            {"item": "oxide", "amount": 250},
+            {"item": "carbide", "amount": 240},
+            {"item": "surgeAlloy", "amount": 120},
+            {"item": "thorium", "amount": 240},
+            {"item": "phaseFabric", "amount": 120}
+        ]
+    }
+]
