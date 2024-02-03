@@ -73,16 +73,17 @@ public class Main extends Plugin {
                 UnitTypes.oct, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 120, Items.silicon, 120, Items.thorium, 40, Items.plastanium, 40, Items.surgeAlloy, 15, Items.phaseFabric, 5),
 
                 // These units are ships, and need water to be placed and work
-                // UnitTypes.risso, ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3),
-                // UnitTypes.minke, ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10),
-                // UnitTypes.bryde, ItemStack.list(Items.lead, 100, Items.metaglass, 40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10),
-                // UnitTypes.sei, ItemStack.list(Items.copper, 300, Items.metaglass, 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5),
-                // UnitTypes.omura, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 100, Items.silicon, 100, Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10, Items.phaseFabric, 10),
-                // UnitTypes.retusa, ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3),
-                // UnitTypes.oxynoe, ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10),
-                // UnitTypes.cyerce, ItemStack.list(Items.lead, 100, Items.metaglass, 40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10),
-                // UnitTypes.aegires, ItemStack.list(Items.copper, 300, Items.metaglass, 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5),
-                // UnitTypes.navanax, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 100, Items.silicon, 100, Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10, Items.phaseFabric, 10),
+                UnitTypes.risso, ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3),
+                UnitTypes.minke, ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10),
+                UnitTypes.bryde, ItemStack.list(Items.lead, 100, Items.metaglass, 40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10),
+                UnitTypes.sei, ItemStack.list(Items.copper, 300, Items.metaglass, 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5),
+                UnitTypes.omura, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 100, Items.silicon, 100, Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10, Items.phaseFabric, 10),
+                
+                UnitTypes.retusa, ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3),
+                UnitTypes.oxynoe, ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10),
+                UnitTypes.cyerce, ItemStack.list(Items.lead, 100, Items.metaglass, 40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10),
+                UnitTypes.aegires, ItemStack.list(Items.copper, 300, Items.metaglass, 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5),
+                UnitTypes.navanax, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 100, Items.silicon, 100, Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10, Items.phaseFabric, 10),
                 
                 // Player Units
                 // UnitTypes.alpha, ItemStack.list(Items.copper, 30, Items.lead, 30, Items.graphite, 20, Items.silicon, 20, Items.metaglass, 20),
@@ -144,10 +145,19 @@ public class Main extends Plugin {
         Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
         Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 500, 0, "ui.ARMOR", Color.HSVtoRGB(240f, 100f, 100f), Strings.autoFixed(ARMOR, 2)), 0f, 1f);
 
+        
         Events.on(WorldLoadEvent.class, event -> multiplier = 1f);
+        
+        
         Events.on(WorldLoadEvent.class, event -> ARMOR = 1f);
+        
+        
         Events.on(WaveEvent.class, event -> multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), multiplier, 100f));
+        
+        
         Events.on(WaveEvent.class, event -> ARMOR = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), ARMOR, 100f));
+        
+        
         Events.on(UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam) return;
 
@@ -161,7 +171,7 @@ public class Main extends Plugin {
             drop.each(stack -> {
                 int amount = Mathf.random(stack.amount - stack.amount / 2, stack.amount + stack.amount / 2);
 
-                builder.append("[accent]+").append(amount).append(" [red]").append(stack.item.emoji()).append("  ");
+                builder.append("[accent]+").append(amount).append(" [green]").append(stack.item.emoji()).append("  ");
                 Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
             });
 
