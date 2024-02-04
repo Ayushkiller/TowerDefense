@@ -29,7 +29,7 @@ public class Main extends Plugin {
 
 
     public static boolean isPath(Tile tile) {
-        return tile.floor() == Blocks.water || tile.floor() == Blocks.darkPanel5;
+        return tile.floor() == Blocks.water || tile.floor() == Blocks.sandWater;
     }
 
     public static boolean canBePlaced(Tile tile, Block block) {
