@@ -3,11 +3,15 @@ package tower;
 import arc.Events;
 import arc.graphics.Color;
 import arc.math.Mathf;
+import arc.scene.utils.Disableable;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.Vars;
 import mindustry.ai.types.*;
 import mindustry.content.*;
+import mindustry.entities.units.AIController;
 import mindustry.game.EventType.*;
+import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration.ActionType;
@@ -18,6 +22,8 @@ import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitBlock;
 import mindustry.world.meta.BlockFlag;
 import useful.Bundle;
+
+import javax.lang.model.type.NullType;
 
 import static mindustry.Vars.*;
 
@@ -78,13 +84,13 @@ public class Main extends Plugin {
                 UnitTypes.bryde, ItemStack.list(Items.lead, 100, Items.metaglass, 40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10),
                 UnitTypes.sei, ItemStack.list(Items.copper, 300, Items.metaglass, 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5),
                 UnitTypes.omura, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 100, Items.silicon, 100, Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10, Items.phaseFabric, 10),
-                
+
                 UnitTypes.retusa, ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3),
                 UnitTypes.oxynoe, ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10),
                 UnitTypes.cyerce, ItemStack.list(Items.lead, 100, Items.metaglass, 40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10),
                 UnitTypes.aegires, ItemStack.list(Items.copper, 300, Items.metaglass, 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5),
                 UnitTypes.navanax, ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 100, Items.silicon, 100, Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10, Items.phaseFabric, 10),
-                
+
                 // Player Units
                 // UnitTypes.alpha, ItemStack.list(Items.copper, 30, Items.lead, 30, Items.graphite, 20, Items.silicon, 20, Items.metaglass, 20),
                 // UnitTypes.beta, ItemStack.list(Items.titanium, 40, Items.thorium, 20),
@@ -116,13 +122,20 @@ public class Main extends Plugin {
         content.units().each(type -> {
             type.mineWalls = type.mineFloor = type.targetAir = type.targetGround = false;
             type.payloadCapacity = type.legSplashDamage = type.range = type.maxRange = type.mineRange = 0f;
+            for (Weapon weapon : type.weapons = new Seq<Weapon>()) {
+                weapon.bullet.damage = 0f;
+                weapon.bullet.speed = 0f;
+            }
+            type.immunities= new ObjectSet<StatusEffect>();
+            type.immunities.add(StatusEffects.wet);
 
             type.aiController = type.flying ? FlyingAI::new : GroundAI::new;
             type.targetFlags = new BlockFlag[]{BlockFlag.core};
         });
+
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null) return true;
-        
+
             if (action.type == ActionType.placeBlock || action.type == ActionType.breakBlock) {
                 if (!(canBePlaced(action.tile, action.block) || action.block instanceof CoreBlock)) {
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
@@ -131,7 +144,7 @@ public class Main extends Plugin {
             }
             return true; // Return true if no conditions are met that would return false
         });
-        
+
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
@@ -140,24 +153,17 @@ public class Main extends Plugin {
             core.damage(unit.health / Mathf.sqrt(multiplier), true);
 
             unit.kill();
+
         }), 0f, 1f);
 
         Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
 
+        Events.on(WorldLoadEvent.class, event -> {
+            multiplier = 0.1f;
+        });
 
-        
-        Events.on(WorldLoadEvent.class, event -> multiplier = 1f);
-        
-        
-
-        
-        
         Events.on(WaveEvent.class, event -> multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), multiplier, 100f));
-        
-        
 
-        
-        
         Events.on(UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam) return;
 
@@ -183,14 +189,15 @@ public class Main extends Plugin {
 
             event.unit.health(event.unit.health * multiplier);
             event.unit.maxHealth(event.unit.maxHealth * multiplier);
-           
             event.unit.damageMultiplier(0f);
+
             event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.overdrive, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
-            event.unit.isImmune(StatusEffects.wet);
+
+//            event.unit.isImmune(StatusEffects.wet);
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
         });
