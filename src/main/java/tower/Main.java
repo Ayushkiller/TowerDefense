@@ -140,8 +140,7 @@ public class Main extends Plugin {
                 if (!(canBePlaced(action.tile, action.block) || action.block instanceof CoreBlock)) {
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                     return false; // Explicitly return false here
-                }
-            }
+                }}
             return true; // Return true if no conditions are met that would return false
         });
 
