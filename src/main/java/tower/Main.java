@@ -32,6 +32,7 @@ public class Main extends Plugin {
 
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
     public static float multiplier = 1f;
+    private final CommandHandlr commandHandlr = new CommandHandlr();
 
 
     public static boolean isPath(Tile tile) {
@@ -43,8 +44,14 @@ public class Main extends Plugin {
     }
 
     @Override
+    public void registerClientCommands(CommandHandler handler) {
+        commandHandlr.registerClientCommands(handler);
+    }
+
+    @Override
     public void init() {
         Bundle.load(getClass());
+        commandHandlr.init();
         TowerPathfinder.load();
 
         drops = ObjectMap.of(
