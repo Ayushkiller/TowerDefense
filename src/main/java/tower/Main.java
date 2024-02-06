@@ -35,7 +35,7 @@ public class Main extends Plugin {
     private static final Ability UnitSpawnAbility = null;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
     public static float multiplier = 1f;
-    private final CommandHandlr commandHandlr = new CommandHandlr();
+    private final CommandHandler commandHandler = new CommandHandler();
 
 
     public static boolean isPath(Tile tile) {
@@ -54,7 +54,7 @@ public class Main extends Plugin {
     @Override
     public void init() {
         Bundle.load(getClass());
-        commandHandlr.init();
+        commandHandler.init();
         TowerPathfinder.load();
 
         drops = ObjectMap.of(
