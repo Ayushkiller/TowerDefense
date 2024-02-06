@@ -4,7 +4,7 @@
   "displayName": "Tower Defense",
   "author": "Ayush Kumar(Alpfha)",
   "description": "TD plugin for Mindustry Strictly owned by Eradication Mindustry Server",
-  "version": "1.1.1",
+  "version": "1.2",
   "main": "tower.Main",
   "contributors":["Ayushkiller","arin-prashar","RaphielHS"],
   "repo": "Ayushkiller/YES"
