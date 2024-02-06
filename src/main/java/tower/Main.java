@@ -13,6 +13,7 @@ import mindustry.entities.units.AIController;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
 import mindustry.gen.Call;
+import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration.ActionType;
 import mindustry.type.*;
@@ -199,6 +200,13 @@ public class Main extends Plugin {
             
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
+        });
+
+
+        Events.on(PlayerConnect.class, event -> {
+            event.player.unit().apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
+            event.player.unit().apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
+            if (event.player.admin) event.player.unit().apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
         });
     }
 }
