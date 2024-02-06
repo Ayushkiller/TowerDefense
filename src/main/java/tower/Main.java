@@ -146,7 +146,13 @@ public class Main extends Plugin {
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                     return false; // Explicitly return false here
                 }}
+                if ((action.type == ActionType.depositItem || action.type == ActionType.withdrawItem) && action.tile.block() instanceof CoreBlock) {
+                    Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
+                    return false;
+                }
+    
             return true; // Return true if no conditions are met that would return false
+            
         });
 
 
@@ -200,7 +206,7 @@ public class Main extends Plugin {
             event.unit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
-            event.unit.apply(StatusEffects.fast, Float.POSITIVE_INFINITY);
+
 
 
             event.unit.shield(event.unit.shield * multiplier);
