@@ -163,10 +163,10 @@ public class Main extends Plugin {
         Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
 
         Events.on(WorldLoadEvent.class, event -> {
-            multiplier = 0.1f;
+            multiplier = 1f;
         });
 
-        Events.on(WaveEvent.class, event -> multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), multiplier, 100f));
+        Events.on(WaveEvent.class, event -> multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 100f));
 
         Events.on(UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam) return;
