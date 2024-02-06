@@ -9,6 +9,8 @@ import arc.util.*;
 import mindustry.Vars;
 import mindustry.ai.types.*;
 import mindustry.content.*;
+import mindustry.entities.abilities.Ability;
+import mindustry.entities.abilities.UnitSpawnAbility;
 import mindustry.entities.units.AIController;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
@@ -30,6 +32,7 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unused")
 public class Main extends Plugin {
 
+    private static final Ability UnitSpawnAbility = null;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
     public static float multiplier = 1f;
     private final CommandHandlr commandHandlr = new CommandHandlr();
@@ -203,6 +206,7 @@ public class Main extends Plugin {
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.fast, Float.POSITIVE_INFINITY);
+            UnitTypes.omura.abilities.remove(UnitSpawnAbility);
             
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
