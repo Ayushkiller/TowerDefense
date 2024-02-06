@@ -1,0 +1,18 @@
+{
+    "name": "tower-defense",
+    "minGameVersion": 146,
+    "displayName": "Tower Defense",
+    "author": "Ayush Kumar(Alpfha)",
+    "description": "TD plugin for Mindustry Strictly owned by Eradication Mindustry Server",
+    "version": "2.0",
+    "main": "tower.TowerDefensePlugin",
+    "java": true,
+    "contributors": [
+        "Ayushkiller",
+        "arin-prashar",
+        "RaphielHS",
+        "TheRadioactiveBanana"
+    ],
+    "repo": "Ayushkiller/YES",
+    "code cancer": true
+}
