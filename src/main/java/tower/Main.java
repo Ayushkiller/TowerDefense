@@ -194,7 +194,9 @@ public class Main extends Plugin {
 
             event.unit.health(event.unit.health * multiplier);
             event.unit.maxHealth(event.unit.maxHealth * multiplier);
-            event.unit.damageMultiplier(0f);
+            
+            event.unit.type.weapons.each(weapon -> weapon.bullet.damage = 0f);
+            event.unit.type.abilities.clear();
 
             event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.overdrive, Float.POSITIVE_INFINITY);
@@ -202,8 +204,6 @@ public class Main extends Plugin {
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.slow, Float.POSITIVE_INFINITY);
-
-
 
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
