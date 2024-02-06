@@ -202,7 +202,6 @@ public class Main extends Plugin {
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
         });
 
-
         Events.on(PlayerConnect.class, event -> {
             event.player.unit().apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.player.unit().apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
