@@ -33,7 +33,7 @@ public class CommandHandler extends Plugin {
             if (args.length == 0) {
                 player.sendMessage("[RED]Missing Args[BLUE] Usage: /store <player/build>");
             } else {
-                HashMap<String, Boolean> user_purchased_hashmap = store.get_purchased_list_player(player);
+                HashMap<String, Boolean> user_purchased_hashmap = store.get_purchased_list(player);
                 StringBuilder user_purchased = new StringBuilder();
 
                 for (HashMap.Entry<String, Boolean> entry : user_purchased_hashmap.entrySet())

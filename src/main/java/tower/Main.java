@@ -48,7 +48,7 @@ public class Main extends Plugin {
 
     @Override
     public void registerClientCommands(CommandHandler handler) {
-        commandHandlr.registerClientCommands(handler);
+        commandHandler.registerClientCommands(handler);
     }
 
     @Override
