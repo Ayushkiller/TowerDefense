@@ -53,8 +53,8 @@ To deploy this on a live system, you can build a distributable version of the ap
 Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests to us. -->
 
 ### Authors
-> Ayush Killer- Devloper and current head - [Ayushkiller](https://github.com/Ayushkiller)<br>
-> Arin Prashar-  ReadMe and Documentation -  [@arin-prashar](https://github.com/arin-prashar)<br> 
+> Ayush Killer- Devloper and current head - [Ayush Killer](https://github.com/Ayushkiller)<br>
+> Arin Prashar-  ReadMe and Documentation -  [Arin Prashar](https://github.com/arin-prashar)<br> 
 > Shiro - Store And Player Upgrades - [RaphielHS](https://github.com/RaphielHS)
 ### License
 This project is licensed under the MIT License - see the LICENSE.md file for details
