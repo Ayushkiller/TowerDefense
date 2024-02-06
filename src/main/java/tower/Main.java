@@ -47,10 +47,9 @@ public class Main extends Plugin {
     }
 
     @Override
-    public void registerClientCommands(CommandHandler handler) {
+    public void registerClientCommands(arc.util.CommandHandler handler) {
         commandHandler.registerClientCommands(handler);
     }
-
     @Override
     public void init() {
         Bundle.load(getClass());
