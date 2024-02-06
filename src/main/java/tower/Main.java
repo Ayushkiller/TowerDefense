@@ -132,16 +132,11 @@ public class Main extends Plugin {
         content.units().each(type -> {
             type.mineWalls = type.mineFloor = type.targetAir = type.targetGround = false;
             type.payloadCapacity = type.legSplashDamage = type.range = type.maxRange = type.mineRange = 0f;
-            for (Weapon weapon : type.weapons = new Seq<Weapon>()) {
-                weapon.bullet.damage = 0f;
-                weapon.bullet.speed = 0f;
-            }
-            type.immunities= new ObjectSet<StatusEffect>();
-            type.immunities.add(StatusEffects.wet);
 
             type.aiController = type.flying ? FlyingAI::new : GroundAI::new;
             type.targetFlags = new BlockFlag[]{BlockFlag.core};
         });
+
 
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null) return true;
