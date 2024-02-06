@@ -201,8 +201,8 @@ public class Main extends Plugin {
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.fast, Float.POSITIVE_INFINITY);
-            UnitTypes.omura.abilities.remove(UnitSpawnAbility);
-            
+
+
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
         });
