@@ -20,4 +20,4 @@ jobs:
           cache-disabled: true
     
     - name: Execute Gradle build
-      run: ./gradlew build
+      run: ./gradlew build --scan
