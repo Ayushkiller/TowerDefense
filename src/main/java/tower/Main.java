@@ -121,7 +121,7 @@ public class Main extends Plugin {
         content.units().each(type -> {
             type.mineWalls = type.mineFloor = type.targetAir = type.targetGround = false;
             type.payloadCapacity = type.legSplashDamage = type.range = type.maxRange = type.mineRange = 0f;
-
+        
             type.aiController = type.flying ? FlyingAI::new : GroundAI::new;
             type.targetFlags = new BlockFlag[]{BlockFlag.core};
         });
