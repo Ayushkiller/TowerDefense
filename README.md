@@ -1,4 +1,4 @@
-[![Gradle Package](https://github.com/Eradication-Mindustry/YES/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/Eradication-Mindustry/YES/actions/workflows/gradle-publish.yml)
+[![Gradle Package](https://github.com/Eradication-Mindustry/YES/actions/workflows/gradle-on-pr.yml/badge.svg)](https://github.com/Eradication-Mindustry/YES/actions/workflows/gradle-on-pr.yml)
 # Project Title
 
 One Paragraph of project description goes here
