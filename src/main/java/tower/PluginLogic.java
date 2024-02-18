@@ -166,15 +166,14 @@ public class PluginLogic {
             event.unit.health(event.unit.health * multiplier);
             event.unit.maxHealth(event.unit.maxHealth * multiplier);
             event.unit.damageMultiplier(0f);
-
-            event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.overdrive, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.slow, Float.POSITIVE_INFINITY);
-
-
+            event.unit.type.speed = 1.1f;
+            event.unit.type.abilities.clear();
+            event.unit.type.canAttack = false;
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
         });

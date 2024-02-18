@@ -1,5 +1,6 @@
 package tower.menus;
 
+
 import arc.util.Log;
 import mindustry.Vars;
 import mindustry.ctype.ContentType;
@@ -39,6 +40,7 @@ public class MenuHandler {
                     if(unitType != null){
                         Unit newUnit = unitType.create(player.team());
                         newUnit.set(player.x, player.y);
+
                         newUnit.add();
                         player.unit(newUnit);
                     }
