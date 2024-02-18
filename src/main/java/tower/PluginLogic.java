@@ -14,8 +14,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
-import tower.commands.Store;
-import tower.menus.MenuHandler;
+
 import useful.Bundle;
 
 import static mindustry.Vars.*;
@@ -27,8 +26,7 @@ public class PluginLogic {
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
 
     public static void init() {
-        Store.init();
-        MenuHandler.init();
+
         drops = ObjectMap.of(
             crawler, ItemStack.list(copper, 20, lead, 10, silicon, 3),
             atrax, ItemStack.list(copper, 30, lead, 40, graphite, 10, titanium, 5),
@@ -99,7 +97,6 @@ public class PluginLogic {
             incite, ItemStack.list(tungsten, 25, oxide, 25, carbide, 50),
             emanate, ItemStack.list(surgeAlloy, 25, thorium, 25, phaseFabric, 50)
         );
-
         content.units().each(type->{
             type.mineWalls = type.mineFloor = type.targetAir = type.targetGround = false;
             type.payloadCapacity = type.legSplashDamage = type.range = type.maxRange = type.mineRange = 0f;
@@ -107,6 +104,7 @@ public class PluginLogic {
             type.aiController = type.flying ? FlyingAI::new : GroundAI::new;
             type.targetFlags = new BlockFlag[]{BlockFlag.core};
         });
+
 
         netServer.admins.addActionFilter(action->{
             if(action.tile == null) return true;
@@ -116,10 +114,6 @@ public class PluginLogic {
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                     return false; // Explicitly return false here
                 }
-            }
-            if((action.type == Administration.ActionType.depositItem || action.type == Administration.ActionType.withdrawItem) && action.tile.block() instanceof CoreBlock){
-                Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
-                return false;
             }
 
             return true; // Return true if no conditions are met that would return false
@@ -171,9 +165,11 @@ public class PluginLogic {
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.slow, Float.POSITIVE_INFINITY);
-            event.unit.type.speed = 1.1f;
+            event.unit.type.speed = 1.5f;
+            event.unit.type.range = -1f;
+            event.unit.type.hovering = true;
             event.unit.type.abilities.clear();
-            event.unit.type.canAttack = false;
+
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
         });

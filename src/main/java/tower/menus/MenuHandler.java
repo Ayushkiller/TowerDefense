@@ -1,8 +1,10 @@
 package tower.menus;
 
 
+
 import arc.util.Log;
 import mindustry.Vars;
+import mindustry.content.StatusEffects;
 import mindustry.ctype.ContentType;
 import mindustry.gen.Unit;
 import mindustry.type.UnitType;
@@ -30,6 +32,7 @@ public class MenuHandler {
                         Unit newUnit = unitType.create(player.team());
                         newUnit.set(player.x, player.y);
                         newUnit.add();
+                        newUnit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
                         player.unit(newUnit);
                     }
                 }
@@ -40,8 +43,8 @@ public class MenuHandler {
                     if(unitType != null){
                         Unit newUnit = unitType.create(player.team());
                         newUnit.set(player.x, player.y);
-
                         newUnit.add();
+                        newUnit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
                         player.unit(newUnit);
                     }
                 }
