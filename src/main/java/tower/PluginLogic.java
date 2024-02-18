@@ -165,6 +165,7 @@ public class PluginLogic {
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.slow, Float.POSITIVE_INFINITY);
+            event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
             event.unit.type.speed = 1.5f;
             event.unit.type.range = -1f;
             event.unit.type.hovering = true;
