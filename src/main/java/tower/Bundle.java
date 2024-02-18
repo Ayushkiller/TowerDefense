@@ -4,7 +4,7 @@ import arc.files.Fi;
 import arc.struct.ObjectMap;
 import arc.util.Log;
 import arc.util.Structs;
-import mindustry.Vars;
+
 
 import java.text.MessageFormat;
 import java.util.Locale;

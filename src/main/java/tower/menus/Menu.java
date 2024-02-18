@@ -18,7 +18,7 @@ public class Menu {
 
     private static final String[][] buttons = {
             {"[lime]Units", "[red]Settings"},
-            {"[cyan]Donate", "[lightgray]Close"}
+            {"[cyan]Helpiamddeadfromcoding", "[lightgray]Close"}
     };
 
     public static void execute(Player player) {

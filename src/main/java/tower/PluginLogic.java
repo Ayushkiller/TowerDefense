@@ -150,6 +150,7 @@ public class PluginLogic {
                 builder.append("[accent]+").append(amount).append(" [green]").append(stack.item.emoji()).append("  ");
                 Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
             });
+            
 
             Call.label(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
         });
