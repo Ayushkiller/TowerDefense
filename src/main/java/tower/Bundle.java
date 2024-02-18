@@ -21,19 +21,15 @@ public class Bundle {
     private Bundle() {}
 
     static {
-        Fi[] files = Vars.mods.getMod("Towerdefense").root.child("bundles").list();
-        supportedLocales = new Locale[files.length];
-
-        for (int i = 0; i < files.length; i++) {
-            String code = files[i].nameWithoutExtension();
-            if (!code.contains("_"))
-                supportedLocales[i] = Locale.ROOT;
-            else {
-                String[] codes;
-                if ((codes = code.replace("bundle_", "").split("_")).length == 1)
-                    supportedLocales[i] = new Locale(codes[0]);
-                else supportedLocales[i] = new Locale(codes[0], codes[1]);
-            }
+        Fi file = new Fi("src/main/resources/bundles/bundle_en.properties");
+        if (file.exists()) {
+            String code = file.nameWithoutExtension();
+            String[] codes;
+            if ((codes = code.replace("bundle_", "").split("_")).length ==   1)
+                supportedLocales = new Locale[]{new Locale(codes[0])};
+            else supportedLocales = new Locale[]{new Locale(codes[0], codes[1])};
+        } else {
+            supportedLocales = new Locale[]{defaultLocale};
         }
     }
 
