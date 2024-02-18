@@ -26,4 +26,9 @@ public class Menuforunits {
     public static void openGui(Player player) {
         Call.menu(player.con, menu, Bundle.get("menu.title", player.locale), "", buttons);
     }
+
+    public static void init() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'init'");
+    }
 }
