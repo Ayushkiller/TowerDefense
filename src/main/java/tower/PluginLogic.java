@@ -14,7 +14,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
-
+import tower.Domain.PlayerData;
 import useful.Bundle;
 
 import static mindustry.Vars.*;
@@ -134,26 +134,31 @@ public class PluginLogic {
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
         Events.on(EventType.WaveEvent.class, event->multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), multiplier, 100f));
 
-        Events.on(EventType.UnitDestroyEvent.class, event->{
-            if(event.unit.team != state.rules.waveTeam) return;
+Events.on(EventType.UnitDestroyEvent.class, event->{
+    if(event.unit.team != state.rules.waveTeam) return;
 
-            var core = event.unit.closestEnemyCore();
-            var drop = drops.get(event.unit.type);
+    var core = event.unit.closestEnemyCore();
+    var drop = drops.get(event.unit.type);
 
-            if(core == null || drop == null) return;
+    if(core == null || drop == null) return;
 
-            var builder = new StringBuilder();
+    var builder = new StringBuilder();
 
-            drop.each(stack->{
-                int amount = Mathf.random(stack.amount - stack.amount / 2, stack.amount + stack.amount / 2);
+    // Get the PlayerData for the player who owns the unit
+    PlayerData playerData = Players.getPlayer(event.unit.getPlayer());
+    if (playerData != null) {
+        playerData.addPoints(4); // Increase points by   4
+    }
 
-                builder.append("[accent]+").append(amount).append(" [green]").append(stack.item.emoji()).append("  ");
-                Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
-            });
-            
+    drop.each(stack->{
+        int amount = Mathf.random(stack.amount - stack.amount /   2, stack.amount + stack.amount /   2);
 
-            Call.label(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
-        });
+        builder.append("[accent]+").append(amount).append(" [green]").append(stack.item.emoji()).append("  ");
+        Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
+    });
+
+    Call.label(builder.toString(),   1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
+});
 
         Events.on(EventType.UnitSpawnEvent.class, event->{
             if(event.unit.team != state.rules.waveTeam) return;

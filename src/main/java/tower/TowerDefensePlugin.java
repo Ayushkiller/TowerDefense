@@ -21,7 +21,7 @@ public class TowerDefensePlugin extends Plugin {
         Loader.load();
     }
     public void registerClientCommands(CommandHandler handler) {
-        handler.register("m", "Opens a menu", (String[] args, Player player) -> Menu.execute(player));
+        handler.register("menu", "Opens a menu", (String[] args, Player player) -> Menu.execute(player));
 
     }
 }
