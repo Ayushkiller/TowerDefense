@@ -57,22 +57,13 @@ public class Units {
             Unit oldUnit = player.unit();
             Unit spawned = unitType.spawn( player.x, player.y);
 
-            if (!spawned.dead) {
-                if (spawned.health <= oldUnit.health) {
-                    spawned.health = spawned.type.health;
-                } else {
-                    spawned.health = oldUnit.health;
-                }
 
                 playerData.setUnit(spawned);
                 Call.unitControl(player, spawned);
                 oldUnit.kill();
 
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
-            } else {
-                Log.err("Spawned unit is dead/null");
-                Core.app.exit();
-            }
+
 
 
         } else {
