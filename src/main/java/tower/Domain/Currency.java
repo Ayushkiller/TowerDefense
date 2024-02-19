@@ -13,7 +13,7 @@ public class Currency {
             , // Tier 3
             {Items.titanium, Items.thorium, Items.tungsten}
             , // Tier 4
-            {Items.oxide, Items.phaseFabric, Items.surgeAlloy, Items.plastanium, Items.carbide}
+            {Items.oxide, Items.phaseFabric, Items.surgeAlloy}
 
     };
     public static Integer[][] Gain = {

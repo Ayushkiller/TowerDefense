@@ -25,7 +25,7 @@ public class Units {
     });
 
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
-    private static final String[][] buttons = new String[6][3];
+    private static final String[][] buttons = new String[7][3];
 
     public static void initUnitsTable() {
         int row = 0;
