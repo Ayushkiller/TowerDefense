@@ -10,13 +10,13 @@ public class Menuforunits {
         switch (option) {
             case 0 -> Units.execute(player);
             case 1 -> Settings.execute(player);
-            case 2 -> {}
+            case 2 -> BuyPoint.execute(player);
         }
     });
 
     private static final String[][] buttons = {
             {"[lime]Units", "[red]Settings"},
-            {"[cyan]Helpiamdeadfromcoding", "[lightgray]Close"}
+            {"[cyan]BuyPoints", "[lightgray]Close"}
     };
 
     public static void execute(Player player) {

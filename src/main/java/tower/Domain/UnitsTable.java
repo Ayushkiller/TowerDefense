@@ -16,8 +16,10 @@ public class UnitsTable {
             , // Tier 5
             {UnitTypes.vela, UnitTypes.scepter, UnitTypes.arkyid}
             , // Tier 6
-            { UnitTypes.anthicus, UnitTypes.vanquish,  UnitTypes.quell}
+            { UnitTypes.anthicus, UnitTypes.vanquish,  UnitTypes.quell},
             // Tier 7
+            { UnitTypes.gamma, UnitTypes.emanate,  UnitTypes.oct}
+            // Tier 8 
     };
 
     public static Integer[][] prices = {
@@ -32,5 +34,8 @@ public class UnitsTable {
             {165, 185, 250}
             ,
             {600, 255, 1200}
+            ,
+            {0, 0, 1200}
     };
+    
 }

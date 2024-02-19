@@ -21,6 +21,7 @@ import static mindustry.Vars.*;
 import static mindustry.content.Items.*;
 import static mindustry.content.UnitTypes.*;
 
+@SuppressWarnings("unused")
 public class PluginLogic {
     public static float multiplier = 1f;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
@@ -143,12 +144,6 @@ Events.on(EventType.UnitDestroyEvent.class, event->{
     if(core == null || drop == null) return;
 
     var builder = new StringBuilder();
-
-    // Get the PlayerData for the player who owns the unit
-    PlayerData playerData = Players.getPlayer(event.unit.getPlayer());
-    if (playerData != null) {
-        playerData.addPoints(4); // Increase points by   4
-    }
 
     drop.each(stack->{
         int amount = Mathf.random(stack.amount - stack.amount /   2, stack.amount + stack.amount /   2);
