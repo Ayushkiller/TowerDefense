@@ -1,41 +1,32 @@
 package tower.Domain;
 
 import mindustry.content.UnitTypes;
+import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 
 public class UnitsTable {
     public static UnitType[][] units = {
-            // Tier 1
-            { UnitTypes.nova, UnitTypes.dagger, UnitTypes.merui}
-            , // Tier 2
-            {UnitTypes.pulsar, UnitTypes.stell, UnitTypes.cleroi}
-            , // Tier 3
-            {UnitTypes.poly, UnitTypes.fortress, UnitTypes.spiroct}
-            , // Tier 4
-            {UnitTypes.quasar, UnitTypes.precept, UnitTypes.tecta}
-            , // Tier 5
-            {UnitTypes.vela, UnitTypes.scepter, UnitTypes.arkyid}
-            , // Tier 6
-            { UnitTypes.anthicus, UnitTypes.vanquish,  UnitTypes.quell},
-            // Tier 7
-            { UnitTypes.gamma, UnitTypes.emanate,  UnitTypes.oct}
-            // Tier 8 
+            // Tier 0
+            {UnitTypes.alpha,UnitTypes.beta,UnitTypes.gamma,UnitTypes.emanate,UnitTypes.evoke,UnitTypes.incite},
+            // Tier 1 : mono,dagger,flare,crawler,nova,risso,retusa,stell,elude,merui
+            {UnitTypes.mono,UnitTypes.dagger,UnitTypes.flare,UnitTypes.crawler,UnitTypes.nova,UnitTypes.risso,UnitTypes.retusa,UnitTypes.stell,UnitTypes.elude,UnitTypes.merui},
+            // Tier 2 : poly,mace,horizon,atrax,,pulsar,minke,oxynoe,locus,avert,cleroi
+            {UnitTypes.poly,UnitTypes.mace,UnitTypes.horizon,UnitTypes.atrax,UnitTypes.pulsar,UnitTypes.minke,UnitTypes.oxynoe,UnitTypes.locus,UnitTypes.avert,UnitTypes.cleroi},
+            // Tier 3 : Fortress,Quasar,Spiroct,Zenith,Mega,Bryde,Cyerce,percept,anthicus,obliviate
+            {UnitTypes.fortress,UnitTypes.quasar,UnitTypes.spiroct,UnitTypes.zenith,UnitTypes.mega,UnitTypes.bryde,UnitTypes.cyerce,UnitTypes.precept,UnitTypes.anthicus,UnitTypes.obviate},
+            // Tier 4 : Scepter,Aegires,Sei,Quad,Antumbra,Arkyid,Vela,Scepter,vanquish,tecta,quell
+            {UnitTypes.scepter,UnitTypes.aegires,UnitTypes.sei,UnitTypes.quad,UnitTypes.antumbra,UnitTypes.arkyid,UnitTypes.vela,UnitTypes.scepter,UnitTypes.vanquish,UnitTypes.tecta,UnitTypes.quell},
+            // Tier 5 : Conquer,Collaris,Disrupt,Reign,Oct,Eclipse,Corvus,Toxopid,Omura,Navanax
+            {UnitTypes.conquer,UnitTypes.collaris,UnitTypes.disrupt,UnitTypes.reign,UnitTypes.oct,UnitTypes.eclipse,UnitTypes.corvus,UnitTypes.toxopid,UnitTypes.omura,UnitTypes.navanax},
     };
 
     public static Integer[][] prices = {
-            {3, 1, 10}
-            ,
-            {25, 10, 30}
-            ,
-            {20, 30, 25}
-            ,
-            {35, 40, 325}
-            ,
-            {165, 185, 250}
-            ,
-            {600, 255, 1200}
-            ,
-            {0, 0, 1200}
+            {3,3,3,3,3,3},
+            {5},
+            {7},
+            {9},
+            {11},
+            {13}
     };
     
 }

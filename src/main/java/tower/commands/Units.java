@@ -18,16 +18,14 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public class Units {
-    static final String[] prefixes = {"[lime]", "[scarlet]", "[lightgray]"};
+//    static final String[] prefixes = {"[lime]", "[scarlet]", "[lightgray]"};
 
     private static final int menu = Menus.registerMenu((player, option) -> {
         UnitType unitType = UnitsTable.units[option / UnitsTable.units[0].length][option % UnitsTable.units[0].length];
         openUnitMenuGui(unitType, player);
     });
-
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
-    private static final String[][] buttons = new String[7][3];
-
+    private static final String[][] buttons = new String[6][10];
     public static void initUnitsTable() {
         int row = 0;
         int column = 0;
@@ -35,10 +33,9 @@ public class Units {
 
         for (UnitType[] unitsLine : UnitsTable.units) {
             for (UnitType unit : unitsLine) {
-                prefix = prefixes[column];
-
-                buttons[row][column] = prefix + unit.name.substring(0, 1).toUpperCase().concat(unit.name.substring(1));
-                unitPrices.put(unit, UnitsTable.prices[row][column]);
+//                prefix = prefixes[column];
+                buttons[row][column] = unit.name.substring(0, 1).toUpperCase().concat(unit.name.substring(1));
+                unitPrices.put(unit, UnitsTable.prices[row][0]);
 
                 column++;
             }

@@ -16,7 +16,7 @@ public class Utils {
     }
 
     public static UnitType parseUnit(String s) {
-        if(s.equals("oct")) return UnitTypes.oct; //spir*oct* will screw this up.
+        if(s.equals("oct")) return UnitTypes.oct;
         for(UnitType type : Vars.content.units()){
             if(type.name.startsWith(s) || type.name.contains(s)) return type;
             if(type.hasEmoji()) if(s.trim().contains(type.emoji())) return type;
