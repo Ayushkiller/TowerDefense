@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+@SuppressWarnings("deprecation")
 public class Bundle {
     private static final ObjectMap<Locale, ResourceBundle> bundles = new ObjectMap<>();
     private static final ObjectMap<Locale, MessageFormat> formats = new ObjectMap<>();

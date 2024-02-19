@@ -16,6 +16,7 @@ import tower.Bundle;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class Units {
     static final String[] prefixes = {"[lime]", "[scarlet]", "[lightgray]"};
 
