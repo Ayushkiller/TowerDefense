@@ -39,17 +39,15 @@ public class Units {
         // Initialize the buttons array with the correct size
         buttons = new String[numberOfRows][numberOfColumns];
     
-        for (int i =   0; i < UnitsTable.units.length; i++) {
-            for (int j =   0; j < UnitsTable.units[i].length; j++) {
+        for (int i =  0; i < UnitsTable.units.length; i++) {
+            for (int j =  0; j < UnitsTable.units[i].length; j++) {
                 UnitType unit = UnitsTable.units[i][j];
-                buttons[i][j] = unit.name.substring(0,   1).toUpperCase().concat(unit.name.substring(1));
-                // Log the values for debugging
+                buttons[i][j] = unit.name.substring(0,  1).toUpperCase().concat(unit.name.substring(1));
                 Log.info("i: " + i + ", j: " + j + ", unit: " + unit + ", price: " + UnitsTable.prices[i][j]);
                 unitPrices.put(unit, UnitsTable.prices[i][j]);
             }
         }
     }
-
     private static void buyUnit(UnitType unitType, Player player) {
         PlayerData playerData = Players.getPlayer(player);
         int price = unitPrices.get(unitType);
