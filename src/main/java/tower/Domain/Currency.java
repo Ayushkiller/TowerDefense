@@ -17,6 +17,7 @@ public class Currency {
 
     };
     public static Integer[][] Gain = {
+
         {3, 1, 10}
         ,
         {25, 10, 30}
@@ -24,6 +25,17 @@ public class Currency {
         {20, 30, 25}
         ,
         {35, 40, 325}
+
+    };
+    public static Integer[][] Priceforitems = {
+        
+        {300, 100, 1000}
+        ,
+        {250, 100, 300}
+        ,
+        {2000, 3000, 2500}
+        ,
+        {3500, 4000, 32500}
 
     };
  

@@ -25,7 +25,7 @@ public class Units {
         openUnitMenuGui(unitType, player);
     });
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
-    private static final String[][] buttons = new String[6][10];
+    private static final String[][] buttons = new String[15][15];
     public static void initUnitsTable() {
         int row = 0;
         int column = 0;

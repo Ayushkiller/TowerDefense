@@ -1,7 +1,6 @@
 package tower.Domain;
 
 import mindustry.content.UnitTypes;
-import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 
 public class UnitsTable {
@@ -21,12 +20,18 @@ public class UnitsTable {
     };
 
     public static Integer[][] prices = {
-            {3,3,3,3,3,3},
-            {5},
-            {7},
-            {9},
-            {11},
-            {13}
+        // Tier  0
+        {3,   3,   3,   3,   3,   3},
+        // Tier  1
+        {5,   5,   5,   5,   5,   5,   5,   5,   5,   5},
+        // Tier  2
+        {7,   7,   7,   7,   7,   7,   7,   7,   7,   7},
+        // Tier  3
+        {9,   9,   9,   9,   9,   9,   9,   9,   9,   9},
+        // Tier  4
+        {11,   11,   11,   11,   11,   11,   11,   11,   11,   11},
+        // Tier  5
+        {13,   13,   13,   13,   13,   13,   13,   13,   13,   13}
     };
     
 }
