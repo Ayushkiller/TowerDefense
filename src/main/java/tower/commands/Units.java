@@ -39,14 +39,12 @@ public class Units {
         // Initialize the buttons array with the correct size
         buttons = new String[numberOfRows][numberOfColumns];
     
-        for (UnitType[] unitsLine : UnitsTable.units) {
-            for (UnitType unit : unitsLine) {
-                buttons[row][column] = unit.name.substring(0,  1).toUpperCase().concat(unit.name.substring(1));
-                unitPrices.put(unit, UnitsTable.prices[row][column]);
-                column++;
+        for (int i =  0; i < UnitsTable.units.length; i++) {
+            for (int j =  0; j < UnitsTable.units[i].length; j++) {
+                UnitType unit = UnitsTable.units[i][j];
+                buttons[i][j] = unit.name.substring(0,   1).toUpperCase().concat(unit.name.substring(1));
+                unitPrices.put(unit, UnitsTable.prices[i][j]);
             }
-            row++;
-            column =  0;
         }
     }
 
