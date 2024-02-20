@@ -3,31 +3,29 @@ package tower.Domain;
 import mindustry.game.Team;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
-import mindustry.world.Tile;
-@SuppressWarnings("unused")
+
+
+/**
+ * Represents the data associated with a player in the tower defense game.
+ * This class stores information such as the player's name, UUID, IP address, health points,
+ * the unit they are controlling, points accumulated, and other game-related data.
+ */
 public class PlayerData {
     
-    private String name;
-    private String uuid;
-    private String ip;
 
     private float hp;
     private Unit unit;
 
     private boolean showStats;
-    private int kills;
     private float points;
 
-    private Tile lastTile;
     private Team team;
 
 
     public void addKills (int amount) {
-        this.kills += amount;
     }
 
     public void setKills (int amount) {
-        this.kills = amount;
     }
 
     public void addPoints (float amount) {
@@ -57,31 +55,56 @@ public class PlayerData {
     public void setUnit(Unit unit) {
         this.unit = unit;
     }
-
+/**
+     * Sets the player's current unit.
+     *
+     * @param unit The new unit the player is controlling.
+     */
     public Unit getUnit() {
         return unit;
     }
+       /**
+     * Returns the player's current unit.
+     *
+     * @return The player's current unit.
+     */
 
     public float getHp() {
         return hp;
     }
-
+   /**
+     * Returns the player's current health points.
+     *
+     * @return The player's health points.
+     */
     public void setHp(float hp) {
         this.hp = hp;
     }
-
+    /**
+     * Sets the player's health points to the specified value.
+     *
+     * @param hp The new health points value.
+     */
     public Team getTeam() {
         return team;
     }
+        /**
+     * Returns the player's current team.
+     *
+     * @return The player's team.
+     */
 
     public void setTeam(Team team) {
         this.team = team;
     }
-
+    /**
+     * Sets the player's team to the specified team.
+     *
+     * @param team The new team the player is part of.
+     */
     public PlayerData(Player player) {
-        this.name = player.name();
-        this.uuid = player.uuid();
-        this.ip = player.ip();
+
+        player.ip();
 
         this.hp = player.unit().health();
 

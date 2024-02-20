@@ -68,7 +68,7 @@ private static void openMenu(Player player) {
      * @param team The team that is attempting to purchase points.
      * @param option The index of the item and tier to check for sufficient quantity.
      * @return true if the team has enough items, false otherwise.
-     */
+     */ //will be used for future//
 private static boolean hasEnoughItems(Team team, int option) {
     for (int i = 0; i < Currency.itemsforcore[option / Currency.itemsforcore[0].length].length; i++) {
         Item item = Currency.itemsforcore[option / Currency.itemsforcore[0].length][i];

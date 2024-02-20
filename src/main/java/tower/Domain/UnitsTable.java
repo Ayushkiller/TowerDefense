@@ -2,8 +2,16 @@ package tower.Domain;
 
 import mindustry.content.UnitTypes;
 import mindustry.type.UnitType;
+/**
+ * This class defines the structure of the units table for the tower defense game.
+ * It contains arrays of unit types and their corresponding prices for each tier.
+ */
 
 public class UnitsTable {
+        /**
+     * A two-dimensional array representing the units available at each tier of the game.
+     * Each element in the array is a UnitType object representing a unit that can be purchased.
+     */
     public static UnitType[][] units = {
     // Tier   0
     {UnitTypes.alpha, UnitTypes.beta, UnitTypes.gamma, UnitTypes.emanate, UnitTypes.evoke, UnitTypes.incite},
@@ -22,6 +30,10 @@ public class UnitsTable {
     { UnitTypes.collaris, UnitTypes.disrupt, UnitTypes.reign, UnitTypes.oct, UnitTypes.eclipse, UnitTypes.corvus},
     {UnitTypes.toxopid, UnitTypes.omura, UnitTypes.navanax,UnitTypes.renale,UnitTypes.latum,UnitTypes.assemblyDrone}
     };
+        /**
+     * A two-dimensional array representing the prices of units at each tier of the game.
+     * Each element in the array is an Integer object representing the cost of a unit.
+     */
     public static Integer[][] prices = {
         // Tier   0
         {3,  5,  7,  9,  11,  13},
