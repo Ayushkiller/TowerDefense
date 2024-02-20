@@ -29,8 +29,8 @@ public class Units {
     private static String[][] buttons; // Declare the buttons variable here
 
     public static void initUnitsTable() {
-        int row =  0;
-        int column =  0;
+        int row =   0;
+        int column =   0;
     
         // Determine the number of rows and columns based on the size of the units array
         int numberOfRows = UnitsTable.units.length;
@@ -39,10 +39,12 @@ public class Units {
         // Initialize the buttons array with the correct size
         buttons = new String[numberOfRows][numberOfColumns];
     
-        for (int i =  0; i < UnitsTable.units.length; i++) {
-            for (int j =  0; j < UnitsTable.units[i].length; j++) {
+        for (int i =   0; i < UnitsTable.units.length; i++) {
+            for (int j =   0; j < UnitsTable.units[i].length; j++) {
                 UnitType unit = UnitsTable.units[i][j];
                 buttons[i][j] = unit.name.substring(0,   1).toUpperCase().concat(unit.name.substring(1));
+                // Log the values for debugging
+                Log.info("i: " + i + ", j: " + j + ", unit: " + unit + ", price: " + UnitsTable.prices[i][j]);
                 unitPrices.put(unit, UnitsTable.prices[i][j]);
             }
         }
