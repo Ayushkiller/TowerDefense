@@ -47,6 +47,8 @@ public class Units {
                 unitPrices.put(unit, UnitsTable.prices[i][j]);
             }
         }
+        
+
     }
     private static void buyUnit(UnitType unitType, Player player) {
         PlayerData playerData = Players.getPlayer(player);
