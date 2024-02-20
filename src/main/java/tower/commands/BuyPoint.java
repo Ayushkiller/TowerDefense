@@ -9,16 +9,30 @@ import tower.Domain.PlayerData;
 import tower.Bundle;
 import tower.Players;
 import tower.Domain.Currency;
-
+/**
+ * Handles the purchase of points in the tower defense game.
+ * This class provides functionality to open a menu for players to buy points using items as currency.
+ */
 
 public class BuyPoint {
+    
+    /**
+     * Executes the purchase of points by opening the buy point menu for the player.
+     *
+     * @param player The player who is attempting to buy points.
+     */
 
     public static void execute(Player player) {
 
         openMenu(player);
 
 }
-
+    /**
+     * Opens the buy point menu for the player.
+     * The menu displays the items that can be used to purchase points and the corresponding point values.
+     *
+     * @param player The player for whom the menu is being opened.
+     */
 private static void openMenu(Player player) {
     String[][] buttons = new String[Currency.itemsforcore.length][Currency.itemsforcore[0].length];
 
@@ -48,7 +62,13 @@ private static void openMenu(Player player) {
         }
     }), Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
 }
-
+    /**
+     * Checks if the team has enough items to purchase points.
+     *
+     * @param team The team that is attempting to purchase points.
+     * @param option The index of the item and tier to check for sufficient quantity.
+     * @return true if the team has enough items, false otherwise.
+     */
 private static boolean hasEnoughItems(Team team, int option) {
     for (int i = 0; i < Currency.itemsforcore[option / Currency.itemsforcore[0].length].length; i++) {
         Item item = Currency.itemsforcore[option / Currency.itemsforcore[0].length][i];
@@ -59,7 +79,12 @@ private static boolean hasEnoughItems(Team team, int option) {
     }
     return true;
 }
-
+    /**
+     * Removes the items used to purchase points from the team's storage.
+     *
+     * @param team The team from which the items will be removed.
+     * @param option The index of the item and tier to remove from the team's storage.
+     */
 private static void removeItemsFromTeam(Team team, int option) {
     for (int i = 0; i < Currency.itemsforcore[option / Currency.itemsforcore[0].length].length; i++) {
         Item item = Currency.itemsforcore[option / Currency.itemsforcore[0].length][i];
