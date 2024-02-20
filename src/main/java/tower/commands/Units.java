@@ -24,23 +24,29 @@ public class Units {
         UnitType unitType = UnitsTable.units[option / UnitsTable.units[0].length][option % UnitsTable.units[0].length];
         openUnitMenuGui(unitType, player);
     });
-    private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
-    private static final String[][] buttons = new String[15][15];
-    public static void initUnitsTable() {
-        int row = 0;
-        int column = 0;
-        String prefix;
 
+    private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
+    private static String[][] buttons; // Declare the buttons variable here
+
+    public static void initUnitsTable() {
+        int row =  0;
+        int column =  0;
+    
+        // Determine the number of rows and columns based on the size of the units array
+        int numberOfRows = UnitsTable.units.length;
+        int numberOfColumns = UnitsTable.units[0].length;
+    
+        // Initialize the buttons array with the correct size
+        buttons = new String[numberOfRows][numberOfColumns];
+    
         for (UnitType[] unitsLine : UnitsTable.units) {
             for (UnitType unit : unitsLine) {
-//                prefix = prefixes[column];
-                buttons[row][column] = unit.name.substring(0, 1).toUpperCase().concat(unit.name.substring(1));
-                unitPrices.put(unit, UnitsTable.prices[row][0]);
-
+                buttons[row][column] = unit.name.substring(0,  1).toUpperCase().concat(unit.name.substring(1));
+                unitPrices.put(unit, UnitsTable.prices[row][column]);
                 column++;
             }
             row++;
-            column = 0;
+            column =  0;
         }
     }
 
