@@ -1,6 +1,7 @@
-./*.class
-./*.class
-./*gradle
-/build/
-/.gradle/
-./*gradle
+.gradle/*
+.vscode/*
+.idea/*
+./bin/*
+./gradle/*
+./build/*
+./lib/*
