@@ -16,6 +16,7 @@ public class Currency {
             {Items.oxide, Items.phaseFabric, Items.surgeAlloy}
 
     };
+    // this integer gain method is used to denoate how much points you will gain buy bying the items
     public static Integer[][] Gain = {
 
         {3, 1, 10}
@@ -27,15 +28,16 @@ public class Currency {
         {35, 40, 325}
 
     };
+    // this is sht of how much items will be removed from core
     public static Integer[][] Priceforitems = {
         
         {300, 100, 1000}
         ,
         {250, 100, 300}
         ,
-        {2000, 3000, 2500}
+        {200, 3000, 250}
         ,
-        {3500, 4000, 32500}
+        {350, 400, 3250}
 
     };
  

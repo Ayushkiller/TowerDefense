@@ -22,6 +22,8 @@ public class UnitsTable {
     { UnitTypes.collaris, UnitTypes.disrupt, UnitTypes.reign, UnitTypes.oct, UnitTypes.eclipse, UnitTypes.corvus},
     {UnitTypes.toxopid, UnitTypes.omura, UnitTypes.navanax,UnitTypes.renale,UnitTypes.latum,UnitTypes.assemblyDrone}
     };
+    // these are prices of units match it with unitype to change values
+    
     public static Integer[][] prices = {
         // Tier   0
         {3,  5,  7,  9,  11,  13},
