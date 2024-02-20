@@ -129,28 +129,28 @@ public class PluginLogic {
             unit.kill();
 
         }), 0f, 1f);
-        Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
+
         Timer.schedule(()->Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
 
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
         Events.on(EventType.WaveEvent.class, event->multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), multiplier, 100f));
 
-        Events.on(EventType.UnitDestroyEvent.class, event->{
-        if(event.unit.team != state.rules.waveTeam) return;
+Events.on(EventType.UnitDestroyEvent.class, event->{
+    if(event.unit.team != state.rules.waveTeam) return;
 
-         var core = event.unit.closestEnemyCore();
-         var drop = drops.get(event.unit.type);
+    var core = event.unit.closestEnemyCore();
+    var drop = drops.get(event.unit.type);
 
-        if(core == null || drop == null) return;
+    if(core == null || drop == null) return;
 
-        var builder = new StringBuilder();
+    var builder = new StringBuilder();
 
-         drop.each(stack->{
+    drop.each(stack->{
         int amount = Mathf.random(stack.amount - stack.amount /   2, stack.amount + stack.amount /   2);
 
         builder.append("[accent]+").append(amount).append(" [green]").append(stack.item.emoji()).append("  ");
         Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
-         });
+    });
 
     Call.label(builder.toString(),   1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
 });

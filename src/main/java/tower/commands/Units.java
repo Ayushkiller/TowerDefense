@@ -42,7 +42,8 @@ public class Units {
         for (int i =  0; i < UnitsTable.units.length; i++) {
             for (int j =  0; j < UnitsTable.units[i].length; j++) {
                 UnitType unit = UnitsTable.units[i][j];
-                buttons[i][j] = unit.emoji();
+                buttons[i][j] = unit.name.substring(0,  1).toUpperCase().concat(unit.name.substring(1));
+                Log.info("i: " + i + ", j: " + j + ", unit: " + unit + ", price: " + UnitsTable.prices[i][j]);
                 unitPrices.put(unit, UnitsTable.prices[i][j]);
             }
         }
@@ -53,11 +54,28 @@ public class Units {
         PlayerData playerData = Players.getPlayer(player);
         int price = unitPrices.get(unitType);
         if (playerData.getPoints() >= price) {
+
+            playerData.subtractPoints(unitPrices.get(unitType));
+
+            Unit oldUnit = player.unit();
+            Unit spawned = unitType.spawn(player.x, player.y);
+
+            // Check if the spawned unit is alive
+            if (spawned != null && !spawned.dead()) {
+                playerData.setUnit(spawned);
+                Call.unitControl(player, spawned);
+                oldUnit.kill();
+
+                player.sendMessage(Bundle.get("unit.brought", player.locale));
+            } else {
+                // Handle the case where the unit could not be spawned
+                player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
+            }
+        } else {
+            player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
+        }
     }
-     else {
-        player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
-    }
-}
+    
 
     public static void execute(Player player) {
         openGui(player);
