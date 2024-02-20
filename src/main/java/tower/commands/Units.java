@@ -55,25 +55,27 @@ public class Units {
         int price = unitPrices.get(unitType);
         if (playerData.getPoints() >= price) {
 
-
             playerData.subtractPoints(unitPrices.get(unitType));
 
             Unit oldUnit = player.unit();
-            Unit spawned = unitType.spawn( player.x, player.y);
+            Unit spawned = unitType.spawn(player.x, player.y);
 
-
+            // Check if the spawned unit is alive
+            if (spawned != null && !spawned.dead()) {
                 playerData.setUnit(spawned);
                 Call.unitControl(player, spawned);
                 oldUnit.kill();
 
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
-
-
-
+            } else {
+                // Handle the case where the unit could not be spawned
+                player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
+            }
         } else {
             player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
         }
     }
+    
 
     public static void execute(Player player) {
         openGui(player);
