@@ -4,7 +4,7 @@ import mindustry.content.UnitTypes;
 import mindustry.type.UnitType;
 
 public class UnitsTable {
-public static UnitType[][] units = {
+    public static UnitType[][] units = {
     // Tier   0
     {UnitTypes.alpha, UnitTypes.beta, UnitTypes.gamma, UnitTypes.emanate, UnitTypes.evoke, UnitTypes.incite},
     // Tier   1
@@ -17,7 +17,7 @@ public static UnitType[][] units = {
     {UnitTypes.scepter, UnitTypes.aegires, UnitTypes.sei, UnitTypes.quad, UnitTypes.antumbra, UnitTypes.arkyid, UnitTypes.vela, UnitTypes.scepter, UnitTypes.vanquish, UnitTypes.tecta, UnitTypes.quell},
     // Tier   5
     {UnitTypes.conquer, UnitTypes.collaris, UnitTypes.disrupt, UnitTypes.reign, UnitTypes.oct, UnitTypes.eclipse, UnitTypes.corvus, UnitTypes.toxopid, UnitTypes.omura, UnitTypes.navanax}
-};
+    };
     public static Integer[][] prices = {
         // Tier   0
         {3,   3,   3,   3,   3,   3},
