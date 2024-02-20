@@ -14,22 +14,9 @@ import tower.Domain.Currency;
 public class BuyPoint {
 
     public static void execute(Player player) {
-    PlayerData playerData = Players.getPlayer(player);
-    if (playerData.getPoints() >= getTotalPrice(player.team())) {
-        openMenu(player);
-    } else {
-        player.sendMessage(Bundle.get("menu.buypoint.notenoughpoints"));
-    }
-}
 
-private static int getTotalPrice(Team team) {
-    int totalPrice = 0;
-    for (int i = 0; i < Currency.itemsforcore.length; i++) {
-        for (int j = 0; j < Currency.itemsforcore[i].length; j++) {
-            totalPrice += Currency.Priceforitems[i][j] * team.items().get(Currency.itemsforcore[i][j]);
-        }
-    }
-    return totalPrice;
+        openMenu(player);
+
 }
 
 private static void openMenu(Player player) {
