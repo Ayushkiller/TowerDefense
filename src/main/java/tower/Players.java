@@ -13,7 +13,7 @@ public class Players {
     public static PlayerData getPlayer(Player player) {
         if (!players.containsKey(player.uuid())) {
             players.put(player.uuid(), new PlayerData(player));
-
+            PlayerData playerData = Players.getPlayer(player);
         }
         return players.get(player.uuid());
     }
