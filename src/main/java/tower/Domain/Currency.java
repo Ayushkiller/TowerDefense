@@ -29,10 +29,10 @@ public class Currency {
      * Each row corresponds to a tier of items, and each column within a row represents the points gained for an item within that tier.
      */
     public static Integer[][] Gain = {
-        {3,  1,  10},
-        {25,  10,  30},
-        {20,  30,  25},
-        {35,  40,  325}
+        {1,  1,  1},
+        {5,  5,  5},
+        {8,  8,  8},
+        {15,  15,  15}
     };
 
     /**
@@ -40,9 +40,9 @@ public class Currency {
      * Each row corresponds to a tier of items, and each column within a row represents the price for an item within that tier.
      */
     public static Integer[][] Priceforitems = {
-        {300,  100,  1000},
-        {250,  100,  300},
-        {2000,  3000,  2500},
-        {3500,  4000,  32500}
+        {15,  15,  15},
+        {25,  25,  25},
+        {30,  30,  30},
+        {35,  35,  35}
     };
 }

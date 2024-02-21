@@ -13,6 +13,8 @@ import tower.Bundle;
 import java.util.HashMap;
 import java.util.Map;
 
+import arc.util.Time;
+
 
 public class Units {
 //    static final String[] prefixes = {"[lime]", "[scarlet]", "[lightgray]"};
@@ -49,20 +51,30 @@ public class Units {
         PlayerData playerData = Players.getPlayer(player);
         int price = unitPrices.get(unitType);
         if (playerData.getPoints() >= price) {
-
-            playerData.subtractPoints(unitPrices.get(unitType));
-
+    
+            playerData.subtractPoints(price);
+    
             Unit oldUnit = player.unit();
             Unit spawned = unitType.spawn(player.x, player.y);
-
+    
             // Check if the spawned unit is alive
             if (spawned != null && !spawned.dead()) {
                 Call.unitControl(player, spawned);
                 oldUnit.kill();
-
+    
+                // Check if the unit dies within  3 seconds
+                Time.run(3f, () -> {
+                    if (spawned.dead()) {
+                        // Return the item to the player
+                        playerData.addPoints(price);
+                        player.sendMessage(Bundle.get("unit.died", player.locale));
+                    }
+                });
+    
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
             } else {
                 // Handle the case where the unit could not be spawned
+                playerData.addPoints(price); // Return the points to the player
                 player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
             }
         } else {

@@ -33,14 +33,16 @@ public class BuyPoint {
      *
      * @param player The player for whom the menu is being opened.
      */
-private static void openMenu(Player player) {
+     private static void openMenu(Player player) {
     String[][] buttons = new String[Currency.itemsforcore.length][Currency.itemsforcore[0].length];
 
     // Create button titles and point values for each item.
     for (int i =  0; i < Currency.itemsforcore.length; i++) {
         for (int j =  0; j < Currency.itemsforcore[i].length; j++) {
             Item item = Currency.itemsforcore[i][j];
-            buttons[i][j] = String.format("[lime]%s (+%d)", item.name, Currency.Gain[i][j]);
+            int cost = Currency.Priceforitems[i][j];
+            int gain = Currency.Gain[i][j];
+            buttons[i][j] = String.format("[lime]%s (+%d) [gray](%d)", item.emoji(), gain, cost);
         }
     }
 
@@ -69,7 +71,7 @@ private static void openMenu(Player player) {
      * @param option The index of the item and tier to check for sufficient quantity.
      * @return true if the team has enough items, false otherwise.
      */ //will be used for future//
-private static boolean hasEnoughItems(Team team, int option) {
+    private static boolean hasEnoughItems(Team team, int option) {
     for (int i = 0; i < Currency.itemsforcore[option / Currency.itemsforcore[0].length].length; i++) {
         Item item = Currency.itemsforcore[option / Currency.itemsforcore[0].length][i];
         int requiredAmount = Currency.Priceforitems[option / Currency.itemsforcore[0].length][i];
@@ -78,20 +80,21 @@ private static boolean hasEnoughItems(Team team, int option) {
         }
     }
     return true;
-}
+    }
     /**
      * Removes the items used to purchase points from the team's storage.
      *
      * @param team The team from which the items will be removed.
      * @param option The index of the item and tier to remove from the team's storage.
      */
-private static void removeItemsFromTeam(Team team, int option) {
-    for (int i = 0; i < Currency.itemsforcore[option / Currency.itemsforcore[0].length].length; i++) {
-        Item item = Currency.itemsforcore[option / Currency.itemsforcore[0].length][i];
-        int amountToRemove = Currency.Priceforitems[option / Currency.itemsforcore[0].length][i];
-        team.items().remove(item, amountToRemove);
-    }
+    private static void removeItemsFromTeam(Team team, int option) {
+    int tier = option / Currency.itemsforcore[0].length;
+    int itemIndex = option % Currency.itemsforcore[0].length;
+    Item item = Currency.itemsforcore[tier][itemIndex];
+    int amountToRemove = Currency.Priceforitems[tier][itemIndex];
+    team.items().remove(item, amountToRemove);
+}
 }
 
-}
+
 
