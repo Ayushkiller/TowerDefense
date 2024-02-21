@@ -40,12 +40,12 @@ public class BuyPoint {
     for (int i =  0; i < Currency.itemsforcore.length; i++) {
         for (int j =  0; j < Currency.itemsforcore[i].length; j++) {
             Item item = Currency.itemsforcore[i][j];
-            int cost = Currency.Priceforitems[i][j];
             int gain = Currency.Gain[i][j];
-            buttons[i][j] = String.format("[lime]%s (+%d) [gray](%d)", item.emoji(), gain, cost);
+            int price = Currency.Priceforitems[i][j];
+            buttons[i][j] = String.format("[lime]%s (+%d) [gray]Price: %d", item.emoji(), gain, price);
         }
     }
-
+    
     Call.menu(player.con, Menus.registerMenu((player1, option) -> {
         PlayerData playerData = Players.getPlayer(player);
         Team team = player.team();
