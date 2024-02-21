@@ -1,8 +1,5 @@
 package tower.commands;
 
-import arc.Core;
-import arc.util.Log;
-
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
@@ -16,7 +13,7 @@ import tower.Bundle;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("unused")
+
 public class Units {
 //    static final String[] prefixes = {"[lime]", "[scarlet]", "[lightgray]"};
 
@@ -29,8 +26,7 @@ public class Units {
     private static String[][] buttons; // Declare the buttons variable here
 
     public static void initUnitsTable() {
-        int row =   0;
-        int column =   0;
+
     
         // Determine the number of rows and columns based on the size of the units array
         int numberOfRows = UnitsTable.units.length;
@@ -61,7 +57,6 @@ public class Units {
 
             // Check if the spawned unit is alive
             if (spawned != null && !spawned.dead()) {
-                playerData.setUnit(spawned);
                 Call.unitControl(player, spawned);
                 oldUnit.kill();
 
