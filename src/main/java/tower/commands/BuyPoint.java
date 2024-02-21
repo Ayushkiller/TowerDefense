@@ -14,7 +14,7 @@ import tower.Domain.Currency;
  * This class provides functionality to open a menu for players to buy points using items as currency.
  */
 
-public class BuyPoint {
+ public class BuyPoint {
     
     /**
      * Executes the purchase of points by opening the buy point menu for the player.
@@ -22,11 +22,11 @@ public class BuyPoint {
      * @param player The player who is attempting to buy points.
      */
 
-    public static void execute(Player player) {
+       public static void execute(Player player) {
 
         openMenu(player);
 
-}
+    }
     /**
      * Opens the buy point menu for the player.
      * The menu displays the items that can be used to purchase points and the corresponding point values.
@@ -34,10 +34,10 @@ public class BuyPoint {
      * @param player The player for whom the menu is being opened.
      */
      private static void openMenu(Player player) {
-    String[][] buttons = new String[Currency.itemsforcore.length][Currency.itemsforcore[0].length];
+      String[][] buttons = new String[Currency.itemsforcore.length][Currency.itemsforcore[0].length];
 
     // Create button titles and point values for each item.
-    for (int i =  0; i < Currency.itemsforcore.length; i++) {
+          for (int i =  0; i < Currency.itemsforcore.length; i++) {
         for (int j =  0; j < Currency.itemsforcore[i].length; j++) {
             Item item = Currency.itemsforcore[i][j];
             int gain = Currency.Gain[i][j];
@@ -46,7 +46,7 @@ public class BuyPoint {
         }
     }
     
-    Call.menu(player.con, Menus.registerMenu((player1, option) -> {
+        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
         PlayerData playerData = Players.getPlayer(player);
         Team team = player.team();
 
@@ -63,7 +63,7 @@ public class BuyPoint {
             player.sendMessage(Bundle.get("menu.buypoint.notenoughitems"));
         }
     }), Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
-}
+    }
     /**
      * Checks if the team has enough items to purchase points.
      *
@@ -93,7 +93,7 @@ public class BuyPoint {
     Item item = Currency.itemsforcore[tier][itemIndex];
     int amountToRemove = Currency.Priceforitems[tier][itemIndex];
     team.items().remove(item, amountToRemove);
-}
+    } 
 }
 
 
