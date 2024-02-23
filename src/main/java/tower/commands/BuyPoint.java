@@ -36,18 +36,6 @@ import tower.Domain.PlayerData;
     // Create a map to store selected items and quantities
     java.util.Map<Item, Integer> selectedItems = new java.util.HashMap<>();
 
-    // Implement item selection logic using itemsforcore (e.g., display items in tiers with quantity input)
-    String[][] buttons = new String[Currency.itemsforcore.length][];
-    for (int i =  0; i < Currency.itemsforcore.length; i++) {
-        buttons[i] = new String[Currency.itemsforcore[i].length];
-        for (int j =  0; j < Currency.itemsforcore[i].length; j++) {
-            Item item = Currency.itemsforcore[i][j];
-            int gain = Currency.Gain[i][j];
-            int price = Currency.Priceforitems[i][j];
-            buttons[i][j] = String.format("[lime]%s (+%d) [gray]Price: %d", item.emoji(), gain, price);
-        }
-    }
-
     // Open menu with item buttons and quantity input fields
     Call.menu(player.con(), Menus.registerMenu((player1, option) -> {
         int tier = option / Currency.itemsforcore[0].length;
@@ -92,11 +80,16 @@ import tower.Domain.PlayerData;
         });
 
         // Open menu with item buttons and quantity input fields
+         // Assuming "Menu Title" and "Menu Description" are placeholders for your actual title and description
+         String title = "Buy here";
+         String description = "Hi";
+         // Assuming buttons is the array you want to display in the menu
+         String[][] buttons = new String[][]{{"Buy", "Close"}};
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
             // Prompt for quantity to purchase
             Menus.textInput(textInputId, Bundle.format("menu.buypoint.quantity", item.name), "",   5, "", false);
-        }), Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
-    }), Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
+        }), title, description, buttons);
+    }), null, null, null);
 }
     private static boolean hasEnoughItems(Team team, java.util.Map<Item, Integer> selectedItems, Player player) {
         for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
