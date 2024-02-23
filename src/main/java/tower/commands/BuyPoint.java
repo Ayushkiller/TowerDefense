@@ -5,102 +5,79 @@ import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.type.Item;
 import mindustry.ui.Menus;
+import tower.Domain.PlayerData;
 import tower.Bundle;
 import tower.Players;
 import tower.Domain.Currency;
-import tower.Domain.PlayerData;
+import java.util.Map;
+import java.util.HashMap;
 
-/**
- * Handles the purchase of points in the tower defense game.
- * This class provides functionality to open a menu for players to buy points using items as currency.
- */
-
- public class BuyPoint {
-    
-    /**
-     * Executes the purchase of points by opening the buy point menu for the player.
-     *
-     * @param player The player who is attempting to buy points.
-     */
-
-     public static void execute(Player player) {
-        openBatchBuyMenu(player);
+public class BuyPoint {
+    private static Map<Player, Map<Item, Integer>> selectedItemsQuantities = new HashMap<>();
+    public static void execute(Player player) {
+        openMenu(player);
     }
-    /**
-     * Opens the buy point menu for the player.
-     * The menu displays the items that can be used to purchase points and the corresponding point values.
-     *
-     * @param player The player for whom the menu is being opened.
-     */
-    private static void openBatchBuyMenu(Player player) {
-        // Create a map to store selected items and quantities
-        java.util.Map<Item, Integer> selectedItems = new java.util.HashMap<>();
 
-        // Open menu with item buttons and quantity input fields
-        Call.menu(player.con(), Menus.registerMenu((player1, option) -> {
-            int tier = option / Currency.itemsforcore[0].length;
-            int itemIndex = option % Currency.itemsforcore[0].length;
-            Item item = Currency.itemsforcore[tier][itemIndex];
+    private static void openMenu(Player player) {
+        String[][] buttons = new String[Currency.itemsforcore.length][Currency.itemsforcore[0].length];
 
-            // Prompt for quantity to purchase
-            // Register a text input listener
-            int textInputId = Menus.registerTextInput((pl, text) -> {
-                try {
-                    int quantity = Integer.parseInt(text);
-                    if (quantity <=  0) {
-                        throw new NumberFormatException("Quantity must be positive.");
-                    }
-                    selectedItems.put(item, quantity);
-
-                    // Check if the player has enough items before proceeding with the purchase
-                    if (hasEnoughItems(player.team(), selectedItems, player)) {
-                        // Proceed with the purchase logic
-                        // Remove items from the team's storage
-                        removeItemsFromTeam(player.team(), selectedItems);
-
-                        // Update the player's points
-                        // Fetch the player's data
-                        PlayerData playerData = Players.getPlayer(player);
-
-                        // Calculate the total points to add based on the selected items and their quantities
-                        int totalPoints = calculateTotalPoints(selectedItems);
-
-                        // Update the player's points
-                        playerData.addPoints(totalPoints);
-
-                        // Optionally, send a confirmation message to the player
-                        player.sendMessage(Bundle.get("menu.buypoint.success"));
-                    } else {
-                        // Inform the player that they do not have enough items
-                        player.sendMessage(Bundle.get("menu.buypoint.error.notEnough"));
-                    }
-                } catch (NumberFormatException e) {
-                    player1.sendMessage(Bundle.get("menu.buypoint.error.invalidQuantity"));
-                }
-            });
-
-            // Open menu with item buttons and quantity input fields
-            String title = "Buy here";
-            String description = "Hi";
-            String[][] buttons = new String[][]{{"Buy", "Close"}};
-            Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-                // Prompt for quantity to purchase
-                Menus.textInput(textInputId, Bundle.format("menu.buypoint.quantity", item.name), "",  5, "", false);
-            }), title, description, buttons);
-        }), "Buy Points Menu", "Select an item to purchase points", new String[][]{{"Item  1", "Item  2", "Item  3"}, {"Item  4", "Item  5", "Item  6"}});
-    }
-    private static boolean hasEnoughItems(Team team, java.util.Map<Item, Integer> selectedItems, Player player) {
-        for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
-            Item item = entry.getKey();
-            int quantity = entry.getValue();
-            int availableAmount = team.items().get(item);
-            if (availableAmount < quantity) {
-                player.sendMessage(Bundle.format("menu.buypoint.error.notEnough", item.name, availableAmount, quantity));
-                return false;
+        for (int i =  0; i < Currency.itemsforcore.length; i++) {
+            for (int j =  0; j < Currency.itemsforcore[i].length; j++) {
+                Item item = Currency.itemsforcore[i][j];
+                int gain = Currency.Gain[i][j];
+                int price = Currency.Priceforitems[i][j];
+                buttons[i][j] = String.format("[lime]%s (+%d) [gray]Price: %d", item.emoji(), gain, price);
             }
         }
-        return true;
+
+        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
+            openQuantityAdjustmentMenu(player, option);
+        }), Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
     }
+
+
+    private static void openQuantityAdjustmentMenu(Player player, int option) {
+        String title = "Adjust Quantity";
+        String description = "Select quantity adjustment";
+        String[][] buttons = new String[][]{{"-100", "-50", "-25", "+25", "+50", "+100"}};
+
+        Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
+            // Adjust the quantity based on the selected button
+            Item selectedItem = Currency.itemsforcore[option / Currency.itemsforcore[0].length][option % Currency.itemsforcore[0].length];
+            int adjustment = Integer.parseInt(buttons[0][opt]);
+            Map<Item, Integer> quantities = selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
+            quantities.put(selectedItem, quantities.getOrDefault(selectedItem,  0) + adjustment);
+
+            // After adjusting the quantity, open the menu to confirm the purchase
+            openConfirmPurchaseMenu(player, option);
+        }), title, description, buttons);
+    }
+
+    private static void openConfirmPurchaseMenu(Player player, int option) {
+        String title = "Confirm Purchase";
+        String description = "Are you sure you want to purchase?";
+        String[][] buttons = new String[][]{{"Buy", "Cancel"}};
+    
+        Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
+            if (opt ==  0) { // If the player clicks "Buy"
+                Map<Item, Integer> selectedItems = selectedItemsQuantities.get(player);
+                int totalPoints = calculateTotalPoints(selectedItems); // Call the new method
+                // Add the total points to the player's points
+                PlayerData playerData = Players.getPlayer(player);
+                playerData.addPoints(totalPoints);
+    
+                // Remove the selected items from the team's inventory
+                Team team = player.team(); // Assuming you have a way to get the player's team
+                removeItemsFromTeam(team, selectedItems);
+    
+                player.sendMessage(Bundle.get("menu.buypoint.success"));
+            } else { // If the player clicks "Cancel"
+                // Do nothing or show a message
+            }
+        }), title, description, buttons);
+    }
+
+
 
     /**
      * Removes items from the team's storage based on the purchase.
