@@ -12,9 +12,7 @@ public class Players {
 
     public static PlayerData getPlayer(Player player) {
         if (!players.containsKey(player.uuid())) {
-            // Create a new PlayerData instance and add it to the map
-            PlayerData playerData = new PlayerData(player);
-            players.put(player.uuid(), playerData);
+            players.put(player.uuid(), new PlayerData(player));
         }
         return players.get(player.uuid());
     }

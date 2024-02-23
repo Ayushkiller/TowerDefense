@@ -12,7 +12,6 @@ import mindustry.gen.Call;
 import mindustry.net.Administration;
 import mindustry.type.*;
 import mindustry.world.*;
-import tower.Domain.PlayerData;
 import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
@@ -146,34 +145,11 @@ public class PluginLogic {
         builder.append("[accent]+").append(amount).append(" [green]").append(stack.item.emoji()).append("  ");
         Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
          });
-
+        
         Call.label(builder.toString(),   1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
+        });
+        Events.on(EventType.UnitSpawnEvent.class, event->{
 
-       // Add points with a    chance to all players
-       if(Mathf.random() <   0.1f) {
-        float pointsToAdd = Mathf.random(0f,   4f);
-        for(ObjectMap.Entry<String, PlayerData> entry : PlayerData.allPlayerDataInstances) {
-            PlayerData playerData = entry.value;
-            playerData.addPoints(pointsToAdd);
-        }
-    }
-Events.on(EventType.PlayerLeave.class, leaveEvent -> {
-    // Get the points of the leaving player
-    PlayerData leavingPlayerData = Players.getPlayer(leaveEvent.player);
-    float leavingPlayerPoints = leavingPlayerData.getPoints();
-
-    // Calculate the points per player
-    int remainingPlayers = PlayerData.allPlayerDataInstances.size -  1; // Subtract  1 because the leaving player is not included in the count
-    float pointsPerPlayer = leavingPlayerPoints / remainingPlayers;
-
-    // Calculate points to add to each remaining player
-    float pointsToAdd = pointsPerPlayer; // Assuming you want to add the average points per player to each remaining player
-
-    // Distribute the points to the remaining players
-    for (PlayerData playerData : Players.players.values()) {
-        playerData.addPoints(pointsToAdd);
-    }
-});
             if(event.unit.team != state.rules.waveTeam) 
 
             event.unit.health(event.unit.health * multiplier);
