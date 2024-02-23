@@ -59,7 +59,7 @@ public class PlayerData {
 
         this.hp = player.unit().health();
 
-        this.points = 5;
+        this.points = 500;
     }
 }
 

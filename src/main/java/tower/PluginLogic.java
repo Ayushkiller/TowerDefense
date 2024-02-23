@@ -147,7 +147,7 @@ public class PluginLogic {
 });
 
         Events.on(EventType.UnitSpawnEvent.class, event->{
-            if(event.unit.team != state.rules.waveTeam) return;
+            if(event.unit.team != state.rules.waveTeam) 
 
             event.unit.health(event.unit.health * multiplier);
             event.unit.maxHealth(event.unit.maxHealth * multiplier);
@@ -162,16 +162,17 @@ public class PluginLogic {
             event.unit.type.range = -1f;
             event.unit.type.hovering = true;
             event.unit.type.abilities.clear();
+            event.unit.type.physics = false;
 
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
-            content.units().each(type->{
-                type.mineWalls = type.mineFloor = type.targetAir = type.targetGround = false;
-                type.payloadCapacity = type.legSplashDamage = type.range = type.maxRange = type.mineRange = 0f;
-    
-                type.aiController = type.flying ? FlyingAI::new : GroundAI::new;
-                type.targetFlags = new BlockFlag[]{BlockFlag.core};
-            });
+
+        // Apply AI settings after the unit has spawned
+        event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
+        event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange =  0f;
+        event.unit.type.aiController = event.unit.type.flying ? FlyingAI::new : GroundAI::new;
+        event.unit.type.targetFlags = new BlockFlag[]{BlockFlag.core};
+            return;
         });
     }
 
