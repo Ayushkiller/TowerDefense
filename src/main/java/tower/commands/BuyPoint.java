@@ -33,64 +33,62 @@ import tower.Domain.PlayerData;
      * @param player The player for whom the menu is being opened.
      */
     private static void openBatchBuyMenu(Player player) {
-    // Create a map to store selected items and quantities
-    java.util.Map<Item, Integer> selectedItems = new java.util.HashMap<>();
-
-    // Open menu with item buttons and quantity input fields
-    Call.menu(player.con(), Menus.registerMenu((player1, option) -> {
-        int tier = option / Currency.itemsforcore[0].length;
-        int itemIndex = option % Currency.itemsforcore[0].length;
-        Item item = Currency.itemsforcore[tier][itemIndex];
-
-        // Prompt for quantity to purchase
-        // Register a text input listener
-        int textInputId = Menus.registerTextInput((player2, text) -> {
-            try {
-                int quantity = Integer.parseInt(text);
-                if (quantity <=   0) {
-                    throw new NumberFormatException("Quantity must be positive.");
-                }
-                selectedItems.put(item, quantity);
-
-                // Check if the player has enough items before proceeding with the purchase
-                if (hasEnoughItems(player.team(), selectedItems, player)) {
-                    // Proceed with the purchase logic
-                    // Remove items from the team's storage
-                    removeItemsFromTeam(player.team(), selectedItems);
-
-                    // Update the player's points
-                    // Fetch the player's data
-                    PlayerData playerData = Players.getPlayer(player);
-
-                    // Calculate the total points to add based on the selected items and their quantities
-                    int totalPoints = calculateTotalPoints(selectedItems);
-
-                    // Update the player's points
-                    playerData.addPoints(totalPoints);
-
-                    // Optionally, send a confirmation message to the player
-                    player.sendMessage(Bundle.get("menu.buypoint.success"));
-                } else {
-                    // Inform the player that they do not have enough items
-                    player.sendMessage(Bundle.get("menu.buypoint.error.notEnough"));
-                }
-            } catch (NumberFormatException e) {
-                player1.sendMessage(Bundle.get("menu.buypoint.error.invalidQuantity"));
-            }
-        });
+        // Create a map to store selected items and quantities
+        java.util.Map<Item, Integer> selectedItems = new java.util.HashMap<>();
 
         // Open menu with item buttons and quantity input fields
-         // Assuming "Menu Title" and "Menu Description" are placeholders for your actual title and description
-         String title = "Buy here";
-         String description = "Hi";
-         // Assuming buttons is the array you want to display in the menu
-         String[][] buttons = new String[][]{{"Buy", "Close"}};
-        Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
+        Call.menu(player.con(), Menus.registerMenu((player1, option) -> {
+            int tier = option / Currency.itemsforcore[0].length;
+            int itemIndex = option % Currency.itemsforcore[0].length;
+            Item item = Currency.itemsforcore[tier][itemIndex];
+
             // Prompt for quantity to purchase
-            Menus.textInput(textInputId, Bundle.format("menu.buypoint.quantity", item.name), "",   5, "", false);
-        }), title, description, buttons);
-    }), null, null, null);
-}
+            // Register a text input listener
+            int textInputId = Menus.registerTextInput((pl, text) -> {
+                try {
+                    int quantity = Integer.parseInt(text);
+                    if (quantity <=  0) {
+                        throw new NumberFormatException("Quantity must be positive.");
+                    }
+                    selectedItems.put(item, quantity);
+
+                    // Check if the player has enough items before proceeding with the purchase
+                    if (hasEnoughItems(player.team(), selectedItems, player)) {
+                        // Proceed with the purchase logic
+                        // Remove items from the team's storage
+                        removeItemsFromTeam(player.team(), selectedItems);
+
+                        // Update the player's points
+                        // Fetch the player's data
+                        PlayerData playerData = Players.getPlayer(player);
+
+                        // Calculate the total points to add based on the selected items and their quantities
+                        int totalPoints = calculateTotalPoints(selectedItems);
+
+                        // Update the player's points
+                        playerData.addPoints(totalPoints);
+
+                        // Optionally, send a confirmation message to the player
+                        player.sendMessage(Bundle.get("menu.buypoint.success"));
+                    } else {
+                        // Inform the player that they do not have enough items
+                        player.sendMessage(Bundle.get("menu.buypoint.error.notEnough"));
+                    }
+                } catch (NumberFormatException e) {
+                    player1.sendMessage(Bundle.get("menu.buypoint.error.invalidQuantity"));
+                }
+            });
+
+            // Open menu with item buttons and quantity input fields
+            String title = "Buy here";
+            String description = "Hi";
+            String[][] buttons = new String[][]{{"Buy", "Close"}};
+            Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
+                // Prompt for quantity to purchase
+                Menus.textInput(textInputId, Bundle.format("menu.buypoint.quantity", item.name), "",  5, "", false);
+            }), title, description, buttons);
+        }), "Buy Points Menu", "Select an item to purchase points", new String[][]{{"Item  1", "Item  2", "Item  3"}, {"Item  4", "Item  5", "Item  6"}});
+    }
     private static boolean hasEnoughItems(Team team, java.util.Map<Item, Integer> selectedItems, Player player) {
         for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
