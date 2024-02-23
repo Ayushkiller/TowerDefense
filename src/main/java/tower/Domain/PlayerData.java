@@ -1,7 +1,6 @@
 package tower.Domain;
 
 
-
 import mindustry.gen.Player;
 
 
@@ -12,20 +11,22 @@ import mindustry.gen.Player;
  */
 public class PlayerData {
     
+
     private float hp;
 
 
     private boolean showStats;
     private float points;
 
-    // In PlayerData.java, within the addPoints method
-    public void addPoints(float amount) {
-        this.points += amount;
-        // Update the points display after adding points
-    
+    public void addKills (int amount) {
     }
-    
-    
+
+    public void setKills (int amount) {
+    }
+
+    public void addPoints (float amount) {
+        this.points += amount;
+    }
 
     public void subtractPoints (float amount) {
         this.points -= amount;
@@ -55,11 +56,9 @@ public class PlayerData {
     public PlayerData(Player player) {
 
         player.ip();
-        player.uuid();
+
         this.hp = player.unit().health();
-       
 
         this.points = 5;
     }
 }
-
