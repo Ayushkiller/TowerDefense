@@ -3,6 +3,7 @@ package tower.commands;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
+import mindustry.gen.Playerc;
 import mindustry.type.Item;
 import mindustry.ui.Menus;
 import tower.Domain.PlayerData;
@@ -40,18 +41,26 @@ public class BuyPoint {
         String title = "Adjust Quantity";
         String description = "Select quantity adjustment";
         String[][] buttons = new String[][]{{"-1000", "-100", "-50", "+50", "+100", "+1000"}};
-
+    
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
             // Adjust the quantity based on the selected button
             Item selectedItem = Currency.itemsforcore[option / Currency.itemsforcore[0].length][option % Currency.itemsforcore[0].length];
             int adjustment = Integer.parseInt(buttons[0][opt]);
+    
+            // Check if the adjustment is negative and display an error message or ignore the action
+            if (adjustment <  0) {
+                player.sendMessage("You cannot set the quantity to a negative value.");
+                return;
+            }
+    
             Map<Item, Integer> quantities = selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
-            quantities.put(selectedItem, quantities.getOrDefault(selectedItem,  0) + adjustment);
-
+            quantities.put(selectedItem, quantities.getOrDefault(selectedItem,   0) + adjustment);
+    
             // After adjusting the quantity, open the menu to confirm the purchase
             openConfirmPurchaseMenu(player, option);
         }), title, description, buttons);
     }
+
 
     private static void openConfirmPurchaseMenu(Player player, int option) {
         String title = "Confirm Purchase";
@@ -94,15 +103,15 @@ public class BuyPoint {
         }
     }
     private static int calculateTotalPoints(java.util.Map<Item, Integer> selectedItems) {
-        int totalPoints =   0;
+        int totalPoints =  0;
         for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
             int quantity = entry.getValue();
-    
+
             // Find the index of the item in the itemsforcore array
             int itemIndex = -1;
-            for (int i =   0; i < Currency.itemsforcore.length; i++) {
-                for (int j =   0; j < Currency.itemsforcore[i].length; j++) {
+            for (int i =  0; i < Currency.itemsforcore.length; i++) {
+                for (int j =  0; j < Currency.itemsforcore[i].length; j++) {
                     if (Currency.itemsforcore[i][j] == item) {
                         itemIndex = j;
                         break;
@@ -110,15 +119,17 @@ public class BuyPoint {
                 }
                 if (itemIndex != -1) break;
             }
-    
+
             // If the item is found, calculate the total points for this item based on the ratio of gain points to priceforitems
             if (itemIndex != -1) {
-
                 int pointGain = Currency.Gain[itemIndex / Currency.itemsforcore[0].length][itemIndex % Currency.itemsforcore[0].length];
-
                 int itemPrice = Currency.Priceforitems[itemIndex / Currency.itemsforcore[0].length][itemIndex % Currency.itemsforcore[0].length];
-
                 totalPoints += (float)pointGain / itemPrice * quantity;
+            } else {
+                // Handle the case where the item is not found in the itemsforcore array
+                // This could involve logging an error, skipping the item, or handling it in another appropriate manner
+                System.err.println("Item not found in itemsforcore array: " + ((Playerc) item).name());
+
             }
         }
         return totalPoints;

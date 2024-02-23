@@ -157,25 +157,23 @@ public class PluginLogic {
             playerData.addPoints(pointsToAdd);
         }
     }
-    Events.on(EventType.PlayerLeave.class, leaveEvent -> {
-        // Get the points of the leaving player
-        PlayerData leavingPlayerData = Players.getPlayer(leaveEvent.player);
-        float leavingPlayerPoints = leavingPlayerData.getPoints();
-    
-        // Calculate the points per player
-        int remainingPlayers = PlayerData.allPlayerDataInstances.size -   1; // Subtract   1 because the leaving player is not included in the count
-        float pointsPerPlayer = leavingPlayerPoints / remainingPlayers;
-    
-        // Distribute the points to the remaining players
-        for (PlayerData playerData : PlayerData.allPlayerDataInstances.values()) {
-            if (playerData != leavingPlayerData) { // Skip the leaving player
-                playerData.addPoints(pointsPerPlayer);
-            }
-        }
-    });
-      });
+Events.on(EventType.PlayerLeave.class, leaveEvent -> {
+    // Get the points of the leaving player
+    PlayerData leavingPlayerData = Players.getPlayer(leaveEvent.player);
+    float leavingPlayerPoints = leavingPlayerData.getPoints();
 
-        Events.on(EventType.UnitSpawnEvent.class, event->{
+    // Calculate the points per player
+    int remainingPlayers = PlayerData.allPlayerDataInstances.size -  1; // Subtract  1 because the leaving player is not included in the count
+    float pointsPerPlayer = leavingPlayerPoints / remainingPlayers;
+
+    // Calculate points to add to each remaining player
+    float pointsToAdd = pointsPerPlayer; // Assuming you want to add the average points per player to each remaining player
+
+    // Distribute the points to the remaining players
+    for (PlayerData playerData : Players.players.values()) {
+        playerData.addPoints(pointsToAdd);
+    }
+});
             if(event.unit.team != state.rules.waveTeam) 
 
             event.unit.health(event.unit.health * multiplier);

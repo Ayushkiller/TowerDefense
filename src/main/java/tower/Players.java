@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Players {
-    private static final Map<String, PlayerData> players = new HashMap<>();
+    static final Map<String, PlayerData> players = new HashMap<>();
 
     public static PlayerData getPlayer(Player player) {
         if (!players.containsKey(player.uuid())) {

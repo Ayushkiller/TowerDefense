@@ -19,12 +19,6 @@ public class PlayerData {
     private boolean showStats;
     private float points;
 
-    public void addKills (int amount) {
-    }
-
-    public void setKills (int amount) {
-    }
-
     // In PlayerData.java, within the addPoints method
     public void addPoints (float amount) {
         this.points += amount;
