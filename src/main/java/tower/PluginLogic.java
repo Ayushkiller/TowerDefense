@@ -12,8 +12,11 @@ import mindustry.gen.Call;
 import mindustry.net.Administration;
 import mindustry.type.*;
 import mindustry.world.*;
+import tower.Domain.PlayerData;
+import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
+
 import useful.Bundle;
 
 import static mindustry.Vars.*;
@@ -102,7 +105,7 @@ public class PluginLogic {
             if(action.tile == null) return true;
 
             if(action.type == Administration.ActionType.placeBlock || action.type == Administration.ActionType.breakBlock){
-                if(!(canBePlaced(action.tile, action.block) || action.block instanceof CoreBlock)){
+                if(!(canBePlaced(action.tile, action.block)|| action.block instanceof ShockMine || action.block instanceof CoreBlock)){
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                     return false; // Explicitly return false here
                 }
@@ -113,9 +116,10 @@ public class PluginLogic {
 
         Timer.schedule(()->state.rules.waveTeam.data().units.each(unit->{
             var core = unit.closestEnemyCore();
-            if(core == null || unit.dst(core) > 80f) return;
+            if(core == null || unit.dst(core) > 60f) return;
 
             core.damage(unit.health / Mathf.sqrt(multiplier), true);
+            
 
             unit.kill();
 
@@ -126,25 +130,50 @@ public class PluginLogic {
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
         Events.on(EventType.WaveEvent.class, event->multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), multiplier, 100f));
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
-        Events.on(EventType.UnitDestroyEvent.class, event->{
-         if(event.unit.team != state.rules.waveTeam) return;
+          Events.on(EventType.UnitDestroyEvent.class, event->{
+       if(event.unit.team != state.rules.waveTeam) return;
 
-           var core = event.unit.closestEnemyCore();
-           var drop = drops.get(event.unit.type);
+        var core = event.unit.closestEnemyCore();
+        var drop = drops.get(event.unit.type);
 
-           if(core == null || drop == null) return;
+        if(core == null || drop == null) return;
 
-          var builder = new StringBuilder();
+        var builder = new StringBuilder();
 
-          drop.each(stack->{
-           int amount = Mathf.random(stack.amount - stack.amount /   2, stack.amount + stack.amount /   2);
+        drop.each(stack-> {
+        int amount = Mathf.random(stack.amount - stack.amount /   2, stack.amount + stack.amount /   2);
 
-          builder.append("[accent]+").append(amount).append(" [green]").append(stack.item.emoji()).append("  ");
-          Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
+        builder.append("[accent]+").append(amount).append(" [green]").append(stack.item.emoji()).append("  ");
+        Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
+         });
+
+        Call.label(builder.toString(),   1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
+
+       // Add points with a    chance to all players
+       if(Mathf.random() <   0.1f) {
+        float pointsToAdd = Mathf.random(0f,   4f);
+        for(ObjectMap.Entry<String, PlayerData> entry : PlayerData.allPlayerDataInstances) {
+            PlayerData playerData = entry.value;
+            playerData.addPoints(pointsToAdd);
+        }
+    }
+    Events.on(EventType.PlayerLeave.class, leaveEvent -> {
+        // Get the points of the leaving player
+        PlayerData leavingPlayerData = Players.getPlayer(leaveEvent.player);
+        float leavingPlayerPoints = leavingPlayerData.getPoints();
+    
+        // Calculate the points per player
+        int remainingPlayers = PlayerData.allPlayerDataInstances.size -   1; // Subtract   1 because the leaving player is not included in the count
+        float pointsPerPlayer = leavingPlayerPoints / remainingPlayers;
+    
+        // Distribute the points to the remaining players
+        for (PlayerData playerData : PlayerData.allPlayerDataInstances.values()) {
+            if (playerData != leavingPlayerData) { // Skip the leaving player
+                playerData.addPoints(pointsPerPlayer);
+            }
+        }
     });
-
-    Call.label(builder.toString(),   1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
-});
+      });
 
         Events.on(EventType.UnitSpawnEvent.class, event->{
             if(event.unit.team != state.rules.waveTeam) 
@@ -167,11 +196,11 @@ public class PluginLogic {
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
 
-        // Apply AI settings after the unit has spawned
-        event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
-        event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange =  0f;
-        event.unit.type.aiController = event.unit.type.flying ? FlyingAI::new : GroundAI::new;
-        event.unit.type.targetFlags = new BlockFlag[]{BlockFlag.core};
+             // Apply AI settings after the unit has spawned
+             event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
+             event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange =  0f;
+             event.unit.type.aiController = event.unit.type.flying ? FlyingAI::new : GroundAI::new;
+             event.unit.type.targetFlags = new BlockFlag[]{BlockFlag.core};
             return;
         });
     }

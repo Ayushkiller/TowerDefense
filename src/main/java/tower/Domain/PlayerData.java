@@ -1,6 +1,7 @@
 package tower.Domain;
 
 
+import arc.struct.ObjectMap;
 import mindustry.gen.Player;
 
 
@@ -11,7 +12,7 @@ import mindustry.gen.Player;
  */
 public class PlayerData {
     
-
+    public static ObjectMap<String, PlayerData> allPlayerDataInstances = new ObjectMap<>();
     private float hp;
 
 
@@ -29,6 +30,7 @@ public class PlayerData {
         this.points += amount;
 
     }
+    
     
 
     public void subtractPoints (float amount) {
