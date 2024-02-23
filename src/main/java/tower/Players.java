@@ -7,8 +7,9 @@ import tower.Domain.PlayerData;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class Players {
-    static final Map<String, PlayerData> players = new HashMap<>();
+    private static Map<String, PlayerData> players = new HashMap<>();
 
     public static PlayerData getPlayer(Player player) {
         if (!players.containsKey(player.uuid())) {
@@ -31,3 +32,4 @@ public class Players {
         });
     }
 }
+

@@ -19,9 +19,10 @@ public class PlayerData {
     private float points;
 
     // In PlayerData.java, within the addPoints method
-    public void addPoints (float amount) {
+    public void addPoints(float amount) {
         this.points += amount;
-
+        // Update the points display after adding points
+    
     }
     
     
@@ -54,10 +55,11 @@ public class PlayerData {
     public PlayerData(Player player) {
 
         player.ip();
-
+        player.uuid();
         this.hp = player.unit().health();
+       
 
-        this.points = 0;
+        this.points = 5;
     }
 }
 

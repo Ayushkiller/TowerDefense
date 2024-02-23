@@ -78,7 +78,7 @@ public class BuyPoint {
                 // Remove the selected items from the team's inventory
                 Team team = player.team(); 
                 removeItemsFromTeam(team, selectedItems);
-    
+            
                 player.sendMessage(Bundle.get("menu.buypoint.success"));
               }    else { // If the player clicks "Cancel"
                 player.sendMessage(Bundle.get("menu.buypoint.cancel"));
