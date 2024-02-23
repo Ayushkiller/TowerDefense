@@ -96,13 +96,6 @@ public class PluginLogic {
             incite, ItemStack.list(tungsten, 25, oxide, 25, carbide, 50),
             emanate, ItemStack.list(surgeAlloy, 25, thorium, 25, phaseFabric, 50)
         );
-        content.units().each(type->{
-            type.mineWalls = type.mineFloor = type.targetAir = type.targetGround = false;
-            type.payloadCapacity = type.legSplashDamage = type.range = type.maxRange = type.mineRange = 0f;
-
-            type.aiController = type.flying ? FlyingAI::new : GroundAI::new;
-            type.targetFlags = new BlockFlag[]{BlockFlag.core};
-        });
 
 
         netServer.admins.addActionFilter(action->{
@@ -172,6 +165,13 @@ public class PluginLogic {
 
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
+            content.units().each(type->{
+                type.mineWalls = type.mineFloor = type.targetAir = type.targetGround = false;
+                type.payloadCapacity = type.legSplashDamage = type.range = type.maxRange = type.mineRange = 0f;
+    
+                type.aiController = type.flying ? FlyingAI::new : GroundAI::new;
+                type.targetFlags = new BlockFlag[]{BlockFlag.core};
+            });
         });
     }
 

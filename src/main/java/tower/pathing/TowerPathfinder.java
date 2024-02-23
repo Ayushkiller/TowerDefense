@@ -5,6 +5,7 @@ import mindustry.gen.PathTile;
 import mindustry.world.Tile;
 
 import static mindustry.Vars.pathfinder;
+import static mindustry.Vars.state;
 import static tower.PluginLogic.isPath;
 
 public class TowerPathfinder extends Pathfinder {
@@ -12,25 +13,37 @@ public class TowerPathfinder extends Pathfinder {
     public static final int impassable = -1, notPath = 999999;
 
     public TowerPathfinder() {
-        costTypes.set(costGround, (team, tile)->(PathTile.allDeep(tile) || ((PathTile.team(tile) == 0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable : 1 +
-            (PathTile.deep(tile) ? notPath : 0) +
-            (PathTile.damages(tile) ? 50 : 0) +
-            (PathTile.nearSolid(tile) ? 50 : 0) +
-            (PathTile.nearLiquid(tile) ? 10 : 0)
-        );
+      costTypes.set(costGround, (team, tile)->{
+            if (team != state.rules.waveTeam.id) {
+                return  1; // Default cost for non-waveTeam units
+            }
+            return (PathTile.allDeep(tile) || ((PathTile.team(tile) ==  0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable :  1 +
+                (PathTile.deep(tile) ? notPath :  0) +
+                (PathTile.damages(tile) ?  50 :  0) +
+                (PathTile.nearSolid(tile) ?  50 :  0) +
+                (PathTile.nearLiquid(tile) ?  10 :  0);
+        });
 
-        costTypes.set(costLegs, (team, tile)->(PathTile.allDeep(tile) || PathTile.legSolid(tile)) ? impassable : 1 +
-            (PathTile.deep(tile) ? notPath : 0) +
-            (PathTile.damages(tile) ? 50 : 0) +
-            (PathTile.nearLegSolid(tile) ? 50 : 0) +
-            (PathTile.nearSolid(tile) ? 10 : 0)
-        );
+        costTypes.set(costLegs, (team, tile)->{
+            if (team != state.rules.waveTeam.id) {
+                return  1; // Default cost for non-waveTeam units
+            }
+            return (PathTile.allDeep(tile) || ((PathTile.team(tile) ==  0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable :  1 +
+                (PathTile.deep(tile) ? notPath :  0) +
+                (PathTile.damages(tile) ?  50 :  0) +
+                (PathTile.nearSolid(tile) ?  50 :  0) +
+                (PathTile.nearLiquid(tile) ?  10 :  0);
+        });
 
-        costTypes.set(costNaval, (team, tile)->(PathTile.solid(tile) || !PathTile.liquid(tile) ? notPath : 1) +
-            (PathTile.damages(tile) ? 50 : 0) +
-            (PathTile.nearSolid(tile) ? 10 : 0) +
-            (PathTile.nearGround(tile) ? 10 : 0)
-        );
+        costTypes.set(costLegs, (team, tile)->{
+            if (team != state.rules.waveTeam.id) {
+                return  1; // Default cost for non-waveTeam units
+            }
+            return (PathTile.allDeep(tile) || ((PathTile.team(tile) ==  0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable :  1 +
+                (PathTile.deep(tile) ? notPath :  0) +
+                (PathTile.damages(tile) ?  50 :  0) +
+                (PathTile.nearSolid(tile) ?  50 :  0);
+        });
     }
 
     public static void init() {
