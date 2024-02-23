@@ -27,7 +27,7 @@ public class PlayerData {
     // In PlayerData.java, within the addPoints method
     public void addPoints (float amount) {
         this.points += amount;
-        System.out.println("Added " + amount + " points. Total points: " + this.points);
+
     }
     
 

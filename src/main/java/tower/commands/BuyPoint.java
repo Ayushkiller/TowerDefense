@@ -39,7 +39,7 @@ public class BuyPoint {
     private static void openQuantityAdjustmentMenu(Player player, int option) {
         String title = "Adjust Quantity";
         String description = "Select quantity adjustment";
-        String[][] buttons = new String[][]{{"-100", "-50", "-25", "+25", "+50", "+100"}};
+        String[][] buttons = new String[][]{{"-1000", "-100", "-50", "+50", "+100", "+1000"}};
 
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
             // Adjust the quantity based on the selected button
@@ -104,7 +104,7 @@ public class BuyPoint {
             for (int i =   0; i < Currency.itemsforcore.length; i++) {
                 for (int j =   0; j < Currency.itemsforcore[i].length; j++) {
                     if (Currency.itemsforcore[i][j] == item) {
-                        itemIndex = j; // Assuming each item is unique across all tiers
+                        itemIndex = j;
                         break;
                     }
                 }
@@ -113,14 +113,11 @@ public class BuyPoint {
     
             // If the item is found, calculate the total points for this item based on the ratio of gain points to priceforitems
             if (itemIndex != -1) {
-                // Assuming the item's point gain is stored in the Gain array at the same index
+
                 int pointGain = Currency.Gain[itemIndex / Currency.itemsforcore[0].length][itemIndex % Currency.itemsforcore[0].length];
-                // Assuming the item's price is stored in the priceforitems array at the same index
+
                 int itemPrice = Currency.Priceforitems[itemIndex / Currency.itemsforcore[0].length][itemIndex % Currency.itemsforcore[0].length];
-    
-                // Calculate the total points to add based on the ratio of gain points to priceforitems
-                // In BuyPoint.java, within the calculateTotalPoints method
-                // Calculate the total points to add based on the ratio of gain points to priceforitems
+
                 totalPoints += (float)pointGain / itemPrice * quantity;
             }
         }
