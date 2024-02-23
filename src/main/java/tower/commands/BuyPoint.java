@@ -67,12 +67,13 @@ public class BuyPoint {
                 playerData.addPoints(totalPoints);
     
                 // Remove the selected items from the team's inventory
-                Team team = player.team(); // Assuming you have a way to get the player's team
+                Team team = player.team(); 
                 removeItemsFromTeam(team, selectedItems);
     
                 player.sendMessage(Bundle.get("menu.buypoint.success"));
-            } else { // If the player clicks "Cancel"
-                // Do nothing or show a message
+              }    else { // If the player clicks "Cancel"
+                player.sendMessage(Bundle.get("menu.buypoint.cancel"));
+            
             }
         }), title, description, buttons);
     }
@@ -118,7 +119,9 @@ public class BuyPoint {
                 int itemPrice = Currency.Priceforitems[itemIndex / Currency.itemsforcore[0].length][itemIndex % Currency.itemsforcore[0].length];
     
                 // Calculate the total points to add based on the ratio of gain points to priceforitems
-                totalPoints += (pointGain / itemPrice) * quantity;
+                // In BuyPoint.java, within the calculateTotalPoints method
+                // Calculate the total points to add based on the ratio of gain points to priceforitems
+                totalPoints += (float)pointGain / itemPrice * quantity;
             }
         }
         return totalPoints;

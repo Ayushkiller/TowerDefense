@@ -24,9 +24,12 @@ public class PlayerData {
     public void setKills (int amount) {
     }
 
+    // In PlayerData.java, within the addPoints method
     public void addPoints (float amount) {
         this.points += amount;
+        System.out.println("Added " + amount + " points. Total points: " + this.points);
     }
+    
 
     public void subtractPoints (float amount) {
         this.points -= amount;
@@ -59,7 +62,7 @@ public class PlayerData {
 
         this.hp = player.unit().health();
 
-        this.points = 500;
+        this.points = 100;
     }
 }
 
