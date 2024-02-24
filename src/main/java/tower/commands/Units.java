@@ -19,11 +19,19 @@ import arc.util.Time;
 public class Units {
 //    static final String[] prefixes = {"[lime]", "[scarlet]", "[lightgray]"};
 
-    private static final int menu = Menus.registerMenu((player, option) -> {
-        UnitType unitType = UnitsTable.units[option / UnitsTable.units[0].length][option % UnitsTable.units[0].length];
-        openUnitMenuGui(unitType, player);
-    });
+private static final int menu = Menus.registerMenu((player, option) -> {
+    int rows = UnitsTable.units.length;
+    int columns = UnitsTable.units[0].length;
+    int row = option / columns;
+    int column = option % columns;
 
+    // Ensure the row and column indices are within bounds
+    if (row >=  0 && row < rows && column >=  0 && column < columns) {
+        UnitType unitType = UnitsTable.units[row][column];
+        openUnitMenuGui(unitType, player);
+
+    }
+});
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
     private static String[][] buttons; // Declare the buttons variable here
 
