@@ -13,43 +13,43 @@ public class UnitsTable {
      * Each element in the array is a UnitType object representing a unit that can be purchased.
      */
     public static UnitType[][] units = {
-    // Tier   0
     {UnitTypes.alpha, UnitTypes.beta, UnitTypes.gamma, UnitTypes.emanate, UnitTypes.evoke, UnitTypes.incite},
-    // Tier   1
     {UnitTypes.mono, UnitTypes.dagger, UnitTypes.flare, UnitTypes.crawler, UnitTypes.nova, UnitTypes.risso},
-    { UnitTypes.retusa, UnitTypes.stell, UnitTypes.elude, UnitTypes.merui,UnitTypes.poly, UnitTypes.mace},
-    // Tier   2
+    {UnitTypes.retusa, UnitTypes.stell, UnitTypes.elude, UnitTypes.merui,UnitTypes.poly, UnitTypes.mace},
     {UnitTypes.horizon, UnitTypes.atrax, UnitTypes.pulsar, UnitTypes.minke, UnitTypes.oxynoe, UnitTypes.locus},
-    { UnitTypes.avert, UnitTypes.cleroi,UnitTypes.bryde, UnitTypes.cyerce, UnitTypes.precept, UnitTypes.anthicus},
-    // Tier   3
+    {UnitTypes.avert, UnitTypes.cleroi,UnitTypes.bryde, UnitTypes.cyerce, UnitTypes.precept, UnitTypes.anthicus},
     {UnitTypes.fortress, UnitTypes.quasar, UnitTypes.spiroct, UnitTypes.zenith, UnitTypes.mega,UnitTypes.obviate},
-    // Tier   4
     {UnitTypes.scepter, UnitTypes.aegires, UnitTypes.sei, UnitTypes.quad, UnitTypes.antumbra, UnitTypes.arkyid},
     {UnitTypes.vela, UnitTypes.scepter, UnitTypes.vanquish, UnitTypes.tecta, UnitTypes.quell,UnitTypes.conquer},
-    // Tier   5
-    { UnitTypes.collaris, UnitTypes.disrupt, UnitTypes.reign, UnitTypes.oct, UnitTypes.eclipse, UnitTypes.corvus},
+    {UnitTypes.collaris, UnitTypes.disrupt, UnitTypes.reign, UnitTypes.oct, UnitTypes.eclipse, UnitTypes.corvus},
     {UnitTypes.toxopid, UnitTypes.omura, UnitTypes.navanax,UnitTypes.renale,UnitTypes.latum,UnitTypes.assemblyDrone}
     };
-        /**
-     * A two-dimensional array representing the prices of units at each tier of the game.
-     * Each element in the array is an Integer object representing the cost of a unit.
-     */
+
     public static Integer[][] prices = {
-        // Tier   0
         {10,  10,   10,   10,   10,   10},
-        // Tier   1
         {13,  15,   17,   19,   21,   23},
-        // Tier   2
         {23,  25,   27,   29,   31,   33},
-        // Tier   3
         {33,  35,   37,   39,   41,   43},
-        // Tier   4
         {43,  45,   47,   49,   51,   53},
-        // Tier   5
         {53,  55,   57,   59,   61,   63},
         {63,  65,   67,   69,   71,   73},
         {73,  75,   77,   79,   81,   83},
         {83,  85,   87,   89,   91,   93},
         {93,  95,   97,   99,   101,   103}
     };
-};
+
+    public static int getPriceForUnitType(int unitTypeId) {
+        // Determine the tier and position within the tier based on the unitTypeId
+        int tier = unitTypeId / prices[0].length;
+        int position = unitTypeId % prices[0].length;
+    
+        // Check if the tier and position are within the bounds of the prices array
+        if (tier >=   0 && tier < prices.length && position >=   0 && position < prices[tier].length) {
+            // Return the price for the unit type within the specified tier and position
+            return prices[tier][position];
+        } else {
+            // Handle the case where the tier or position is out of bounds
+            throw new IllegalArgumentException("Unit type ID out of bounds: " + unitTypeId);
+        }
+    }
+}

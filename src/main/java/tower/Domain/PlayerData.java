@@ -66,7 +66,7 @@ public class PlayerData {
     }
 
     public PlayerData(Player player) {
-
+        player.uuid();
         player.ip();
         this.hp = player.unit().health();
         this.team = player.team();

@@ -63,20 +63,20 @@ public class Statuseffects {
     private static void buyEffect(StatusEffect effect, Player player) {
         PlayerData playerData = Players.getPlayer(player);
         int effectPrice = effectPrices.get(effect);
-
+    
         // Fetch the current unit's type
         UnitType currentUnitType = player.unit().type();
-        // Look up the current unit's price in UnitsTable.java
-        Integer[] currentUnitPrice = UnitsTable.prices[currentUnitType.id];
-        // Calculate 75% of the current unit's price
-        int additionalPrice = (int) (currentUnitPrice[0] * 0.75);
+        // Use the new method to get the price for the current unit type
+        int currentUnitPrice = UnitsTable.getPriceForUnitType(currentUnitType.id);
+        // Calculate  75% of the current unit's price
+        int additionalPrice = (int) (currentUnitPrice *  0.75);
         // Add the calculated amount to the status effect's price
         int totalPrice = effectPrice + additionalPrice;
-
+    
         if (playerData.getPoints() >= totalPrice) {
             playerData.subtractPoints(totalPrice);
             // Ensure the unit ID is valid before applying the status effect
-            if (currentUnitType.id >=   0) {
+            if (currentUnitType.id >=  0) {
                 // Apply the status effect with an infinite duration
                 player.unit().apply(effect, Float.POSITIVE_INFINITY);
                 // Display the total price to the player
