@@ -15,7 +15,8 @@ public class Menu {
             case 0 -> Units.execute(player);
             case 1 -> Settings.execute(player);
             case 2 -> BuyPoint.execute(player);
-            case 3 -> Statuseffects.execute(player);
+            case  3 -> Statuseffects.execute(player);
+  
         }
     });
 

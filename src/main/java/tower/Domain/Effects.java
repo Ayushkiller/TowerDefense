@@ -27,9 +27,6 @@ public static StatusEffect[][] Effects = {
         {15,  15,  15},
         {25,  25,  25}
     };
-    public static Integer[][] Timetoapplyfor = {
-        {1500,  1500,  1500},
-        {2500,  2500,  2500}
-    };
+
 }
 
