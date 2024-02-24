@@ -30,10 +30,10 @@ public class Statuseffects {
 
     private static void openGui(Player player) {
         // Ensure the buttons array is initialized
-        if (buttons == null || buttons.length == 0) {
-            initEffectsTable();
+        if (buttons == null || buttons.length ==  0) {
+            initEffectsTable(player); // Pass the Player object here
         }
-
+    
         // Display the menu to the player
         Call.menu(player.con, menu, Bundle.get("menu.effects.title", player.locale), "", buttons);
     }
@@ -45,16 +45,40 @@ public class Statuseffects {
 
     private static final java.util.Map<StatusEffect, Integer> effectPrices = new HashMap<>();
     private static String[][] buttons; // Declare the buttons variable here
-    public static void initEffectsTable() {
+    private static void initEffectsTable(Player player) {
         int numberOfRows = Effects.Effects.length;
         int numberOfColumns = Effects.Effects[0].length;
 
         buttons = new String[numberOfRows][numberOfColumns];
 
-        for (int i = 0; i < Effects.Effects.length; i++) {
-            for (int j = 0; j < Effects.Effects[i].length; j++) {
+        for (int i =  0; i < Effects.Effects.length; i++) {
+            for (int j =  0; j < Effects.Effects[i].length; j++) {
                 StatusEffect effect = Effects.Effects[i][j];
-                buttons[i][j] = effect.emoji(); // Assuming effect.emoji() returns a string representation of the effect
+                int effectPrice = effectPrices.get(effect);
+                // Calculate the additional price based on the current unit type
+                UnitType currentUnitType = player.unit().type(); // Now player is accessible here
+                int unitPosition = -1;
+                for (int k =  0; k < UnitsTable.units.length; k++) {
+                    for (int l =  0; l < UnitsTable.units[k].length; l++) {
+                        if (UnitsTable.units[k][l] == currentUnitType) {
+                            unitPosition = k * UnitsTable.units[k].length + l;
+                            break;
+                        }
+                    }
+                    if (unitPosition != -1) {
+                        break;
+                    }
+                }
+                if (unitPosition != -1) {
+                    int currentUnitPrice = UnitsTable.prices[0][unitPosition];
+                    int additionalPrice = (int) (currentUnitPrice *  0.75);
+                    int totalPrice = effectPrice + additionalPrice;
+                    // Concatenate the emoji with the total price
+                    buttons[i][j] = effect.emoji() + " Total Price: " + totalPrice;
+                } else {
+                    // Handle the case where the unit type is not found
+                    buttons[i][j] = effect.emoji() + " Error: Unit type not found";
+                }
                 effectPrices.put(effect, Effects.Priceforeffects[i][j]);
             }
         }
@@ -94,7 +118,7 @@ public class Statuseffects {
         int totalPrice = effectPrice + additionalPrice;
     
         if (playerData.getPoints() >= totalPrice) {
-            playerData.subtractPoints(totalPrice);
+            playerData.subtractPoints(totalPrice, player);
             // Apply the status effect with an infinite duration
             player.unit().apply(effect, Float.POSITIVE_INFINITY);
             // Display the total price to the player

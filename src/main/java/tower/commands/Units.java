@@ -54,7 +54,7 @@ public class Units {
         int price = unitPrices.get(unitType);
         if (playerData.getPoints() >= price) {
     
-            playerData.subtractPoints(price);
+            playerData.subtractPoints((float) price, player);
     
             Unit oldUnit = player.unit();
             Unit spawned = unitType.spawn(player.x, player.y);
@@ -68,7 +68,7 @@ public class Units {
                 Time.run(3f, () -> {
                     if (spawned.dead()) {
                         // Return the item to the player
-                        playerData.addPoints(price);
+                        playerData.addPoints((float) price, player);
                         player.sendMessage(Bundle.get("unit.died", player.locale));
                     }
                 });
@@ -76,7 +76,7 @@ public class Units {
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
             } else {
                 // Handle the case where the unit could not be spawned
-                playerData.addPoints(price); // Return the points to the player
+                playerData.addPoints((float) price, player); // Return the points to the player
                 player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
             }
         } else {

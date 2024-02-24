@@ -75,7 +75,7 @@ public class BuyPoint {
                     int totalPoints = calculateTotalPoints(selectedItems); // Call the new method
                     // Add the total points to the player's points
                     PlayerData playerData = Players.getPlayer(player);
-                    playerData.addPoints(totalPoints);
+                    playerData.addPoints(totalPoints, player);
     
                     // Remove the selected items from the team's inventory
                     removeItemsFromTeam(team, selectedItems);
