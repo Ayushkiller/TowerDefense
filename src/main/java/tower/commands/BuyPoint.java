@@ -39,37 +39,38 @@ public class BuyPoint {
 
     private static void openQuantityAdjustmentMenu(Player player, int option) {
         String title = "Adjust Quantity";
-        String description = "Select quantity adjustment";
+        Map<Item, Integer> quantities = selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
+        String updatedQuantities = "";
+        for (Map.Entry<Item, Integer> entry : quantities.entrySet()) {
+            updatedQuantities += entry.getKey().emoji() + ": " + entry.getValue() + "\n";
+        }
+        String description = "Select quantity adjustment\n\n" + updatedQuantities;
         String[][] buttons = new String[][]{{"-1000", "-100", "-50", "+50", "+100", "+1000"}, {"Buy", "Close", "Back"}};
 
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-            if (opt <  6) { // Adjustment buttons
+            if (opt <   6) { // Adjustment buttons
                 Item selectedItem = Currency.itemsforcore[option / Currency.itemsforcore[0].length][option % Currency.itemsforcore[0].length];
                 int adjustment = Integer.parseInt(buttons[0][opt]);
 
-                if (adjustment <  0) {
+                if (adjustment <   0) {
                     player.sendMessage("You cannot set the quantity to a negative value.");
                     return;
                 }
 
-                Map<Item, Integer> quantities = selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
-                quantities.put(selectedItem, quantities.getOrDefault(selectedItem,  0) + adjustment);
+                quantities.put(selectedItem, quantities.getOrDefault(selectedItem,   0) + adjustment);
 
-                // Display the updated quantities
-                String updatedQuantities = "";
-                for (Map.Entry<Item, Integer> entry : quantities.entrySet()) {
-                    updatedQuantities += entry.getKey().emoji() + ": " + entry.getValue() + "\n";
-                }
-                player.sendMessage(updatedQuantities);
-            } else if (opt ==  6) { // Buy button
+                // Reopen the QuantityAdjustmentMenu with updated quantities
+                openQuantityAdjustmentMenu(player, option);
+            } else if (opt ==   6) { // Buy button
                 openConfirmPurchaseMenu(player, option);
-            } else if (opt ==  7) { // Close button
+            } else if (opt ==   7) { // Close button
                 player.sendMessage("Closing menu without purchasing.");
-            } else if (opt ==  8) { // Back button
+            } else if (opt ==   8) { // Back button
                 openMenu(player);
             }
         }), title, description, buttons);
     }
+    
 
 
     private static void openConfirmPurchaseMenu(Player player, int option) {
@@ -109,6 +110,11 @@ public class BuyPoint {
     
     private static boolean hasEnoughItems(Team team, int option, Player player) {
         Map<Item, Integer> selectedItems = selectedItemsQuantities.get(player);
+        if (selectedItems == null) {
+            // If selectedItems is null, initialize it with an empty map
+            selectedItems = new HashMap<>();
+            selectedItemsQuantities.put(player, selectedItems);
+        }
         for (int i =   0; i < Currency.itemsforcore[option / Currency.itemsforcore[0].length].length; i++) {
             Item item = Currency.itemsforcore[option / Currency.itemsforcore[0].length][i];
             int requiredAmount = selectedItems.getOrDefault(item,   0); // Use the quantity the player wants to purchase
@@ -118,6 +124,7 @@ public class BuyPoint {
         }
         return true;
     }
+    
     
 
 
