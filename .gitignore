@@ -1,12 +1,4 @@
-# Ignore everything
-*
+# Ignore build and .gradle directories
+/build/
+/.gradle/
 
-# But not these files...
-!src/
-!build.gradle
-!README.md
-
-# Exclude directories and files already ignored
-!src/.gitignore
-!build.gradle.kts
-!README.md
