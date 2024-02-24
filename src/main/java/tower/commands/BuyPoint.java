@@ -77,7 +77,8 @@ public class BuyPoint {
     
                 // Remove the selected items from the team's inventory
                 Team team = player.team(); 
-                removeItemsFromTeam(team, selectedItems);
+                // Inside openConfirmPurchaseMenu method, adjust the call to removeItemsFromTeam
+                removeItemsFromTeam(team, selectedItems, player);
             
                 player.sendMessage(Bundle.get("menu.buypoint.success"));
               }    else { // If the player clicks "Cancel"
@@ -95,13 +96,21 @@ public class BuyPoint {
      * @param team The team from which to remove items.
      * @param selectedItems A map of items and their purchased quantities.
      */
-    private static void removeItemsFromTeam(Team team, java.util.Map<Item, Integer> selectedItems) {
+    private static void removeItemsFromTeam(Team team, java.util.Map<Item, Integer> selectedItems, Player player) {
         for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
             int quantity = entry.getValue();
-            team.items().remove(item, quantity);
+            // Check if the team has enough of the item
+            if (team.items().get(item) >= quantity) {
+                team.items().remove(item, quantity);
+            } else {
+                // Send a message to the player indicating not enough items
+                player.sendMessage(Bundle.get("not.enough.items", player.locale()) + ": " + item.name);
+                // Optionally, you could break the loop or skip this item
+            }
         }
     }
+    
     private static int calculateTotalPoints(java.util.Map<Item, Integer> selectedItems) {
         int totalPoints =  0;
         for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
@@ -126,8 +135,8 @@ public class BuyPoint {
                 int itemPrice = Currency.Priceforitems[itemIndex / Currency.itemsforcore[0].length][itemIndex % Currency.itemsforcore[0].length];
                 totalPoints += (float)pointGain / itemPrice * quantity;
             } else {
-                // Handle the case where the item is not found in the itemsforcore array
-                // This could involve logging an error, skipping the item, or handling it in another appropriate manner
+         
+                // This could involve logging an error
                 System.err.println("Item not found in itemsforcore array: " + ((Playerc) item).name());
 
             }
