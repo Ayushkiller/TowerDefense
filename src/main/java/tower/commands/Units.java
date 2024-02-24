@@ -28,26 +28,21 @@ public class Units {
     private static String[][] buttons; // Declare the buttons variable here
 
     public static void initUnitsTable() {
-        // Determine the number of rows and columns based on the size of the units array
-        int numberOfRows = UnitsTable.units.length;
-        int numberOfColumns = UnitsTable.units[0].length;
-
-        // Check if the dimensions of UnitsTable.units and UnitsTable.prices match
-        if (numberOfRows != UnitsTable.prices.length || numberOfColumns != UnitsTable.prices[0].length) {
-            throw new IllegalStateException("The dimensions of UnitsTable.units and UnitsTable.prices do not match.");
-        }
-
-        // Initialize the buttons array with the correct size
-        buttons = new String[numberOfRows][numberOfColumns];
+        // Initialize the buttons array based on the size of UnitsTable.units
+        int rows = UnitsTable.units.length;
+        int columns = UnitsTable.units[0].length;
+        buttons = new String[rows][columns];
 
         for (int i =  0; i < UnitsTable.units.length; i++) {
             for (int j =  0; j < UnitsTable.units[i].length; j++) {
                 UnitType unit = UnitsTable.units[i][j];
-                buttons[i][j] = unit.emoji();
-                unitPrices.put(unit, UnitsTable.prices[i][j]);
+                int price = UnitsTable.prices[i][j];
+                buttons[i][j] = unit.emoji() + " Price: " + price;
+                unitPrices.put(unit, price);
             }
         }
     }
+    
     private static void buyUnit(UnitType unitType, Player player) {
         logUnitType(unitType);
         PlayerData playerData = Players.getPlayer(player);
