@@ -36,7 +36,7 @@ public class Players {
                 displayStatsForAllPlayers(player);
             }
             PlayerData playerData = Players.getPlayer(player);
-            if (player.uuid().equals(playerData.getUuid()) && !player.dead()) {
+            if (!player.dead() && player.name().equals(playerData.getName())) {
                 float currentPoints = playerData.getPoints();
                 if (currentPoints != playerData.getLastUpdatedPoints()) {
                     StringBuilder hud = new StringBuilder();

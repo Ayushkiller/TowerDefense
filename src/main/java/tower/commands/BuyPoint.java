@@ -3,6 +3,7 @@ package tower.commands;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
+
 import mindustry.type.Item;
 import mindustry.ui.Menus;
 import tower.Domain.PlayerData;
@@ -46,39 +47,38 @@ public class BuyPoint {
         String description = "Select quantity adjustment\n\n" + updatedQuantities;
         String[][] buttons = new String[][]{{"-1000", "-100", "-50", "+50", "+100", "+1000"}, {"Buy", "Close", "Back"}};
 
-        Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-            if (opt <   6) { // Adjustment buttons
-                Item selectedItem = Currency.itemsforcore[option / Currency.itemsforcore[0].length][option % Currency.itemsforcore[0].length];
-                int adjustment = Integer.parseInt(buttons[0][opt]);
+    Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
+        if (opt <  6) { // Adjustment buttons
+            // Adjusted logic to iterate through rows first and then columns
+            Item selectedItem = Currency.itemsforcore[option / Currency.itemsforcore[0].length][option % Currency.itemsforcore[0].length];
+            int adjustment = Integer.parseInt(buttons[0][opt]);
 
-                if (adjustment <   0) {
-                    player.sendMessage("You cannot set the quantity to a negative value.");
-                    return;
-                }
-
-                quantities.put(selectedItem, quantities.getOrDefault(selectedItem,   0) + adjustment);
-
-                // Reopen the QuantityAdjustmentMenu with updated quantities
-                openQuantityAdjustmentMenu(player, option);
-            } else if (opt ==   6) { // Buy button
-                if (hasEnoughItems(player.team(), option, player)) {
-                    openConfirmPurchaseMenu(player, option);
-                } else {
-                    player.sendMessage("You do not have enough items to complete this purchase.");
-                    // Reset selectedItems for the player
-                    selectedItemsQuantities.put(player, new HashMap<>());
-                    // Reopen the QuantityAdjustmentMenu
-                    openQuantityAdjustmentMenu(player, option);
-                }
-            } else if (opt ==   7) { // Close button
-                player.sendMessage("Closing menu without purchasing.");
-            } else if (opt ==   8) { // Back button
-                openMenu(player);
+            if (adjustment <  0) {
+                player.sendMessage("You cannot set the quantity to a negative value.");
+                return;
             }
-        }), title, description, buttons);
-    }
-    
-    
+
+            quantities.put(selectedItem, quantities.getOrDefault(selectedItem,  0) + adjustment);
+
+            // Reopen the QuantityAdjustmentMenu with updated quantities
+            openQuantityAdjustmentMenu(player, option);
+        } else if (opt ==  6) { // Buy button
+            if (hasEnoughItems(player.team(), option, player)) {
+                openConfirmPurchaseMenu(player, option);
+            } else {
+                player.sendMessage("You do not have enough items to complete this purchase.");
+                // Reset selectedItems for the player
+                selectedItemsQuantities.put(player, new HashMap<>());
+                // Reopen the QuantityAdjustmentMenu
+                openQuantityAdjustmentMenu(player, option);
+            }
+        } else if (opt ==  7) { // Close button
+            player.sendMessage("Closing menu without purchasing.");
+        } else if (opt ==  8) { // Back button
+            openMenu(player);
+        }
+    }), title, description, buttons);
+  }
 
 
     private static void openConfirmPurchaseMenu(Player player, int option) {

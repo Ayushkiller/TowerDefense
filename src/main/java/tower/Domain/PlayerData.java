@@ -18,7 +18,7 @@ public class PlayerData {
     private float hp;
     private String uuid;
     private float lastUpdatedPoints;
-
+    private String name;
     private boolean showStats;
     private float points;
 
@@ -67,6 +67,10 @@ public class PlayerData {
     public void setHp(float hp) {
         this.hp = hp;
     }
+    public String getName() {
+        return name;
+    }
+
     public String getUuid() {
         return this.uuid;
     }
@@ -80,5 +84,6 @@ public class PlayerData {
         player.ip();
         this.hp = player.unit().health();
         this.points = 5;
+        this.name = player.name();
     }
 }
