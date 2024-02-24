@@ -50,16 +50,19 @@ while (players.hasNext()) {
 }
       
       private static void updatePlayerHud(Player player) {
-        PlayerData playerData = Players.getPlayer(player);
-        if (!player.dead() && player.uuid().equals(playerData.getUuid())) {
-          float currentPoints = playerData.getPoints();
-          if (currentPoints != playerData.getLastUpdatedPoints()) {
-            StringBuilder hud = new StringBuilder();
-            hud.append("[green]").append(player.name()).append("'s Points ").append((int) currentPoints);
-            Call.setHudText(hud.toString());
-            playerData.setLastUpdatedPoints(currentPoints);
+          PlayerData playerData = Players.getPlayer(player);
+          if (!player.dead() && player.uuid().equals(playerData.getUuid())) {
+              float currentPoints = playerData.getPoints();
+              if (currentPoints != playerData.getLastUpdatedPoints()) {
+                  StringBuilder hud = new StringBuilder();
+                  hud.append("[green]").append(player.name()).append("'s Points ").append((int) currentPoints);
+                  // Check if the current instance is a client before setting the HUD text
+                  if (player.isLocal()) {
+                      Call.setHudText(hud.toString());
+                  }
+                  playerData.setLastUpdatedPoints(currentPoints);
+              }
           }
-        }
       }
       
     
