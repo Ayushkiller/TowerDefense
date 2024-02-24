@@ -53,18 +53,22 @@ while (players.hasNext()) {
           PlayerData playerData = Players.getPlayer(player);
           if (!player.dead() && player.uuid().equals(playerData.getUuid())) {
               float currentPoints = playerData.getPoints();
-              if (currentPoints != playerData.getLastUpdatedPoints()) {
-                  StringBuilder hud = new StringBuilder();
-                  hud.append("[green]").append(player.name()).append("'s Points ").append((int) currentPoints);
-                  // Check if the current instance is a client before setting the HUD text
-                  if (player.isLocal()) {
-                      Call.setHudText(hud.toString());
-                  }
-                  playerData.setLastUpdatedPoints(currentPoints);
+              // Format the HUD text dynamically based on player data
+              String hudText = "[green]" + player.name() + "'s Points: " + (int) currentPoints + " | " +
+                               "[accent]Level: " + playerData.getPoints() + " | " +
+                               "[scarlet]Health: " + (int) player.unit().health + " | " +
+                               "[blue]Shield: " + (int) player.unit().shield;
+
+              // Log the HUD text being set
+              System.out.println("Setting HUD text for player " + player.name() + ": " + hudText);
+
+              // Check if the current instance is a client before setting the HUD text
+              if (player.isLocal()) {
+                  Call.setHudText(player.con, hudText);
               }
           }
       }
-      
+        
     
 
 private static void displayStatsForAllPlayers(Player player) {
@@ -83,5 +87,6 @@ private static void displayStatsForAllPlayers(Player player) {
 
 }
 }
+
 
 
