@@ -49,6 +49,7 @@ public class Units {
         }
     }
     private static void buyUnit(UnitType unitType, Player player) {
+        logUnitType(unitType);
         PlayerData playerData = Players.getPlayer(player);
         int price = unitPrices.get(unitType);
         if (playerData.getPoints() >= price) {
@@ -82,6 +83,11 @@ public class Units {
             player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
         }
     }
+    // Add a method to log the unit type ID and the length of the prices array
+   private static void logUnitType(UnitType unitType) {
+    System.out.println("Unit type ID: " + unitType.id);
+    System.out.println("Length of prices array: " + UnitsTable.prices.length);
+     }
     
 
     public static void execute(Player player) {

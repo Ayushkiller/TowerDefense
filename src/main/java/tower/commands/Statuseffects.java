@@ -62,10 +62,16 @@ public class Statuseffects {
 
         // Fetch the current unit's type
         UnitType currentUnitType = player.unit().type();
+        // Ensure the currentUnitType.id is within the valid range of indices for UnitsTable.prices
+        if (currentUnitType.id <  0 || currentUnitType.id >= UnitsTable.prices.length) {
+            // Handle the case where the id is out of bounds
+            player.sendMessage("Error: Invalid unit type ID.");
+            return;
+        }
         // Look up the current unit's price in UnitsTable.java
         Integer[] currentUnitPrice = UnitsTable.prices[currentUnitType.id];
-        // Calculate  75% of the current unit's price
-        int additionalPrice = (int) (currentUnitPrice[0] *  0.75);
+        // Calculate   75% of the current unit's price
+        int additionalPrice = (int) (currentUnitPrice[0] *   0.75);
         // Add the calculated amount to the status effect's price
         int totalPrice = effectPrice + additionalPrice;
 
@@ -79,5 +85,4 @@ public class Statuseffects {
             player.sendMessage(Bundle.get("menu.effects.not-enough", player.locale()));
         }
     }
-
 }
