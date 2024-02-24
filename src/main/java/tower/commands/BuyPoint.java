@@ -78,7 +78,7 @@ public class BuyPoint {
         String[][] buttons = new String[][]{{"Buy", "Cancel"}};
 
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-            if (opt ==  0) { // If the player clicks "Buy"
+            if (opt ==   0) { // If the player clicks "Buy"
                 Team team = player.team();
                 if (hasEnoughItems(team, option, player)) {
                     Map<Item, Integer> selectedItems = selectedItemsQuantities.get(player);
@@ -94,14 +94,19 @@ public class BuyPoint {
                     selectedItemsQuantities.remove(player);
 
                     player.sendMessage(Bundle.get("menu.buypoint.success"));
+                    // Return to the QuantityAdjustmentMenu after a successful purchase
+                    openQuantityAdjustmentMenu(player, option);
                 } else {
-                    player.sendMessage("You do not have enough items to complete this purchase.");
+                    player.sendMessage(Bundle.get("menu.buypoint.failure"));
                 }
             } else { // If the player clicks "Cancel"
                 player.sendMessage(Bundle.get("menu.buypoint.cancel"));
+                // Return to the QuantityAdjustmentMenu after cancelling
+                openQuantityAdjustmentMenu(player, option);
             }
         }), title, description, buttons);
     }
+    
     private static boolean hasEnoughItems(Team team, int option, Player player) {
         Map<Item, Integer> selectedItems = selectedItemsQuantities.get(player);
         for (int i =   0; i < Currency.itemsforcore[option / Currency.itemsforcore[0].length].length; i++) {
