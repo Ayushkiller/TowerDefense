@@ -1,7 +1,11 @@
 package tower.Domain;
 
 
+
+import mindustry.game.Team;
 import mindustry.gen.Player;
+import mindustry.gen.Unit;
+
 
 
 /**
@@ -11,9 +15,9 @@ import mindustry.gen.Player;
  */
 public class PlayerData {
     
-
+    private Unit unit;
     private float hp;
-
+    private Team team;
 
     private boolean showStats;
     private float points;
@@ -39,6 +43,9 @@ public class PlayerData {
     public float getPoints() {
         return points;
     }
+    public Unit getUnit() {
+        return unit;
+    }
     
     public void setStats(boolean value) {
         this.showStats = value;
@@ -47,7 +54,12 @@ public class PlayerData {
     public boolean stats() {
         return showStats;
     }
-
+    public void setHp(float hp) {
+        this.hp = hp;
+    }
+    public Team getTeam() {
+        return team;
+    }
 
     public float getHp() {
         return hp;
@@ -56,9 +68,10 @@ public class PlayerData {
     public PlayerData(Player player) {
 
         player.ip();
-
+        player.uuid();
+        this.unit =player.unit();
         this.hp = player.unit().health();
-
+        this.team = player.team();
         this.points = 5;
     }
 }

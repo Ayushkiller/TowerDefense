@@ -11,11 +11,12 @@ public class Menuforunits {
             case 0 -> Units.execute(player);
             case 1 -> Settings.execute(player);
             case 2 -> BuyPoint.execute(player);
+            case 3 -> Statuseffects.execute(player);
         }
     });
 
     private static final String[][] buttons = {
-            {"[lime]Units", "[red]Settings"},
+            {"[lime]Units", "{[blue]Powerups}", "[red]Settings"},
             {"[cyan]BuyPoints", "[lightgray]Close"}
     };
 

@@ -28,15 +28,18 @@ public class Units {
     private static String[][] buttons; // Declare the buttons variable here
 
     public static void initUnitsTable() {
-
-    
         // Determine the number of rows and columns based on the size of the units array
         int numberOfRows = UnitsTable.units.length;
         int numberOfColumns = UnitsTable.units[0].length;
-    
+
+        // Check if the dimensions of UnitsTable.units and UnitsTable.prices match
+        if (numberOfRows != UnitsTable.prices.length || numberOfColumns != UnitsTable.prices[0].length) {
+            throw new IllegalStateException("The dimensions of UnitsTable.units and UnitsTable.prices do not match.");
+        }
+
         // Initialize the buttons array with the correct size
         buttons = new String[numberOfRows][numberOfColumns];
-    
+
         for (int i =  0; i < UnitsTable.units.length; i++) {
             for (int j =  0; j < UnitsTable.units[i].length; j++) {
                 UnitType unit = UnitsTable.units[i][j];
@@ -44,8 +47,6 @@ public class Units {
                 unitPrices.put(unit, UnitsTable.prices[i][j]);
             }
         }
-        
-
     }
     private static void buyUnit(UnitType unitType, Player player) {
         PlayerData playerData = Players.getPlayer(player);
