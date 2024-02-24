@@ -46,6 +46,14 @@ public class Statuseffects {
     private static final java.util.Map<StatusEffect, Integer> effectPrices = new HashMap<>();
     private static String[][] buttons; // Declare the buttons variable here
     private static void initEffectsTable(Player player) {
+        for (int i =   0; i < Effects.Effects.length; i++) {
+            for (int j =   0; j < Effects.Effects[i].length; j++) {
+                StatusEffect effect = Effects.Effects[i][j];
+                int price = Effects.Priceforeffects[i][j];
+                effectPrices.put(effect, price);
+            }
+        }
+    
         int numberOfRows = Effects.Effects.length;
         int numberOfColumns = Effects.Effects[0].length;
 
