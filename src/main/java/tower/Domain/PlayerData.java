@@ -4,7 +4,7 @@ package tower.Domain;
 
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
-import java.util.logging.Logger;
+
 
 
 /**
@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * the unit they are controlling, points accumulated, and other game-related data.
  */
 public class PlayerData {
-    private static final Logger logger = Logger.getLogger(PlayerData.class.getName());
+
     private Unit unit;
     private float hp;
     private String uuid;
@@ -30,12 +30,11 @@ public class PlayerData {
 
     public void addPoints(float amount, Player player) {
         this.points += amount;
-        logger.info("Player " + player.uuid() + " added " + amount + " points. Total points: " + this.points);
+   
     }
 
     public void subtractPoints(float amount, Player player) {
         this.points -= amount;
-        logger.info("Player " + player.uuid() + " subtracted " + amount + " points. Total points: " + this.points);
     }
     public float getLastUpdatedPoints() {
         return lastUpdatedPoints;
@@ -46,7 +45,7 @@ public class PlayerData {
     }
     public void setPoints(float points, Player player) {
         this.points = points;
-        logger.info("Player " + player.uuid() + " set points to " + points);
+
     }
 
 
@@ -88,7 +87,6 @@ public class PlayerData {
         this.uuid = player.uuid();
         player.ip();
         this.hp = player.unit().health();
-        this.points = 5;
         this.name = player.name();
     }
 }
