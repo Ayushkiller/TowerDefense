@@ -69,7 +69,6 @@ public class PlayerData {
         player.uuid();
         player.ip();
         this.hp = player.unit().health();
-        this.team = player.team();
         this.points = 5;
     }
 }

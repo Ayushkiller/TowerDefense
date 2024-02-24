@@ -70,7 +70,7 @@ public class BuyPoint {
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
             if (opt ==  0) { // If the player clicks "Buy"
                 Team team = player.team();
-                if (hasEnoughItems(team, option)) {
+                if (hasEnoughItems(team, option, player)) {
                     Map<Item, Integer> selectedItems = selectedItemsQuantities.get(player);
                     int totalPoints = calculateTotalPoints(selectedItems); // Call the new method
                     // Add the total points to the player's points
@@ -89,16 +89,19 @@ public class BuyPoint {
             }
         }), title, description, buttons);
     }
-    private static boolean hasEnoughItems(Team team, int option) {
-        for (int i =  0; i < Currency.itemsforcore[option / Currency.itemsforcore[0].length].length; i++) {
+    private static boolean hasEnoughItems(Team team, int option, Player player) {
+        Map<Item, Integer> selectedItems = selectedItemsQuantities.get(player);
+        for (int i =   0; i < Currency.itemsforcore[option / Currency.itemsforcore[0].length].length; i++) {
             Item item = Currency.itemsforcore[option / Currency.itemsforcore[0].length][i];
-            int requiredAmount = Currency.Priceforitems[option / Currency.itemsforcore[0].length][i];
+            int requiredAmount = selectedItems.getOrDefault(item,   0); // Use the quantity the player wants to purchase
             if (team.items().get(item) < requiredAmount) {
                 return false;
             }
         }
         return true;
     }
+    
+
 
 
     /**

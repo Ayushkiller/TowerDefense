@@ -66,25 +66,39 @@ public class Statuseffects {
     
         // Fetch the current unit's type
         UnitType currentUnitType = player.unit().type();
-        // Use the new method to get the price for the current unit type
-        int currentUnitPrice = UnitsTable.getPriceForUnitType(currentUnitType.id);
-        // Calculate  75% of the current unit's price
-        int additionalPrice = (int) (currentUnitPrice *  0.75);
+        // Find the position of the current unit type within the UnitsTable.units array
+        int unitPosition = -1;
+        for (int i =  0; i < UnitsTable.units.length; i++) {
+            for (int j =  0; j < UnitsTable.units[i].length; j++) {
+                if (UnitsTable.units[i][j] == currentUnitType) {
+                    unitPosition = i * UnitsTable.units[i].length + j;
+                    break;
+                }
+            }
+            if (unitPosition != -1) {
+                break;
+            }
+        }
+    
+        // Check if the unit position was found
+        if (unitPosition == -1) {
+            player.sendMessage("Error: Unit type not found in UnitsTable.");
+            return;
+        }
+    
+        // Directly access the price for the current unit type from the prices array using the unit position
+        int currentUnitPrice = UnitsTable.prices[0][unitPosition];
+        // Calculate   75% of the current unit's price
+        int additionalPrice = (int) (currentUnitPrice *   0.75);
         // Add the calculated amount to the status effect's price
         int totalPrice = effectPrice + additionalPrice;
     
         if (playerData.getPoints() >= totalPrice) {
             playerData.subtractPoints(totalPrice);
-            // Ensure the unit ID is valid before applying the status effect
-            if (currentUnitType.id >=  0) {
-                // Apply the status effect with an infinite duration
-                player.unit().apply(effect, Float.POSITIVE_INFINITY);
-                // Display the total price to the player
-                player.sendMessage(Bundle.get("effect.bought.with.additional", player.locale) + totalPrice);
-            } else {
-                // Include the incorrect unit ID in the error message
-                player.sendMessage("Error: Invalid unit type ID: " + currentUnitType.id);
-            }
+            // Apply the status effect with an infinite duration
+            player.unit().apply(effect, Float.POSITIVE_INFINITY);
+            // Display the total price to the player
+            player.sendMessage(Bundle.get("effect.bought.with.additional", player.locale) + totalPrice);
         } else {
             player.sendMessage(Bundle.get("menu.effects.not-enough", player.locale()));
         }

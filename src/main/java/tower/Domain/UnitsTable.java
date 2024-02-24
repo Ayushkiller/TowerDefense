@@ -37,19 +37,4 @@ public class UnitsTable {
         {83,  85,   87,   89,   91,   93},
         {93,  95,   97,   99,   101,   103}
     };
-
-    public static int getPriceForUnitType(int unitTypeId) {
-        // Determine the tier and position within the tier based on the unitTypeId
-        int tier = unitTypeId / prices[0].length;
-        int position = unitTypeId % prices[0].length;
-    
-        // Check if the tier and position are within the bounds of the prices array
-        if (tier >=   0 && tier < prices.length && position >=   0 && position < prices[tier].length) {
-            // Return the price for the unit type within the specified tier and position
-            return prices[tier][position];
-        } else {
-            // Handle the case where the tier or position is out of bounds
-            throw new IllegalArgumentException("Unit type ID out of bounds: " + unitTypeId);
-        }
-    }
 }
