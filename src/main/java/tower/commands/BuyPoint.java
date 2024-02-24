@@ -40,24 +40,34 @@ public class BuyPoint {
     private static void openQuantityAdjustmentMenu(Player player, int option) {
         String title = "Adjust Quantity";
         String description = "Select quantity adjustment";
-        String[][] buttons = new String[][]{{"-1000", "-100", "-50", "+50", "+100", "+1000"}};
-    
+        String[][] buttons = new String[][]{{"-1000", "-100", "-50", "+50", "+100", "+1000"}, {"Buy", "Close", "Back"}};
+
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-            // Adjust the quantity based on the selected button
-            Item selectedItem = Currency.itemsforcore[option / Currency.itemsforcore[0].length][option % Currency.itemsforcore[0].length];
-            int adjustment = Integer.parseInt(buttons[0][opt]);
-    
-            // Check if the adjustment is negative and display an error message or ignore the action
-            if (adjustment <  0) {
-                player.sendMessage("You cannot set the quantity to a negative value.");
-                return;
+            if (opt <  6) { // Adjustment buttons
+                Item selectedItem = Currency.itemsforcore[option / Currency.itemsforcore[0].length][option % Currency.itemsforcore[0].length];
+                int adjustment = Integer.parseInt(buttons[0][opt]);
+
+                if (adjustment <  0) {
+                    player.sendMessage("You cannot set the quantity to a negative value.");
+                    return;
+                }
+
+                Map<Item, Integer> quantities = selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
+                quantities.put(selectedItem, quantities.getOrDefault(selectedItem,  0) + adjustment);
+
+                // Display the updated quantities
+                String updatedQuantities = "";
+                for (Map.Entry<Item, Integer> entry : quantities.entrySet()) {
+                    updatedQuantities += entry.getKey().emoji() + ": " + entry.getValue() + "\n";
+                }
+                player.sendMessage(updatedQuantities);
+            } else if (opt ==  6) { // Buy button
+                openConfirmPurchaseMenu(player, option);
+            } else if (opt ==  7) { // Close button
+                player.sendMessage("Closing menu without purchasing.");
+            } else if (opt ==  8) { // Back button
+                openMenu(player);
             }
-    
-            Map<Item, Integer> quantities = selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
-            quantities.put(selectedItem, quantities.getOrDefault(selectedItem,   0) + adjustment);
-    
-            // After adjusting the quantity, open the menu to confirm the purchase
-            openConfirmPurchaseMenu(player, option);
         }), title, description, buttons);
     }
 
