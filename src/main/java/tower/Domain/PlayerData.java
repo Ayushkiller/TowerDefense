@@ -68,8 +68,6 @@ public class PlayerData {
     public PlayerData(Player player) {
 
         player.ip();
-        player.uuid();
-        this.unit =player.unit();
         this.hp = player.unit().health();
         this.team = player.team();
         this.points = 5;
