@@ -81,10 +81,16 @@ public class Statuseffects {
 
         if (playerData.getPoints() >= totalPrice) {
             playerData.subtractPoints(totalPrice);
-            // Apply the status effect with an infinite duration
-            player.unit().apply(effect, Float.POSITIVE_INFINITY);
-            // Display the total price to the player
-            player.sendMessage(Bundle.get("effect.bought.with.additional", player.locale) + totalPrice);
+            // Ensure the unit ID is valid before applying the status effect
+            if (currentUnitType.id >=   0) {
+                // Apply the status effect with an infinite duration
+                player.unit().apply(effect, Float.POSITIVE_INFINITY);
+                // Display the total price to the player
+                player.sendMessage(Bundle.get("effect.bought.with.additional", player.locale) + totalPrice);
+            } else {
+                // Include the incorrect unit ID in the error message
+                player.sendMessage("Error: Invalid unit type ID: " + currentUnitType.id);
+            }
         } else {
             player.sendMessage(Bundle.get("menu.effects.not-enough", player.locale()));
         }
