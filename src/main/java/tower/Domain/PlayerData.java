@@ -78,6 +78,11 @@ public class PlayerData {
     public float getHp() {
         return hp;
     }
+    
+    
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public PlayerData(Player player) {
         this.uuid = player.uuid();

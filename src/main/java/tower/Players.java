@@ -5,21 +5,23 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import tower.Domain.PlayerData;
 import tower.commands.Settings;
+import java.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Players {
     private static final Map<String, PlayerData> players = new HashMap<>();
-
+    private static final Logger logger = Logger.getLogger(Players.class.getName());
     public static PlayerData getPlayer(Player player) {
         if (!players.containsKey(player.uuid())) {
             PlayerData playerData = new PlayerData(player);
+            // Set the player's name in the PlayerData object
+            playerData.setName(player.name());
             players.put(player.uuid(), playerData);
         }
         return players.get(player.uuid());
     }
-
     public static void clearMap() {
         players.clear();
     }
@@ -50,6 +52,7 @@ public class Players {
 
     private static void displayStatsForAllPlayers(Player player) {
         if (Settings.isDisplayStatsForAll()) {
+            logger.info("Displaying stats for all players for player: " + player.uuid());
             Groups.player.each(p -> {
                 if (!p.dead()) {
                     String message = "[scarlet]" + (int) p.unit().health + "/" + (int) p.unit().type.health + "\n" +
@@ -58,8 +61,11 @@ public class Players {
                     Call.label(player.con, message.replace("  ", Players.getPlayer(p).stats()? "[lime]true" : "[scarlet]false"),   0.017f, p.x, p.y-16);
                 }
             });
+        } else {
+            logger.info("Not displaying stats for all players for player: " + player.uuid());
         }
     }
- }
+}
+
 
 
