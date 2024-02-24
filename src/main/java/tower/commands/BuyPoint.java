@@ -66,7 +66,7 @@ public class BuyPoint {
         String title = "Confirm Purchase";
         String description = "Are you sure you want to purchase?";
         String[][] buttons = new String[][]{{"Buy", "Cancel"}};
-    
+
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
             if (opt ==  0) { // If the player clicks "Buy"
                 Team team = player.team();
@@ -76,10 +76,13 @@ public class BuyPoint {
                     // Add the total points to the player's points
                     PlayerData playerData = Players.getPlayer(player);
                     playerData.addPoints(totalPoints, player);
-    
+
                     // Remove the selected items from the team's inventory
                     removeItemsFromTeam(team, selectedItems);
-    
+
+                    // Clear the selected items quantities for the player
+                    selectedItemsQuantities.remove(player);
+
                     player.sendMessage(Bundle.get("menu.buypoint.success"));
                 } else {
                     player.sendMessage("You do not have enough items to complete this purchase.");
