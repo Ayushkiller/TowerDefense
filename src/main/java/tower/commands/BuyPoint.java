@@ -62,7 +62,15 @@ public class BuyPoint {
                 // Reopen the QuantityAdjustmentMenu with updated quantities
                 openQuantityAdjustmentMenu(player, option);
             } else if (opt ==   6) { // Buy button
-                openConfirmPurchaseMenu(player, option);
+                if (hasEnoughItems(player.team(), option, player)) {
+                    openConfirmPurchaseMenu(player, option);
+                } else {
+                    player.sendMessage("You do not have enough items to complete this purchase.");
+                    // Reset selectedItems for the player
+                    selectedItemsQuantities.put(player, new HashMap<>());
+                    // Reopen the QuantityAdjustmentMenu
+                    openQuantityAdjustmentMenu(player, option);
+                }
             } else if (opt ==   7) { // Close button
                 player.sendMessage("Closing menu without purchasing.");
             } else if (opt ==   8) { // Back button
@@ -70,6 +78,7 @@ public class BuyPoint {
             }
         }), title, description, buttons);
     }
+    
     
 
 
