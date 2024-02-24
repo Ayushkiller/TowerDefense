@@ -1,7 +1,12 @@
-.gradle/*
-.vscode/*
-.idea/*
-./bin/*
-./gradle/*
-./build/*
-./lib/*
+# Ignore everything
+*
+
+# But not these files...
+!src/
+!build.gradle
+!README.md
+
+# Exclude directories and files already ignored
+!src/.gitignore
+!build.gradle.kts
+!README.md

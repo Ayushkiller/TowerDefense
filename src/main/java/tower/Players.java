@@ -27,7 +27,7 @@ public class Players {
             if(Players.getPlayer(player).getUnit() != null && player.unit() != Players.getPlayer(player).getUnit()) {
                 player.unit(Players.getPlayer(player).getUnit());
             }
-
+    
             if(Players.getPlayer(player).stats()) {
                 Groups.player.each(p -> {
                     if (!p.dead()) {
@@ -39,9 +39,10 @@ public class Players {
                 });
             }
             StringBuilder hud = new StringBuilder();
-
+    
+            // Ensure the HUD displays the current player's points
             hud.append("[green]").append((int) Players.getPlayer(player).getPoints());
-
+    
             Call.setHudText(hud.toString());
         });
     }
