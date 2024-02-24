@@ -36,24 +36,30 @@ public class Players {
                 displayStatsForAllPlayers(player);
             }
             PlayerData playerData = Players.getPlayer(player);
-            if (player.uuid().equals(playerData.getUuid())) {
-                StringBuilder hud = new StringBuilder();
-                hud.append("[green]I am not Paif for this").append((int) playerData.getPoints());
-                Call.setHudText(hud.toString());
+            if (player.uuid().equals(playerData.getUuid()) && !player.dead()) {
+                float currentPoints = playerData.getPoints();
+                if (currentPoints != playerData.getLastUpdatedPoints()) {
+                    StringBuilder hud = new StringBuilder();
+                    hud.append("[green]Your Points ").append((int) currentPoints);
+                    Call.setHudText(hud.toString());
+                    playerData.setLastUpdatedPoints(currentPoints);
+                }
             }
         });
     }
 
     private static void displayStatsForAllPlayers(Player player) {
-        Groups.player.each(p -> {
-            if (!p.dead()) {
-                String message = "[scarlet]" + (int) p.unit().health + "/" + (int) p.unit().type.health + "\n" +
-                        "[accent]" + (int) p.unit().shield + " " +
-                        "[green]" + (int) Players.getPlayer(p).getPoints() + "\n  ";
-                Call.label(player.con, message.replace("  ", Players.getPlayer(p).stats()? "[lime]true" : "[scarlet]false"),   0.017f, p.x, p.y-16);
-            }
-        });
+        if (Settings.isDisplayStatsForAll()) {
+            Groups.player.each(p -> {
+                if (!p.dead()) {
+                    String message = "[scarlet]" + (int) p.unit().health + "/" + (int) p.unit().type.health + "\n" +
+                            "[accent]" + (int) p.unit().shield + " " +
+                            "[green]" + (int) Players.getPlayer(p).getPoints() + "\n  ";
+                    Call.label(player.con, message.replace("  ", Players.getPlayer(p).stats()? "[lime]true" : "[scarlet]false"),   0.017f, p.x, p.y-16);
+                }
+            });
+        }
     }
+ }
 
-}
 

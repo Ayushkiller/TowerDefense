@@ -17,7 +17,7 @@ public class PlayerData {
     private Unit unit;
     private float hp;
     private String uuid;
-
+    private float lastUpdatedPoints;
 
     private boolean showStats;
     private float points;
@@ -37,7 +37,13 @@ public class PlayerData {
         this.points -= amount;
         logger.info("Player " + player.uuid() + " subtracted " + amount + " points. Total points: " + this.points);
     }
-
+    public float getLastUpdatedPoints() {
+        return lastUpdatedPoints;
+    }
+    
+    public void setLastUpdatedPoints(float lastUpdatedPoints) {
+        this.lastUpdatedPoints = lastUpdatedPoints;
+    }
     public void setPoints(float points, Player player) {
         this.points = points;
         logger.info("Player " + player.uuid() + " set points to " + points);

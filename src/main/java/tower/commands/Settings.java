@@ -4,20 +4,19 @@ import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.ui.Menus;
 import tower.Bundle;
-import tower.Players;
+
 
 
 public class Settings {
     public static final int menu = Menus.registerMenu((player, option) -> {
         switch (option) {
-            case 0 -> Players.getPlayer(player).setStats(true); // On
-            case 1 -> Players.getPlayer(player).setStats(false); // Off
-            case 2 -> Menuforunits.execute(player); // Back
+            case  0 -> Settings.toggleDisplayStatsForAll(); // Toggle stats for all players
+            case  1 -> Menuforunits.execute(player); // Back
         }
     });
 
     private static final String[][] buttons = {
-            {"[lime]On", "[red]Off"},
+            {"[lime]On"},
             {"[lightgray]Back", "[gray]Close"}
     };
 
