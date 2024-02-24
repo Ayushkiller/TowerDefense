@@ -16,6 +16,17 @@ import tower.Domain.UnitsTable;
 
 public class Statuseffects {
     private static final Logger logger = Logger.getLogger(Statuseffects.class.getName());
+    private static final java.util.Map<StatusEffect, Integer> effectPrices = new HashMap<>();
+    static {
+        // Initialize effectPrices map with prices from Effects.Priceforeffects
+        for (int i =   0; i < Effects.Effects.length; i++) {
+            for (int j =   0; j < Effects.Effects[i].length; j++) {
+                StatusEffect effect = Effects.Effects[i][j];
+                int price = Effects.Priceforeffects[i][j];
+                effectPrices.put(effect, price);
+            }
+        }
+    }
 
     public static void execute(Player player) {
         // Ensure the player object is not null
@@ -43,7 +54,6 @@ public class Statuseffects {
         buyEffect(effect, player);
     });
 
-    private static final java.util.Map<StatusEffect, Integer> effectPrices = new HashMap<>();
     private static String[][] buttons; // Declare the buttons variable here
     private static void initEffectsTable(Player player) {
         for (int i =   0; i < Effects.Effects.length; i++) {
