@@ -134,18 +134,11 @@ public class Statuseffects {
         int totalPrice = effectPrice + additionalPrice;
 
         if (playerData.getPoints() >= totalPrice) {
-            // Check if the effect can be applied and if it's not already applied
-            if (player.unit().isImmune(effect) && !player.unit().hasEffect(effect)) {
-                playerData.subtractPoints(totalPrice, player);
-                // Apply the status effect with an infinite duration
-                player.unit().apply(effect, Float.POSITIVE_INFINITY);
-                // Display the total price to the player
-                player.sendMessage(Bundle.get("effect.bought.with.additional", player.locale) + totalPrice);
-            } else {
-                // If the effect can't be applied or is already applied, add the points back
-                playerData.addPoints(totalPrice, player);
-                player.sendMessage("Effect cannot be applied or is already applied.");
-            }
+            // Directly apply the status effect with an infinite duration
+            playerData.subtractPoints(totalPrice, player);
+            player.unit().apply(effect, Float.POSITIVE_INFINITY);
+            // Display the total price to the player
+            player.sendMessage(Bundle.get("effect.bought.with.additional", player.locale) + totalPrice);
         } else {
             player.sendMessage(Bundle.get("menu.effects.not-enough", player.locale()));
         }
