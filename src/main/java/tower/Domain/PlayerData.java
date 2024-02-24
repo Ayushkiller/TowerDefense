@@ -2,7 +2,6 @@ package tower.Domain;
 
 
 
-import mindustry.game.Team;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 
@@ -17,7 +16,7 @@ public class PlayerData {
     
     private Unit unit;
     private float hp;
-    private Team team;
+
 
     private boolean showStats;
     private float points;
@@ -57,9 +56,7 @@ public class PlayerData {
     public void setHp(float hp) {
         this.hp = hp;
     }
-    public Team getTeam() {
-        return team;
-    }
+
 
     public float getHp() {
         return hp;

@@ -28,9 +28,6 @@ public class Players {
             if(Players.getPlayer(player).getUnit() != null && player.unit() != getPlayer(player).getUnit()) {
                 player.unit(getPlayer(player).getUnit());
             }
-            if(player.team() != getPlayer(player).getTeam()) {
-                player.team(getPlayer(player).getTeam());
-            }
 
             if(getPlayer(player).stats()) {
                 Groups.player.each(p -> {
