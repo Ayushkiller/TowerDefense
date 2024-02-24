@@ -54,13 +54,7 @@ while (players.hasNext()) {
           if (!player.dead() && player.uuid().equals(playerData.getUuid())) {
               float currentPoints = playerData.getPoints();
               // Format the HUD text dynamically based on player data
-              String hudText = "[green]" + player.name() + "'s Points: " + (int) currentPoints + " | " +
-                               "[accent]Level: " + playerData.getPoints() + " | " +
-                               "[scarlet]Health: " + (int) player.unit().health + " | " +
-                               "[blue]Shield: " + (int) player.unit().shield;
-
-              // Log the HUD text being set
-              System.out.println("Setting HUD text for player " + player.name() + ": " + hudText);
+              String hudText = "[green]" + player.name() + "'s Points: " + (int) currentPoints;
 
               // Check if the current instance is a client before setting the HUD text
               if (player.isLocal()) {
