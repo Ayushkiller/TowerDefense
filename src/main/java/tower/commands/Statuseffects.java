@@ -66,12 +66,6 @@ public class Statuseffects {
 
         // Fetch the current unit's type
         UnitType currentUnitType = player.unit().type();
-        // Ensure the currentUnitType.id is within the valid range of indices for UnitsTable.prices
-        if (currentUnitType.id <  0 || currentUnitType.id >= UnitsTable.prices.length) {
-            // Handle the case where the id is out of bounds
-            player.sendMessage("Error: Invalid unit type ID: " + currentUnitType.id);
-            return;
-        }
         // Look up the current unit's price in UnitsTable.java
         Integer[] currentUnitPrice = UnitsTable.prices[currentUnitType.id];
         // Calculate 75% of the current unit's price
