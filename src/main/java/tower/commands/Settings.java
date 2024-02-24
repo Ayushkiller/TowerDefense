@@ -28,4 +28,14 @@ public class Settings {
     public static void openGui(Player player) {
         Call.menu(player.con, menu, Bundle.get("settings.title", player.locale), Bundle.get("settings.message", player.locale), buttons);
     }
+    
+    private static boolean displayStatsForAll = false;
+
+    public static void toggleDisplayStatsForAll() {
+        displayStatsForAll = !displayStatsForAll;
+    }
+
+    public static boolean isDisplayStatsForAll() {
+        return displayStatsForAll;
+    }
 }
