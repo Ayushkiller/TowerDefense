@@ -55,9 +55,9 @@ public class Players {
             Groups.player.each(p -> {
                 if (!p.dead()) {
                     String message = "[scarlet]" + (int) p.unit().health + "/" + (int) p.unit().type.health + "\n" +
-                            "[accent]" + (int) p.unit().shield + " " +
-                            "[green]" + (int) Players.getPlayer(p).getPoints() + "\n  ";
-                    Call.label(player.con, message.replace("  ", Players.getPlayer(p).stats() ? "[lime]true" : "[scarlet]false"),  0.017f, p.x, p.y-16);
+                   "[accent]" + (int) p.unit().shield + " " +
+                  "[green]" + (int) Players.getPlayer(p).getPoints() + "\n  ";
+                   Call.label(player.con, message.replace("  ", Settings.isDisplayStatsForAll() ? "[lime]on" : "[scarlet]off"),   0.017f, p.x, p.y-16);
                 }
             });
         }
