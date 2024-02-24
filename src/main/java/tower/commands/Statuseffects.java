@@ -56,16 +56,21 @@ public class Statuseffects {
 
     private static String[][] buttons; // Declare the buttons variable here
     private static void initEffectsTable(Player player) {
-        for (int i =   0; i < Effects.Effects.length; i++) {
-            for (int j =   0; j < Effects.Effects[i].length; j++) {
+        // Initialize the buttons array based on the size of Effects.Effects
+        int rows = Effects.Effects.length;
+        int columns = Effects.Effects[0].length;
+        buttons = new String[rows][columns];
+    
+        for (int i =  0; i < Effects.Effects.length; i++) {
+            for (int j =  0; j < Effects.Effects[i].length; j++) {
                 StatusEffect effect = Effects.Effects[i][j];
                 int effectPrice = effectPrices.get(effect);
                 // Fetch the current unit's type
                 UnitType currentUnitType = player.unit().type();
                 // Find the position of the current unit type within the UnitsTable.units array
                 int row = -1, column = -1;
-                for (int k =   0; k < UnitsTable.units.length; k++) {
-                    for (int l =   0; l < UnitsTable.units[k].length; l++) {
+                for (int k =  0; k < UnitsTable.units.length; k++) {
+                    for (int l =  0; l < UnitsTable.units[k].length; l++) {
                         if (UnitsTable.units[k][l] == currentUnitType) {
                             row = k;
                             column = l;
@@ -83,7 +88,7 @@ public class Statuseffects {
                 }
                 // Directly access the price for the current unit type from the prices array using the row and column
                 int currentUnitPrice = UnitsTable.prices[row][column];
-                // Calculate  75% of the current unit's price
+                // Calculate   75% of the current unit's price
                 int additionalPrice = (int) (currentUnitPrice *  0.75);
                 // Add the calculated amount to the status effect's price
                 int totalPrice = effectPrice + additionalPrice;
@@ -92,7 +97,6 @@ public class Statuseffects {
             }
         }
     }
-    
 
     private static void buyEffect(StatusEffect effect, Player player) {
         PlayerData playerData = Players.getPlayer(player);
