@@ -16,6 +16,7 @@ public class PlayerData {
     private static final Logger logger = Logger.getLogger(PlayerData.class.getName());
     private Unit unit;
     private float hp;
+    private String uuid;
 
 
     private boolean showStats;
@@ -60,14 +61,16 @@ public class PlayerData {
     public void setHp(float hp) {
         this.hp = hp;
     }
-
+    public String getUuid() {
+        return this.uuid;
+    }
 
     public float getHp() {
         return hp;
     }
 
     public PlayerData(Player player) {
-        player.uuid();
+        this.uuid = player.uuid();
         player.ip();
         this.hp = player.unit().health();
         this.points = 5;
