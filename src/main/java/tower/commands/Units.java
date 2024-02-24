@@ -32,13 +32,12 @@ public class Units {
         int rows = UnitsTable.units.length;
         int columns = UnitsTable.units[0].length;
         buttons = new String[rows][columns];
-
+    
         for (int i =  0; i < UnitsTable.units.length; i++) {
             for (int j =  0; j < UnitsTable.units[i].length; j++) {
                 UnitType unit = UnitsTable.units[i][j];
-                int price = UnitsTable.prices[i][j];
-                buttons[i][j] = unit.emoji() + " Price: " + price;
-                unitPrices.put(unit, price);
+                buttons[i][j] = unit.emoji(); // Only include the unit's emoji
+                unitPrices.put(unit, UnitsTable.prices[i][j]); // Keep the price mapping for other uses
             }
         }
     }

@@ -35,16 +35,11 @@ public class Players {
                 // Display stats for all players
                 displayStatsForAllPlayers(player);
             }
-    
-            // Update the HUD to show only the current player's points
-            StringBuilder hud = new StringBuilder();
-            hud.append("[green]").append((int) Players.getPlayer(player).getPoints());
-            Call.setHudText(hud.toString());
-    
-            // Ensure stats are shown for the current player using their UUID
-            if (player.uuid().equals(Players.getPlayer(player).getUuid())) {
-                // Display stats for the current player
-                displayStatsForCurrentPlayer(player);
+            PlayerData playerData = Players.getPlayer(player);
+            if (player.uuid().equals(playerData.getUuid())) {
+                StringBuilder hud = new StringBuilder();
+                hud.append("[green]I am not Paif for this").append((int) playerData.getPoints());
+                Call.setHudText(hud.toString());
             }
         });
     }
@@ -60,12 +55,5 @@ public class Players {
         });
     }
 
-    private static void displayStatsForCurrentPlayer(Player player) {
-        PlayerData playerData = Players.getPlayer(player);
-        if (player.uuid().equals(playerData.getUuid())) {
-            String message = "[green]Your points: " + (int) playerData.getPoints();
-            Call.label(player.con, message,  0.017f, player.x, player.y-16);
-        }
-    }
 }
 
