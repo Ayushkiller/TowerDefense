@@ -3,7 +3,6 @@ package tower.commands;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
-import mindustry.gen.Playerc;
 import mindustry.type.Item;
 import mindustry.ui.Menus;
 import tower.Domain.PlayerData;
@@ -124,17 +123,17 @@ public class BuyPoint {
             selectedItems = new HashMap<>();
             selectedItemsQuantities.put(player, selectedItems);
         }
-        for (int i =   0; i < Currency.itemsforcore[option / Currency.itemsforcore[0].length].length; i++) {
-            Item item = Currency.itemsforcore[option / Currency.itemsforcore[0].length][i];
-            int requiredAmount = selectedItems.getOrDefault(item,   0); // Use the quantity the player wants to purchase
-            if (team.items().get(item) < requiredAmount) {
-                return false;
+        for (int i =   0; i < Currency.itemsforcore.length; i++) {
+            for (int j =   0; j < Currency.itemsforcore[i].length; j++) {
+                Item item = Currency.itemsforcore[i][j];
+                int requiredAmount = selectedItems.getOrDefault(item,   0); // Use the quantity the player wants to purchase
+                if (team.items().get(item) < requiredAmount) {
+                    return false;
+                }
             }
         }
         return true;
     }
-    
-    
 
 
 
@@ -156,29 +155,19 @@ public class BuyPoint {
         for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
             int quantity = entry.getValue();
-
-            // Find the index of the item in the itemsforcore array
-            int itemIndex = -1;
+    
+            // Iterate through rows of itemsforcore
             for (int i =  0; i < Currency.itemsforcore.length; i++) {
+                // Iterate through items in the current row
                 for (int j =  0; j < Currency.itemsforcore[i].length; j++) {
                     if (Currency.itemsforcore[i][j] == item) {
-                        itemIndex = j;
-                        break;
+                        // Found the item, calculate the total points for this item based on the ratio of gain points to priceforitems
+                        int pointGain = Currency.Gain[i][j];
+                        int itemPrice = Currency.Priceforitems[i][j];
+                        totalPoints += (float)pointGain / itemPrice * quantity;
+                        break; // Break the inner loop as the item is found
                     }
                 }
-                if (itemIndex != -1) break;
-            }
-
-            // If the item is found, calculate the total points for this item based on the ratio of gain points to priceforitems
-            if (itemIndex != -1) {
-                int pointGain = Currency.Gain[itemIndex / Currency.itemsforcore[0].length][itemIndex % Currency.itemsforcore[0].length];
-                int itemPrice = Currency.Priceforitems[itemIndex / Currency.itemsforcore[0].length][itemIndex % Currency.itemsforcore[0].length];
-                totalPoints += (float)pointGain / itemPrice * quantity;
-            } else {
-                // Handle the case where the item is not found in the itemsforcore array
-                // This could involve logging an error, skipping the item, or handling it in another appropriate manner
-                System.err.println("Item not found in itemsforcore array: " + ((Playerc) item).name());
-
             }
         }
         return totalPoints;
