@@ -88,6 +88,6 @@ public class PlayerData {
         player.ip();
         this.hp = player.unit().health();
         this.name = player.name();
-        this.points= 500;
+        this.points= 0;
     }
 }
