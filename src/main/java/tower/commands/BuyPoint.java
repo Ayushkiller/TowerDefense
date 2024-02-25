@@ -70,9 +70,13 @@ public class BuyPoint {
                     selectedItemsQuantities.put(player, new HashMap<>());
                     // Reopen the QuantityAdjustmentMenu
                     openQuantityAdjustmentMenu(player, option);
+                    selectedItemsQuantities.remove(player);
+
                 }
             } else if (opt ==   7) { // Close button
                 sendMessageToPlayer(player, "menu.buypoint.close");
+                selectedItemsQuantities.remove(player);
+
             } else if (opt ==   8) { // Back button
                 openMenu(player);
             }
