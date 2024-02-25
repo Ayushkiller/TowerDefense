@@ -31,7 +31,7 @@ public class SuperPowers {
     private static void spawnUnitsAroundPlayer(Player player, World world, float playerX, float playerY) {
         float radius =  80f;
         Random random = new Random();
-    
+
         for (int i =  0; i <  6; i++) {
             // Calculate a random angle for the spawn position
             float angle = random.nextFloat() *  360;
@@ -40,22 +40,22 @@ public class SuperPowers {
             // Calculate the spawn position
             float x = playerX + radius * (float) Math.cos(radians);
             float y = playerY + radius * (float) Math.sin(radians);
-    
+
             // Convert the float coordinates to integers
             int intX = (int) x;
             int intY = (int) y;
             // Convert the integer coordinates to world coordinates
             float worldX = intX * tilesize;
             float worldY = intY * tilesize;
-    
+
             // Find the tile at the world position
             Tile tile = world.tileWorld(worldX, worldY);
             if (tile != null) {
                 // Spawn a Corvus unit at the tile
-                // Assuming there's a method to spawn a unit of a specific type
                 Unit unit = UnitTypes.corvus.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
                 if (unit != null) {
-                    // Optionally, set the unit's target or other properties here
+                    // Set the unit's target to the player's position
+                    unit.aim(playerX, playerY);
                 }
             }
         }
