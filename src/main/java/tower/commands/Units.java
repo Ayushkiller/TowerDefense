@@ -26,12 +26,15 @@ private static final int menu = Menus.registerMenu((player, option) -> {
     int column = option % columns;
 
     // Ensure the row and column indices are within bounds
-    if (row >=  0 && row < rows && column >=  0 && column < columns) {
+    if (row >=   0 && row < rows && column >=   0 && column < columns) {
         UnitType unitType = UnitsTable.units[row][column];
         openUnitMenuGui(unitType, player);
-
+    } else {
+     
+        player.sendMessage("Invalid selection. Please try again.");
     }
 });
+
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
     private static String[][] buttons; // Declare the buttons variable here
 
