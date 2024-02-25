@@ -17,23 +17,22 @@ import arc.util.Time;
 
 
 public class Units {
-//    static final String[] prefixes = {"[lime]", "[scarlet]", "[lightgray]"};
+    private static final int menu = Menus.registerMenu((player, option) -> {
+        int rows = UnitsTable.units.length;
+        int columns = UnitsTable.units[0].length;
+        int row = option / columns;
+        int column = option % columns;
 
-private static final int menu = Menus.registerMenu((player, option) -> {
-    int rows = UnitsTable.units.length;
-    int columns = UnitsTable.units[0].length;
-    int row = option / columns;
-    int column = option % columns;
-
-    // Ensure the row and column indices are within bounds
-    if (row >=   0 && row < rows && column >=   0 && column < columns) {
-        UnitType unitType = UnitsTable.units[row][column];
-        openUnitMenuGui(unitType, player);
-    } else {
-     
-        player.sendMessage("Invalid selection. Please try again.");
-    }
-});
+        // Ensure the row and column indices are within bounds
+        if (row >=   0 && row < rows && column >=   0 && column < columns) {
+            UnitType unitType = UnitsTable.units[row][column];
+            openUnitMenuGui(unitType, player);
+        } else {
+            // Handle the case where the indices are out of bounds
+            // For example, you might want to show an error message to the player or log the error
+            player.sendMessage("Invalid selection. Please try again.");
+        }
+    });
 
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
     private static String[][] buttons; // Declare the buttons variable here
@@ -43,16 +42,15 @@ private static final int menu = Menus.registerMenu((player, option) -> {
         int rows = UnitsTable.units.length;
         int columns = UnitsTable.units[0].length;
         buttons = new String[rows][columns];
-    
-        for (int i =  0; i < UnitsTable.units.length; i++) {
-            for (int j =  0; j < UnitsTable.units[i].length; j++) {
+
+        for (int i =   0; i < UnitsTable.units.length; i++) {
+            for (int j =   0; j < UnitsTable.units[i].length; j++) {
                 UnitType unit = UnitsTable.units[i][j];
                 buttons[i][j] = unit.emoji(); // Only include the unit's emoji
                 unitPrices.put(unit, UnitsTable.prices[i][j]); // Keep the price mapping for other uses
             }
         }
     }
-    
     private static void buyUnit(UnitType unitType, Player player) {
         logUnitType(unitType);
         PlayerData playerData = Players.getPlayer(player);
@@ -104,24 +102,52 @@ private static final int menu = Menus.registerMenu((player, option) -> {
         Call.menu(player.con, menu, Bundle.get("menu.units.title", player.locale), "", buttons);
     }
 
+    @SuppressWarnings("unused")
     private static void openUnitMenuGui(UnitType unitType, Player player) {
-        String[][] buttons = {
-                {"[lime]Buy"},
-                {"[lightgray]Back", "[gray]Close"}
-        };
+        // Initialize the buttons array based on the size of UnitsTable.units
+        int rows = UnitsTable.units.length;
+        int columns = UnitsTable.units[0].length;
+        buttons = new String[rows][columns];
 
-        String message = unitType.emoji() + "\n" + "\n" +
-                Bundle.get("menu.units.info.health", player.locale) + " " + (int) unitType.health + "\n" +
-                Bundle.get("menu.units.info.armor", player.locale) + " " + (int) unitType.armor + "\n" +
-                Bundle.get("menu.units.info.price", player.locale) + " " + unitPrices.get(unitType);
+        // Iterate through rows
+        for (int row =  0; row < UnitsTable.units.length; row++) {
+            // Iterate through columns
+            for (int col =  0; col < UnitsTable.units[row].length; col++) {
+                // Calculate the index based on the current row and column
+                int index = row * UnitsTable.units[row].length + col;
 
-        int menu = Menus.registerMenu(((player1, option) -> {
-            switch (option) {
-                case 0 -> buyUnit(unitType, player);
-                case 1 -> openGui(player);
+                // Check if the calculated index matches the unitType
+                if (UnitsTable.units[row][col] == unitType) {
+                    // Use row and col to access elements in UnitsTable.units and UnitsTable.prices
+                    UnitType selectedUnitType = UnitsTable.units[row][col];
+                    int price = UnitsTable.prices[row][col];
+
+                    // Set up the menu for the selected unit
+                    String[][] buttons = {
+                            {"[lime]Buy"},
+                            {"[lightgray]Back", "[gray]Close"}
+                    };
+
+                    String message = selectedUnitType.emoji() + "\n" + "\n" +
+                            Bundle.get("menu.units.info.health", player.locale) + " " + (int) selectedUnitType.health + "\n" +
+                            Bundle.get("menu.units.info.armor", player.locale) + " " + (int) selectedUnitType.armor + "\n" +
+                            Bundle.get("menu.units.info.price", player.locale) + " " + price;
+
+                    int menu = Menus.registerMenu(((player1, option) -> {
+                        switch (option) {
+                            case  0 -> buyUnit(selectedUnitType, player);
+                            case  1 -> openGui(player);
+                        }
+                    }));
+
+                    Call.menu(player.con, menu, Bundle.get("menu.units.title"), message, buttons);
+                    return; // Exit the method once the matching unit is found
+                }
             }
-        }));
+        }
 
-        Call.menu(player.con, menu, Bundle.get("menu.units.title"), message, buttons);
+        // If no matching unit is found, send an error message
+        player.sendMessage("Invalid selection. Please try again.");
     }
-}
+ }
+
