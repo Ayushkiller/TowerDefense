@@ -3,30 +3,32 @@ package tower.commands;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
 import mindustry.core.World;
+import mindustry.entities.units.AIController;
 import mindustry.gen.Player;
+import mindustry.gen.Teamc;
 import mindustry.gen.Unit;
 import mindustry.world.Tile;
 
-
 public class SuperPowers {
     private static final float tilesize =  1.0f; // Adjust the value as needed
+
     public static void execute(Player player) {
         // Implement the logic for the Super Powers menu option here
         player.sendMessage("Super Powers menu option selected.");
-    
+
         // Spawn  6 units around the player within a  40f radius
         Unit playerUnit = player.unit(); // Get the player's unit
         if (playerUnit != null) {
             float playerX = playerUnit.x; // Get the player's X position
             float playerY = playerUnit.y; // Get the player's Y position
-            World world = Vars.world;// Get the World object from the unit
-            spawnUnitsAroundPlayer(player, world, playerX, playerY);
+            World world = Vars.world; // Get the World object from the unit
+            spawnUnitsAroundPlayer(player, world, playerX, playerY, playerUnit);
         } else {
             player.sendMessage("Player unit is not available.");
         }
     }
-    
-    private static void spawnUnitsAroundPlayer(Player player, World world, float playerX, float playerY) {
+
+    private static void spawnUnitsAroundPlayer(Player player, World world, float playerX, float playerY, Unit playerUnit) {
         float radius =  80f;
         int numberOfUnits =  6; // Number of units to spawn
         float angleStep =  360f / numberOfUnits; // Calculate the angle step for even spacing
@@ -54,12 +56,25 @@ public class SuperPowers {
                 Unit unit = UnitTypes.corvus.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
                 if (unit != null) {
                     // Set the unit's target to the player's position
-                   
-                    // Optionally, set the unit's target or other properties here
-                 
+                    unit.controller(new PlayerIndependentAI(playerUnit));
                 }
             }
         }
     }
-}
 
+    // Define PlayerIndependentAI as an inner class
+    private static class PlayerIndependentAI extends AIController {
+        private final Unit targetUnit;
+
+        public PlayerIndependentAI(Unit targetUnit) {
+            this.targetUnit = targetUnit;
+        }
+
+        @Override
+        public boolean checkTarget(Teamc target, float x, float y, float range) {
+            // Check if the target is the player's unit
+            return ((AIController) target).unit() == targetUnit;
+        }
+
+    }
+}
