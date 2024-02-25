@@ -3,52 +3,36 @@ package tower.Domain;
 import mindustry.content.Items;
 import mindustry.type.Item;
 
-/**
- * Represents the currency system for the tower defense game.
- * This class contains static arrays that define the items used as currency,
- * the points gained for each item, and the prices for purchasing items.
- */
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@SuppressWarnings("unused")
 public class Currency {
-    /**
-     * A  2D array representing the items that can be used as currency.
-     * Each row represents a tier of items, and each column within a row represents an item within that tier.
-     */
-    public static Item[][] itemsforcore = {
+    public static List<Map<String, Object>> items = new ArrayList<>();
+
+    static {
         // Tier  1
-        {Items.copper, Items.lead, Items.graphite, Items.beryllium},
+        items.add(Map.of("item", Items.copper, "gain",  1, "price",  400, "minQuantity",  1500));
+        items.add(Map.of("item", Items.lead, "gain",  1, "price",  400, "minQuantity",  1500));
+        items.add(Map.of("item", Items.graphite, "gain",  1, "price",  350, "minQuantity",  1500));
+        items.add(Map.of("item", Items.beryllium, "gain",  1, "price",  500, "minQuantity",  1500));
+
         // Tier  2
-        {Items.metaglass, Items.silicon, Items.titanium, Items.tungsten},
+        items.add(Map.of("item", Items.metaglass, "gain",  1, "price",  320, "minQuantity",  1500));
+        items.add(Map.of("item", Items.silicon, "gain",  1, "price",  320, "minQuantity",  1500));
+        items.add(Map.of("item", Items.titanium, "gain",  1, "price",  270, "minQuantity",  1500));
+        items.add(Map.of("item", Items.tungsten, "gain",  1, "price",  300, "minQuantity",  1500));
+
         // Tier  3
-        {Items.thorium, Items.plastanium, Items.oxide},
+        items.add(Map.of("item", Items.thorium, "gain",  1, "price",  240, "minQuantity",  1500));
+        items.add(Map.of("item", Items.plastanium, "gain",  1, "price",  200, "minQuantity",  1500));
+        items.add(Map.of("item", Items.oxide, "gain",  1, "price",  240, "minQuantity",  1500));
+
         // Tier  4
-        {Items.phaseFabric, Items.surgeAlloy, Items.carbide}
-    };
-
-    /**
-     * A  2D array representing the points gained for each item in the currency system.
-     * Each row corresponds to a tier of items, and each column within a row represents the points gained for an item within that tier.
-     */
-    public static Integer[][] Gain = {
-        {1,  1,  1,  1},
-        {1,  1,  1,  1},
-        {1,  1,  1},
-        {1,  1,  1}
-    };
-
-    /**
-     * A  2D array representing the prices for purchasing items in the currency system.
-     * Each row corresponds to a tier of items, and each column within a row represents the price for an item within that tier.
-     */
-    public static Integer[][] Priceforitems = {
-        {400,  400,  350,  500},
-        {320,  320,  270,  300},
-        {240,  200,  240},
-        {150,  150,  150}
-    };
-  public static Integer[][] MinQuantity = {
-    {1500,  1500, 1500, 1500}, // Tier  1
-    {1500,  1500, 1500 ,1500}, // Tier  2
-    {1500,  1500,  1500}, // Tier  3
-    {1500,  1500,  1500}  // Tier  4
-  };
+        items.add(Map.of("item", Items.phaseFabric, "gain",  1, "price",  150, "minQuantity",  1500));
+        items.add(Map.of("item", Items.surgeAlloy, "gain",  1, "price",  150, "minQuantity",  1500));
+        items.add(Map.of("item", Items.carbide, "gain",  1, "price",  150, "minQuantity",  1500));
+    }
 }
