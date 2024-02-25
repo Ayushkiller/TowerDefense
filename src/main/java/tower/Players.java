@@ -49,11 +49,8 @@ public class Players {
                         System.out.println("Displaying HUD text: " + hud.toString()); // Debug statement
                         Call.setHudText(hud.toString());
                         playerData.setLastUpdatedPoints(currentPoints);
-                    } else {
-                        System.out.println("Points have not changed."); // Debug statement
+
                     }
-                } else {
-                    System.out.println("Player is dead or name/UUID does not match."); // Debug statement
                 }
             }
         });
