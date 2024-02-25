@@ -71,6 +71,7 @@ private static final int menu = Menus.registerMenu((player, option) -> {
                     if (spawned.dead()) {
                         // Return the item to the player
                         playerData.addPoints((float) price, player);
+                        player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
                         player.sendMessage(Bundle.get("unit.died", player.locale));
                     }
                 });

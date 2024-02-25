@@ -9,7 +9,7 @@ public class Menuforunits {
     private static final int menu = Menus.registerMenu((player, option) -> {
         switch (option) {
             case 0 -> Units.execute(player);
-            case 1 -> Settings.execute(player);
+            case 1 -> Info.execute(player);
             case 2 -> BuyPoint.execute(player);
             case  3 -> Statuseffects.execute(player);
 
@@ -17,7 +17,7 @@ public class Menuforunits {
     });
 
     private static final String[][] buttons = {
-            {"[lime]Units",  "[red]Settings"},
+            {"[lime]Units",  "[red]Info"},
             {"[cyan]BuyPoints","[blue]Powerups", "[lightgray]Close"}
     };
 

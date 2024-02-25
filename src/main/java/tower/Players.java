@@ -4,7 +4,7 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import tower.Domain.PlayerData;
-import tower.commands.Settings;
+
 
 
 import java.util.HashMap;
@@ -35,17 +35,11 @@ public class Players {
                     player.unit(Players.getPlayer(player).getUnit());
                 }
 
-                // Check if stats are enabled for all players
-                if (Settings.isDisplayStatsForAll()) {
-                    // Display stats for all players
-                    displayStatsForAllPlayers(player);
-                }
-
                 if (!player.dead() && player.name().equals(playerData.getName()) && player.uuid().equals(playerData.getUuid())) {
                     float currentPoints = playerData.getPoints();
                     if (currentPoints != playerData.getLastUpdatedPoints()) {
                         StringBuilder hud = new StringBuilder();
-                        hud.append("[green]Points " + playerData.getName() + (int) playerData.getPoints() + "\n  ");
+                        hud.append("[green]Points " + playerData.getName()+ "=" + (int) playerData.getPoints() + "\n  ");
                         System.out.println("Displaying HUD text: " + hud.toString()); // Debug statement
                         Call.setHudText(player.con, hud.toString());
                         playerData.setLastUpdatedPoints(currentPoints);
@@ -57,19 +51,7 @@ public class Players {
     }
     
 
-    private static void displayStatsForAllPlayers(Player player) {
-        if (Settings.isDisplayStatsForAll()) {
-            Groups.player.each(p -> {
-                if (!p.dead() && p.uuid().equals(player.uuid())) {
-                    PlayerData playerData = Players.getPlayer(p);
-                    String message = "[scarlet]" + (int) p.unit().health + "/" + (int) p.unit().type.health + "\n" +
-                            "[accent]" + (int) p.unit().shield + " " +
-                            "[green]" + (int) playerData.getPoints() + "\n  ";
-                    Call.label(player.con, message.replace("  ", playerData.stats() ? "[lime]on" : "[scarlet]off"),   0.017f, p.x, p.y-16);
-                }
-            });
-        }
-    }
+
 }
 
 
