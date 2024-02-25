@@ -1,11 +1,12 @@
 package tower.commands;
 
 import mindustry.Vars;
+import mindustry.content.UnitTypes;
 import mindustry.core.World;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.world.Tile;
-import tower.Domain.UnitsTable;
+
 
 import java.util.Random;
 
@@ -28,7 +29,7 @@ public class SuperPowers {
     }
     
     private static void spawnUnitsAroundPlayer(Player player, World world, float playerX, float playerY) {
-        float radius =  40f;
+        float radius =  80f;
         Random random = new Random();
     
         for (int i =  0; i <  6; i++) {
@@ -50,13 +51,15 @@ public class SuperPowers {
             // Find the tile at the world position
             Tile tile = world.tileWorld(worldX, worldY);
             if (tile != null) {
-                // Spawn a unit at the tile
-                Unit unit = UnitsTable.spawnUnit(tile, player);
+                // Spawn a Corvus unit at the tile
+                // Assuming there's a method to spawn a unit of a specific type
+                Unit unit = UnitTypes.corvus.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
                 if (unit != null) {
                     // Optionally, set the unit's target or other properties here
                 }
             }
         }
     }
+
 }
 
