@@ -1,6 +1,7 @@
 package tower.commands;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import mindustry.gen.Call;
@@ -41,19 +42,19 @@ public class Statuseffects {
 
     private static void openGui(Player player) {
         // Ensure the buttons array is initialized
-        if (buttons == null || buttons.length ==  0) {
+        if (buttons == null || buttons.length ==   0) {
             initEffectsTable(player); // Pass the Player object here
         }
-    
+
         // Display the menu to the player
         Call.menu(player.con, menu, Bundle.get("menu.effects.title", player.locale), "", buttons);
     }
 
     private static final int menu = Menus.registerMenu((player, option) -> {
         // Iterate through each row of the Effects.Effects array
-        for (int i =  0; i < Effects.Effects.length; i++) {
+        for (int i =   0; i < Effects.Effects.length; i++) {
             // Iterate through each column in the current row
-            for (int j =  0; j < Effects.Effects[i].length; j++) {
+            for (int j =   0; j < Effects.Effects[i].length; j++) {
                 // Calculate the index based on the current row and column
                 int index = i * Effects.Effects[i].length + j;
                 // Check if the calculated index matches the option
@@ -73,35 +74,33 @@ public class Statuseffects {
         int columns = Effects.Effects[0].length;
         buttons = new String[rows][columns];
     
-        for (int i =  0; i < Effects.Effects.length; i++) {
-            for (int j =  0; j < Effects.Effects[i].length; j++) {
+        for (int i =   0; i < Effects.Effects.length; i++) {
+            for (int j =   0; j < Effects.Effects[i].length; j++) {
                 StatusEffect effect = Effects.Effects[i][j];
                 int effectPrice = effectPrices.get(effect);
                 // Fetch the current unit's type
                 UnitType currentUnitType = player.unit().type();
                 // Find the position of the current unit type within the UnitsTable.units array
                 int row = -1, column = -1;
-                for (int k =  0; k < UnitsTable.units.length; k++) {
-                    for (int l =  0; l < UnitsTable.units[k].length; l++) {
-                        if (UnitsTable.units[k][l] == currentUnitType) {
-                            row = k;
-                            column = l;
-                            break;
-                        }
-                    }
-                    if (row != -1) {
+                Map<String, Object> unitMap = null; // Declare unitMap outside the loop
+                for (int k =   0; k < UnitsTable.units.size(); k++) {
+                    unitMap = UnitsTable.units.get(k); // Use 'k' here
+                    UnitType unitType = (UnitType) unitMap.get("unit");
+                    if (unitType == currentUnitType) {
+                        row = k; // Use 'k' here
+                        column =   0; // Assuming you want to access the first element of the map
                         break;
                     }
                 }
-                // Check if the unit position was found
+    
+                // Now unitMap is accessible here
                 if (row == -1 || column == -1) {
                     buttons[i][j] = effect.emoji() + " Error: Unit type not found";
                     continue;
                 }
-                // Directly access the price for the current unit type from the prices array using the row and column
-                int currentUnitPrice = UnitsTable.prices[row][column];
+                int currentUnitPrice = (int) unitMap.get("price");
                 // Calculate   75% of the current unit's price
-                int additionalPrice = (int) (currentUnitPrice *  0.75);
+                int additionalPrice = (int) (currentUnitPrice *   0.75);
                 // Add the calculated amount to the status effect's price
                 int totalPrice = effectPrice + additionalPrice;
                 // Concatenate the emoji with the total price
@@ -118,30 +117,34 @@ public class Statuseffects {
         UnitType currentUnitType = player.unit().type();
         // Find the position of the current unit type within the UnitsTable.units array
         int row = -1, column = -1;
-        for (int i =   0; i < UnitsTable.units.length; i++) {
-            for (int j =   0; j < UnitsTable.units[i].length; j++) {
-                if (UnitsTable.units[i][j] == currentUnitType) {
-                    row = i;
-                    column = j;
-                    break;
-                }
-            }
-            if (row != -1) {
+        Map<String, Object> unitMap = null; // Declare unitMap outside the loop
+        for (int i =  0; i < UnitsTable.units.size(); i++) {
+            unitMap = UnitsTable.units.get(i); // Use 'i' here
+            UnitType unitType = (UnitType) unitMap.get("unit");
+            if (unitType == currentUnitType) {
+                row = i;
+                column =  0; // Assuming you want to access the first element of the map
                 break;
             }
         }
 
-        // Check if the unit position was found
-        if (row == -1 || column == -1) {
-            player.sendMessage("Error: Unit type not found in UnitsTable.");
+        // Check if the unit position was found and unitMap is not null
+        if (row == -1 || column == -1 || unitMap == null) {
+            player.sendMessage("Error: Unit type not found in UnitsTable or unitMap is null.");
             return;
         }
 
-        // Directly access the price for the current unit type from the prices array using the unit position
-        int currentUnitPrice = UnitsTable.prices[row][column];
+        // Check if unitMap contains the "price" key
+        if (!unitMap.containsKey("price")) {
+            player.sendMessage("Error: Price not found for the unit.");
+            return;
+        }
 
-        // Calculate   75% of the current unit's price
-        int additionalPrice = (int) (currentUnitPrice *   0.75);
+        // Directly access the price for the current unit type from the unitMap
+        int currentUnitPrice = (int) unitMap.get("price");
+
+        // Calculate  75% of the current unit's price
+        int additionalPrice = (int) (currentUnitPrice *  0.75);
         // Add the calculated amount to the status effect's price
         int totalPrice = effectPrice + additionalPrice;
 
@@ -156,4 +159,3 @@ public class Statuseffects {
         }
     }
 }
-

@@ -5,9 +5,9 @@ import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 import mindustry.ui.Menus;
-import tower.Domain.UnitsTable;
 import tower.Bundle;
 import tower.Domain.PlayerData;
+import tower.Domain.UnitsTable;
 import tower.Players;
 
 import java.util.HashMap;
@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 public class Units {
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
 
@@ -50,7 +51,7 @@ public class Units {
                         player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
                         player.sendMessage(Bundle.get("unit.died", player.locale));
                     }
-                },  3, TimeUnit.SECONDS);
+                },   3, TimeUnit.SECONDS);
 
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
             } else {
@@ -69,7 +70,6 @@ public class Units {
                 Bundle.get("menu.units.info.health", player.locale) + " " + (int) unitType.health + "\n" +
                 Bundle.get("menu.units.info.armor", player.locale) + " " + (int) unitType.armor + "\n" +
                 Bundle.get("menu.units.info.price", player.locale) + " " + price;
-
 
         int menu = Menus.registerMenu(((player1, option) -> {
             switch (option) {
