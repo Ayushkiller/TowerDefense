@@ -18,8 +18,6 @@ public class Players {
     public static PlayerData getPlayer(Player player) {
         if (!players.containsKey(player.uuid())) {
             PlayerData playerData = new PlayerData(player);
-            // Set the player's name in the PlayerData object
-            playerData.setName(player.name());
             players.put(player.uuid(), playerData);
         }
         return players.get(player.uuid());
@@ -60,7 +58,11 @@ while (players.hasNext()) {
               Call.setHudText(player.con, hudText);
           }
       }
-              
+      public static void clearPlayerHud(Player player) {
+        if (player != null && !player.dead()) {
+            Call.setHudText(player.con, "");
+        }
+    }    
     
 
  private static void displayStatsForAllPlayers(Player player) {
@@ -70,7 +72,7 @@ while (players.hasNext()) {
                 Timer.schedule(() -> {
                     String message = "[green]"+player.name()+ "[red]Points" + (int) Players.getPlayer(p).getPoints() + "\n  ";
                     Call.label(player.con, message.replace("  ", Settings.isDisplayStatsForAll() ? "[lime]On" : "[scarlet]Off"),   0.017f, p.x, p.y-16);
-                },  0f,  1f);
+                },  1f,  0f);
             }
         });
     }
