@@ -29,7 +29,7 @@ public class SuperPowers {
     private static void spawnUnitsAroundPlayer(Player player, World world, float playerX, float playerY) {
         float radius =  80f;
         int numberOfUnits =  6; // Number of units to spawn
-        float angleStep =  60f / numberOfUnits; // Calculate the angle step for even spacing
+        float angleStep =  360f / numberOfUnits; // Calculate the angle step for even spacing
 
         for (int i =  0; i < numberOfUnits; i++) {
             // Calculate the angle for the current unit
@@ -54,8 +54,9 @@ public class SuperPowers {
                 Unit unit = UnitTypes.corvus.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
                 if (unit != null) {
                     // Set the unit's target to the player's position
-                    unit.aim(playerX, playerY);
-                    unit.isShooting=true;
+                   
+                    // Optionally, set the unit's target or other properties here
+                 
                 }
             }
         }
