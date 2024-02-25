@@ -47,7 +47,7 @@ public class Players {
                         StringBuilder hud = new StringBuilder();
                         hud.append("[green]Points " + playerData.getName() + (int) playerData.getPoints() + "\n  ");
                         System.out.println("Displaying HUD text: " + hud.toString()); // Debug statement
-                        Call.setHudText(hud.toString());
+                        Call.setHudText(player.con, hud.toString());
                         playerData.setLastUpdatedPoints(currentPoints);
                     }
                 }
