@@ -36,15 +36,13 @@ public class BuyPoint {
     }
 
     private static void openQuantityAdjustmentMenu(Player player, int option) {
-        if (option >= Currency.items.size()) {
+        if (option <  0 || option >= Currency.items.size()) {
             player.sendMessage("Invalid selection. Please try again.");
             return;
         }
-
         Map<String, Object> selectedItemMap = Currency.items.get(option);
         Item selectedItem = (Item) selectedItemMap.get("item");
-
-        // Set up the menu for quantity adjustment
+    
         String title = "Adjust Quantity";
         Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
         String updatedQuantities = "";
@@ -52,7 +50,8 @@ public class BuyPoint {
             updatedQuantities += entry.getKey().emoji() + ": " + entry.getValue() + "\n";
         }
         String description = "Select quantity adjustment\n\n" + updatedQuantities;
-        String[][] buttons = new String[][]{{"-1000", "-100", "-50", "+50", "+100", "+1000"}, {"Buy", "Close", "Back"}};
+        String[][] buttons = new String[][]{{"-2000", "-1000", "-100", "+400", "+1000", "+2000"}, {"Buy", "Close", "Back"}};
+    
 
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
             if (opt <  6) { // Adjustment buttons
