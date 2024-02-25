@@ -8,8 +8,6 @@ import mindustry.gen.Unit;
 import mindustry.world.Tile;
 
 
-import java.util.Random;
-
 public class SuperPowers {
     private static final float tilesize =  1.0f; // Adjust the value as needed
     public static void execute(Player player) {
@@ -30,11 +28,12 @@ public class SuperPowers {
     
     private static void spawnUnitsAroundPlayer(Player player, World world, float playerX, float playerY) {
         float radius =  80f;
-        Random random = new Random();
+        int numberOfUnits =  6; // Number of units to spawn
+        float angleStep =  60f / numberOfUnits; // Calculate the angle step for even spacing
 
-        for (int i =  0; i <  6; i++) {
-            // Calculate a random angle for the spawn position
-            float angle = random.nextFloat() *  360;
+        for (int i =  0; i < numberOfUnits; i++) {
+            // Calculate the angle for the current unit
+            float angle = i * angleStep;
             // Convert the angle to radians
             double radians = Math.toRadians(angle);
             // Calculate the spawn position
@@ -56,10 +55,10 @@ public class SuperPowers {
                 if (unit != null) {
                     // Set the unit's target to the player's position
                     unit.aim(playerX, playerY);
+                    unit.isShooting=true;
                 }
             }
         }
     }
-
 }
 
