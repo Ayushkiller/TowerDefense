@@ -40,8 +40,8 @@ public class Currency {
      * Each row corresponds to a tier of items, and each column within a row represents the price for an item within that tier.
      */
     public static Integer[][] Priceforitems = {
-        {250,  250,  250},
-        {150,  150,  150},
+        {25,  25,  25},
+        {15,  15,  15},
         {50,  50,  50},
         {30,  30,  30}
     };
