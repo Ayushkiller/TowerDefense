@@ -73,7 +73,7 @@ public class BuyPoint {
                 openQuantityAdjustmentMenu(player, option);
             }
         } else if (opt ==  7) { // Close button
-            player.sendMessage("Closing menu without purchasing.");
+            player.sendMessage("");
         } else if (opt ==  8) { // Back button
             openMenu(player);
         }
@@ -127,13 +127,15 @@ public class BuyPoint {
             for (int j =   0; j < Currency.itemsforcore[i].length; j++) {
                 Item item = Currency.itemsforcore[i][j];
                 int requiredAmount = selectedItems.getOrDefault(item,   0); // Use the quantity the player wants to purchase
-                if (team.items().get(item) < requiredAmount) {
+                if (team.items().get(item) < requiredAmount || team.items().get(item) - requiredAmount <   1500) {
+                    player.sendMessage(Bundle.get("menu.buypoint.critically_low_resources"));
                     return false;
                 }
             }
         }
         return true;
     }
+
 
 
 

@@ -56,31 +56,26 @@ while (players.hasNext()) {
               // Format the HUD text dynamically based on player data
               String hudText = "[green]" + player.name() + "'s Points: " + (int) currentPoints;
 
-              // Check if the current instance is a client before setting the HUD text
-              if (player.isLocal()) {
-                  Call.setHudText(player.con, hudText);
-              }
+              // Use Call.setHudText to display the points on the client's HUD
+              Call.setHudText(player.con, hudText);
           }
       }
-        
+              
     
 
-private static void displayStatsForAllPlayers(Player player) {
+ private static void displayStatsForAllPlayers(Player player) {
     if (Settings.isDisplayStatsForAll()) {
         Groups.player.each(p -> {
             if (!p.dead()) {
                 Timer.schedule(() -> {
-                    String message = "[scarlet]" + (int) p.unit().health + "/" + (int) p.unit().type.health + "\n" +
-                            "[accent]" + (int) p.unit().shield + " " +
-                            "[green]" + (int) Players.getPlayer(p).getPoints() + "\n  ";
-                    Call.label(player.con, message.replace("  ", Settings.isDisplayStatsForAll() ? "[lime]true" : "[scarlet]false"),   0.017f, p.x, p.y-16);
+                    String message = "[green]"+player.name()+ "[red]Points" + (int) Players.getPlayer(p).getPoints() + "\n  ";
+                    Call.label(player.con, message.replace("  ", Settings.isDisplayStatsForAll() ? "[lime]On" : "[scarlet]Off"),   0.017f, p.x, p.y-16);
                 },  0f,  1f);
             }
         });
     }
 
+ } 
 }
-}
-
 
 
