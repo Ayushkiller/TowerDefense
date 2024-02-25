@@ -21,21 +21,21 @@ public class BuyPoint {
 
     private static void openMenu(Player player) {
         String[][] buttons = new String[Currency.itemsforcore.length][Currency.itemsforcore[0].length];
-
-        for (int i =  0; i < Currency.itemsforcore.length; i++) {
-            for (int j =  0; j < Currency.itemsforcore[i].length; j++) {
+    
+        for (int i =   0; i < Currency.itemsforcore.length; i++) {
+            for (int j =   0; j < Currency.itemsforcore[i].length; j++) {
                 Item item = Currency.itemsforcore[i][j];
                 int gain = Currency.Gain[i][j];
                 int price = Currency.Priceforitems[i][j];
                 buttons[i][j] = String.format("[lime]%s (+%d) [gray]Price: %d", item.emoji(), gain, price);
             }
         }
-
+    
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
             openQuantityAdjustmentMenu(player, option);
         }), Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
     }
-
+    
     private static void openQuantityAdjustmentMenu(Player player, int option) {
         // Iterate through rows
         for (int row =   0; row < Currency.itemsforcore.length; row++) {
@@ -43,12 +43,12 @@ public class BuyPoint {
             for (int col =   0; col < Currency.itemsforcore[row].length; col++) {
                 // Calculate the index based on the current row and column
                 int index = row * Currency.itemsforcore[row].length + col;
-
+    
                 // Check if the calculated index matches the option
                 if (index == option) {
                     // Use row and col to access elements in Currency.itemsforcore and Currency.MinQuantity
                     Item selectedItem = Currency.itemsforcore[row][col];
-
+    
                     // Set up the menu for quantity adjustment
                     String title = "Adjust Quantity";
                     Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
@@ -58,7 +58,8 @@ public class BuyPoint {
                     }
                     String description = "Select quantity adjustment\n\n" + updatedQuantities;
                     String[][] buttons = new String[][]{{"-1000", "-100", "-50", "+50", "+100", "+1000"}, {"Buy", "Close", "Back"}};
-
+    
+    
                     Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
                         if (opt <   6) { // Adjustment buttons
                             int adjustment = Integer.parseInt(buttons[0][opt]);
@@ -88,16 +89,16 @@ public class BuyPoint {
                             openMenu(player);
                         }
                     }), title, description, buttons);
-
+    
+    
                     return; // Exit the method once the matching item is found
                 }
             }
         }
-
+    
         // If no matching item is found, send an error message
         player.sendMessage("Invalid selection. Please try again.");
     }
-    
     private static boolean hasEnoughItems(Team team, int option, Player player) {
         Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
         for (int i =   0; i < Currency.itemsforcore.length; i++) {
