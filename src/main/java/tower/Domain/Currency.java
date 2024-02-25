@@ -15,13 +15,13 @@ public class Currency {
      */
     public static Item[][] itemsforcore = {
         // Tier  1
-        { Items.copper, Items.lead, Items.beryllium},
+        {Items.copper, Items.lead, Items.graphite, Items.beryllium},
         // Tier  2
-        {Items.metaglass, Items.graphite, Items.silicon},
+        {Items.metaglass, Items.silicon, Items.titanium, Items.tungsten},
         // Tier  3
-        {Items.titanium, Items.thorium, Items.tungsten},
+        {Items.thorium, Items.plastanium, Items.oxide},
         // Tier  4
-        {Items.oxide, Items.phaseFabric, Items.surgeAlloy}
+        {Items.phaseFabric, Items.surgeAlloy, Items.carbide}
     };
 
     /**
@@ -29,10 +29,10 @@ public class Currency {
      * Each row corresponds to a tier of items, and each column within a row represents the points gained for an item within that tier.
      */
     public static Integer[][] Gain = {
+        {1,  1,  1,  1},
+        {1,  1,  1,  1},
         {1,  1,  1},
-        {5,  5,  5},
-        {8,  8,  8},
-        {15,  15,  15}
+        {1,  1,  1}
     };
 
     /**
@@ -40,14 +40,14 @@ public class Currency {
      * Each row corresponds to a tier of items, and each column within a row represents the price for an item within that tier.
      */
     public static Integer[][] Priceforitems = {
-        {25,  25,  25},
-        {15,  15,  15},
-        {50,  50,  50},
-        {30,  30,  30}
+        {400,  400,  350,  500},
+        {320,  320,  270,  300},
+        {240,  200,  240},
+        {150,  150,  150}
     };
   public static Integer[][] MinQuantity = {
-    {1500,  1500,  1500}, // Tier  1
-    {1500,  1500,  1500}, // Tier  2
+    {1500,  1500, 1500, 1500}, // Tier  1
+    {1500,  1500, 1500 ,1500}, // Tier  2
     {1500,  1500,  1500}, // Tier  3
     {1500,  1500,  1500}  // Tier  4
   };

@@ -104,36 +104,63 @@ public class BuyPoint {
         return true;
     }
 
+    private static int calculateTotalPoints(java.util.Map<Item, Integer> selectedItems) {
+        int totalPoints =   0;
+        for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
+            Item item = entry.getKey();
+            int quantity = entry.getValue();
+            int minQuantity = getMinQuantityForItem(item);
+            int actualQuantity = Math.min(quantity, minQuantity);
+            int excessQuantity = Math.max(0, quantity - minQuantity);
+    
+            // Initialize i and j outside the loop to make them accessible for excess quantity calculation
+            int i = -1;
+            int j = -1;
+    
+            // Calculate points for actualQuantity
+            for (int row =  0; row < Currency.itemsforcore.length; row++) {
+                for (int col =  0; col < Currency.itemsforcore[row].length; col++) {
+                    if (Currency.itemsforcore[row][col] == item) {
+                        i = row;
+                        j = col;
+                        int pointGain = Currency.Gain[i][j];
+                        int itemPrice = Currency.Priceforitems[i][j];
+                        totalPoints += (float)pointGain / itemPrice * actualQuantity;
+                        break;
+                    }
+                }
+                if (i != -1 && j != -1) {
+                    break; // Break the outer loop if the item is found
+                }
+            }
+    
+            // If there's excess quantity, calculate points for it
+            if (excessQuantity >   0) {
+                
+                totalPoints += (float)Currency.Gain[i][j] / Currency.Priceforitems[i][j] * excessQuantity;
+            }
+        }
+        return totalPoints;
+    }
+
+    private static int getMinQuantityForItem(Item item) {
+        for (int i =   0; i < Currency.itemsforcore.length; i++) {
+            for (int j =   0; j < Currency.itemsforcore[i].length; j++) {
+                if (Currency.itemsforcore[i][j] == item) {
+                    return Currency.MinQuantity[i][j];
+                }
+            }
+        }
+        return  0; // Return  0 if the item is not found in the itemsforcore array
+    }
     private static void removeItemsFromTeam(Team team, java.util.Map<Item, Integer> selectedItems) {
         for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
             int quantity = entry.getValue();
-            team.items().remove(item, quantity);
+            int minQuantity = getMinQuantityForItem(item);
+            int actualQuantity = Math.min(quantity, minQuantity);
+            team.items().remove(item, actualQuantity);
         }
-    }
-
-
-    private static int calculateTotalPoints(java.util.Map<Item, Integer> selectedItems) {
-        int totalPoints =  0;
-        for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
-            Item item = entry.getKey();
-            int quantity = entry.getValue();
-    
-            // Iterate through rows of itemsforcore
-            for (int i =  0; i < Currency.itemsforcore.length; i++) {
-                // Iterate through items in the current row
-                for (int j =  0; j < Currency.itemsforcore[i].length; j++) {
-                    if (Currency.itemsforcore[i][j] == item) {
-                        // Found the item, calculate the total points for this item based on the ratio of gain points to priceforitems
-                        int pointGain = Currency.Gain[i][j];
-                        int itemPrice = Currency.Priceforitems[i][j];
-                        totalPoints += (float)pointGain / itemPrice * quantity;
-                        break; // Break the inner loop as the item is found
-                    }
-                }
-            }
-        }
-        return totalPoints;
     }
     public static void createAndDisplayMenu(Player player, String title, String description, String[][] buttons) {
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {

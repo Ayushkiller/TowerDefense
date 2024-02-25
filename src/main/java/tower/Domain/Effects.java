@@ -16,7 +16,7 @@ public static StatusEffect[][] Effects = {
     // Tier   1
     { StatusEffects.overdrive, StatusEffects.fast, StatusEffects.overclock},
     // Tier   2
-    {StatusEffects.shielded, StatusEffects.slow, StatusEffects.boss}
+    {StatusEffects.shielded, StatusEffects.boss, StatusEffects.invincible}
 };
 
     /**
@@ -24,9 +24,8 @@ public static StatusEffect[][] Effects = {
      * Each row corresponds to a tier of items, and each column within a row represents the price for an item within that tier.
      */
     public static Integer[][] Priceforeffects = {
-        {15,  15,  15},
-        {25,  25,  25}
+        {20,  15,  30},
+        {20,  45,  30}
     };
-
 }
 

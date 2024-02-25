@@ -13,28 +13,32 @@ public class UnitsTable {
      * Each element in the array is a UnitType object representing a unit that can be purchased.
      */
     public static UnitType[][] units = {
-    {UnitTypes.alpha, UnitTypes.beta, UnitTypes.gamma, UnitTypes.emanate, UnitTypes.evoke, UnitTypes.incite},
-    {UnitTypes.mono, UnitTypes.dagger, UnitTypes.flare, UnitTypes.crawler, UnitTypes.nova, UnitTypes.risso},
-    {UnitTypes.retusa, UnitTypes.stell, UnitTypes.elude, UnitTypes.merui,UnitTypes.poly, UnitTypes.mace},
-    {UnitTypes.horizon, UnitTypes.atrax, UnitTypes.pulsar, UnitTypes.minke, UnitTypes.oxynoe, UnitTypes.locus},
-    {UnitTypes.avert, UnitTypes.cleroi,UnitTypes.bryde, UnitTypes.cyerce, UnitTypes.precept, UnitTypes.anthicus},
-    {UnitTypes.fortress, UnitTypes.quasar, UnitTypes.spiroct, UnitTypes.zenith, UnitTypes.mega,UnitTypes.obviate},
-    {UnitTypes.scepter, UnitTypes.aegires, UnitTypes.sei, UnitTypes.quad, UnitTypes.antumbra, UnitTypes.arkyid},
-    {UnitTypes.vela, UnitTypes.scepter, UnitTypes.vanquish, UnitTypes.tecta, UnitTypes.quell,UnitTypes.conquer},
-    {UnitTypes.collaris, UnitTypes.disrupt, UnitTypes.reign, UnitTypes.oct, UnitTypes.eclipse, UnitTypes.corvus},
-    {UnitTypes.toxopid, UnitTypes.omura, UnitTypes.navanax,UnitTypes.renale,UnitTypes.latum,UnitTypes.assemblyDrone}
+    {UnitTypes.alpha, UnitTypes.beta, UnitTypes.gamma, UnitTypes.evoke, UnitTypes.incite, UnitTypes.emanate},
+    {UnitTypes.dagger, UnitTypes.mace, UnitTypes.fortress, UnitTypes.scepter, UnitTypes.reign},
+    {UnitTypes.nova, UnitTypes.pulsar, UnitTypes.quasar, UnitTypes.vela,UnitTypes.corvus},
+    {UnitTypes.crawler, UnitTypes.atrax, UnitTypes.spiroct, UnitTypes.arkyid, UnitTypes.toxopid},
+    {UnitTypes.flare, UnitTypes.horizon, UnitTypes.zenith, UnitTypes.antumbra, UnitTypes.eclipse},
+    {UnitTypes.mono, UnitTypes.poly, UnitTypes.mega, UnitTypes.quad, UnitTypes.oct},
+    {UnitTypes.risso, UnitTypes.minke, UnitTypes.bryde, UnitTypes.sei, UnitTypes.omura},
+    {UnitTypes.retusa, UnitTypes.oxynoe, UnitTypes.cyerce, UnitTypes.aegires, UnitTypes.navanax},
+    {UnitTypes.stell, UnitTypes.locus, UnitTypes.precept, UnitTypes.vanquish, UnitTypes.conquer},
+    {UnitTypes.merui, UnitTypes.cleroi, UnitTypes.anthicus, UnitTypes.tecta, UnitTypes.collaris},
+    {UnitTypes.elude, UnitTypes.avert, UnitTypes.obviate, UnitTypes.quell, UnitTypes.disrupt},
+    {UnitTypes.renale, UnitTypes.latum}
     };
 
     public static Integer[][] prices = {
-        {10,  10,   10,   10,   10,   10},
-        {13,  15,   17,   19,   21,   23},
-        {23,  25,   27,   29,   31,   33},
-        {33,  35,   37,   39,   41,   43},
-        {43,  45,   47,   49,   51,   53},
-        {53,  55,   57,   59,   61,   63},
-        {63,  65,   67,   69,   71,   73},
-        {73,  75,   77,   79,   81,   83},
-        {83,  85,   87,   89,   91,   93},
-        {93,  95,   97,   99,   101,   103}
+        {4,  5,  6,   8,   9,   10},
+        {1,  4,  12,  30,  50},
+        {1,  4,  13,  32,  52},
+        {1,  3,  12,  30,  50},
+        {1,  3,  10,  27,  48},
+        {2,  5,  13,  27,  45},
+        {2,  5,  13,  32,  52},
+        {2,  5,  13,  32,  52},
+        {3,  8,  18,  40,  65},
+        {3,  9,  20,  42,  65},
+        {3,  8,  18,  40,  65},
+        {12, 60}
     };
 }

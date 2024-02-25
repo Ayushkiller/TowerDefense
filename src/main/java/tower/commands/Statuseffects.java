@@ -50,8 +50,20 @@ public class Statuseffects {
     }
 
     private static final int menu = Menus.registerMenu((player, option) -> {
-        StatusEffect effect = Effects.Effects[option / Effects.Effects[0].length][option % Effects.Effects[0].length];
-        buyEffect(effect, player);
+        // Iterate through each row of the Effects.Effects array
+        for (int i =  0; i < Effects.Effects.length; i++) {
+            // Iterate through each column in the current row
+            for (int j =  0; j < Effects.Effects[i].length; j++) {
+                // Calculate the index based on the current row and column
+                int index = i * Effects.Effects[i].length + j;
+                // Check if the calculated index matches the option
+                if (index == option) {
+                    StatusEffect effect = Effects.Effects[i][j];
+                    buyEffect(effect, player);
+                    break; // Exit the loop once the matching effect is found
+                }
+            }
+        }
     });
 
     private static String[][] buttons; // Declare the buttons variable here
