@@ -45,13 +45,13 @@ public class Players {
                     float currentPoints = playerData.getPoints();
                     if (currentPoints != playerData.getLastUpdatedPoints()) {
                         StringBuilder hud = new StringBuilder();
-                        hud.append("[green]Points "+ Players.getPlayer(player).getName()+ (int) Players.getPlayer(player).getPoints() + "\n  ");
+                        hud.append("[green]Points " + playerData.getName() + (int) playerData.getPoints() + "\n  ");
                         System.out.println("Displaying HUD text: " + hud.toString()); // Debug statement
                         Call.setHudText(hud.toString());
                         playerData.setLastUpdatedPoints(currentPoints);
-
                     }
                 }
+                
             }
         });
     }
@@ -61,10 +61,11 @@ public class Players {
         if (Settings.isDisplayStatsForAll()) {
             Groups.player.each(p -> {
                 if (!p.dead() && p.uuid().equals(player.uuid())) {
+                    PlayerData playerData = Players.getPlayer(p);
                     String message = "[scarlet]" + (int) p.unit().health + "/" + (int) p.unit().type.health + "\n" +
                             "[accent]" + (int) p.unit().shield + " " +
-                            "[green]" + (int) Players.getPlayer(p).getPoints() + "\n  ";
-                    Call.label(player.con, message.replace("  ", Players.getPlayer(p).stats() ? "[lime]true" : "[scarlet]false"),   0.017f, p.x, p.y-16);
+                            "[green]" + (int) playerData.getPoints() + "\n  ";
+                    Call.label(player.con, message.replace("  ", playerData.stats() ? "[lime]on" : "[scarlet]off"),   0.017f, p.x, p.y-16);
                 }
             });
         }

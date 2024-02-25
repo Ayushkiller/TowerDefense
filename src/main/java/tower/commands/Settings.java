@@ -28,7 +28,6 @@ public class Settings {
     public enum DisplayStatsMode {
         ON, OFF
     }
-
     private static DisplayStatsMode displayStatsMode = DisplayStatsMode.OFF;
 
     public static void toggleDisplayStatsForAll() {
@@ -38,4 +37,5 @@ public class Settings {
     public static boolean isDisplayStatsForAll() {
         return displayStatsMode == DisplayStatsMode.ON;
     }
+
 }
