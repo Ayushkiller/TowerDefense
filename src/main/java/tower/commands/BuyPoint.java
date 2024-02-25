@@ -27,7 +27,7 @@ public class BuyPoint {
             Item item = (Item) itemMap.get("item");
             int gain = (int) itemMap.get("gain");
             int price = (int) itemMap.get("price");
-            buttons[i][0] = String.format("[lime]%s (+%d) [gray]Price: %d", item.emoji(), gain, price);
+            buttons[i][0] = String.format("%s (+%d) [gray]Price: %d", item.emoji(), gain, price);
         }
 
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
