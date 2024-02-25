@@ -10,16 +10,17 @@ public class Menuforunits {
         switch (option) {
             case 0 -> Units.execute(player);
             case 1 -> Info.execute(player);
-            case 2 -> BuyPoint.execute(player);
-            case  3 -> Statuseffects.execute(player);
+            case 2 -> SuperPowers.execute(player);
+            case 3 -> BuyPoint.execute(player);
+            case 4 -> Statuseffects.execute(player);
 
         }
     });
 
     private static final String[][] buttons = {
-            {"[lime]Units",  "[red]Info"},
-            {"[cyan]BuyPoints","[blue]Powerups", "[lightgray]Close"}
-    };
+        {"[lime]Units", "[red]Info","[purple]SuperPowers"},
+        {"[cyan]BuyPoints","[blue]Powerups", "[lightgray]Close"}
+};
 
     public static void execute(Player player) {
         openGui(player);

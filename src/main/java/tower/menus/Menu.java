@@ -7,6 +7,7 @@ import tower.Bundle;
 import tower.commands.BuyPoint;
 import tower.commands.Info;
 import tower.commands.Statuseffects;
+import tower.commands.SuperPowers;
 import tower.commands.Units;
 
 public class Menu {
@@ -14,14 +15,15 @@ public class Menu {
         switch (option) {
             case 0 -> Units.execute(player);
             case 1 -> Info.execute(player);
-            case 2 -> BuyPoint.execute(player);
-            case  3 -> Statuseffects.execute(player);
+            case 2 -> SuperPowers.execute(player);
+            case 3 -> BuyPoint.execute(player);
+            case 4 -> Statuseffects.execute(player);
   
         }
     });
 
     private static final String[][] buttons = {
-            {"[lime]Units", "[red]Info"},
+            {"[lime]Units", "[red]Info","[purple]SuperPowers"},
             {"[cyan]BuyPoints","[blue]Powerups", "[lightgray]Close"}
     };
 
