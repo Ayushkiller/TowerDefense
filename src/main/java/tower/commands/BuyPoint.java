@@ -39,7 +39,7 @@ public class BuyPoint {
 
     private static void openQuantityAdjustmentMenu(Player player, int option) {
         String title = "Adjust Quantity";
-        Map<Item, Integer> quantities = selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
+        Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
         String updatedQuantities = "";
         for (Map.Entry<Item, Integer> entry : quantities.entrySet()) {
             updatedQuantities += entry.getKey().emoji() + ": " + entry.getValue() + "\n";
@@ -47,38 +47,38 @@ public class BuyPoint {
         String description = "Select quantity adjustment\n\n" + updatedQuantities;
         String[][] buttons = new String[][]{{"-1000", "-100", "-50", "+50", "+100", "+1000"}, {"Buy", "Close", "Back"}};
 
-    Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-        if (opt <  6) { // Adjustment buttons
-            // Adjusted logic to iterate through rows first and then columns
-            Item selectedItem = Currency.itemsforcore[option / Currency.itemsforcore[0].length][option % Currency.itemsforcore[0].length];
-            int adjustment = Integer.parseInt(buttons[0][opt]);
+        Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
+            if (opt <   6) { // Adjustment buttons
+                Item selectedItem = Currency.itemsforcore[option / Currency.itemsforcore[0].length][option % Currency.itemsforcore[0].length];
+                int adjustment = Integer.parseInt(buttons[0][opt]);
 
-            if (adjustment <  0) {
-                player.sendMessage("You cannot set the quantity to a negative value.");
-                return;
-            }
+                if (adjustment <   0) {
+                    sendMessageToPlayer(player, "menu.buypoint.negativeQuantity");
+                    return;
+                }
 
-            quantities.put(selectedItem, quantities.getOrDefault(selectedItem,  0) + adjustment);
+                quantities.put(selectedItem, quantities.getOrDefault(selectedItem,   0) + adjustment);
 
-            // Reopen the QuantityAdjustmentMenu with updated quantities
-            openQuantityAdjustmentMenu(player, option);
-        } else if (opt ==  6) { // Buy button
-            if (hasEnoughItems(player.team(), option, player)) {
-                openConfirmPurchaseMenu(player, option);
-            } else {
-                player.sendMessage("You do not have enough items to complete this purchase.");
-                // Reset selectedItems for the player
-                selectedItemsQuantities.put(player, new HashMap<>());
-                // Reopen the QuantityAdjustmentMenu
+                // Reopen the QuantityAdjustmentMenu with updated quantities
                 openQuantityAdjustmentMenu(player, option);
+            } else if (opt ==   6) { // Buy button
+                if (hasEnoughItems(player.team(), option, player)) {
+                    openConfirmPurchaseMenu(player, option);
+                } else {
+                    sendMessageToPlayer(player, "critical.resource");
+                    // Reset selectedItems for the player
+                    selectedItemsQuantities.put(player, new HashMap<>());
+                    // Reopen the QuantityAdjustmentMenu
+                    openQuantityAdjustmentMenu(player, option);
+                }
+            } else if (opt ==   7) { // Close button
+                sendMessageToPlayer(player, "menu.buypoint.close");
+            } else if (opt ==   8) { // Back button
+                openMenu(player);
             }
-        } else if (opt ==  7) { // Close button
-            player.sendMessage("");
-        } else if (opt ==  8) { // Back button
-            openMenu(player);
-        }
-    }), title, description, buttons);
-  }
+        }), title, description, buttons);
+    }
+  
 
 
     private static void openConfirmPurchaseMenu(Player player, int option) {
@@ -106,7 +106,7 @@ public class BuyPoint {
                     // Return to the QuantityAdjustmentMenu after a successful purchase
                     openQuantityAdjustmentMenu(player, option);
                 } else {
-                    player.sendMessage(Bundle.get("menu.buypoint.failure"));
+                    player.sendMessage(Bundle.get("critical.resource")); // Use a different message for insufficient resources
                 }
             } else { // If the player clicks "Cancel"
                 player.sendMessage(Bundle.get("menu.buypoint.cancel"));
@@ -115,6 +115,7 @@ public class BuyPoint {
             }
         }), title, description, buttons);
     }
+
     
     private static boolean hasEnoughItems(Team team, int option, Player player) {
         Map<Item, Integer> selectedItems = selectedItemsQuantities.get(player);
@@ -127,14 +128,15 @@ public class BuyPoint {
             for (int j =   0; j < Currency.itemsforcore[i].length; j++) {
                 Item item = Currency.itemsforcore[i][j];
                 int requiredAmount = selectedItems.getOrDefault(item,   0); // Use the quantity the player wants to purchase
-                if (team.items().get(item) < requiredAmount || team.items().get(item) - requiredAmount <   1500) {
-                    player.sendMessage(Bundle.get("menu.buypoint.critically_low_resources"));
+                if (team.items().get(item) < requiredAmount || team.items().get(item) < Currency.MinQuantity[i][j]) {
                     return false;
                 }
             }
         }
         return true;
     }
+
+    
 
 
 
@@ -174,4 +176,20 @@ public class BuyPoint {
         }
         return totalPoints;
     }
+public static void createAndDisplayMenu(Player player, String title, String description, String[][] buttons) {
+    Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
+        // Implement menu logic here
+    }), title, description, buttons);
+}
+public static Map<Item, Integer> getSelectedItemsQuantities(Player player) {
+    Map<Item, Integer> selectedItems = selectedItemsQuantities.get(player);
+    if (selectedItems == null) {
+        selectedItems = new HashMap<>();
+        selectedItemsQuantities.put(player, selectedItems);
+    }
+    return selectedItems;
+}
+public static void sendMessageToPlayer(Player player, String messageKey) {
+    player.sendMessage(Bundle.get(messageKey, player.locale()));
+}
 }

@@ -72,7 +72,6 @@ public class PlayerData {
 
     public String getUuid() {
         return this.uuid;
-        
     }
 
     public float getHp() {

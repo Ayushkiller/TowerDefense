@@ -45,4 +45,10 @@ public class Currency {
         {30,  30,  30},
         {35,  35,  35}
     };
+  public static Integer[][] MinQuantity = {
+    {1500,  1500,  1500}, // Tier  1
+    {1500,  1500,  1500}, // Tier  2
+    {1500,  1500,  1500}, // Tier  3
+    {1500,  1500,  1500}  // Tier  4
+  };
 }

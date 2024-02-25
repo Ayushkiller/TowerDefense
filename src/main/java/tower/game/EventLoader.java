@@ -25,11 +25,6 @@ public class EventLoader {
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
         });
-        Events.on(EventType.PlayerLeave.class, event -> {
-            Player player = event.player;
-            // Clear the player's HUD
-            Players.clearPlayerHud(player);
-        });
         Events.run(EventType.Trigger.update, Players::forEach);
     }
 }
