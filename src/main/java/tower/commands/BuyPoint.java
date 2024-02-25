@@ -92,11 +92,11 @@ public class BuyPoint {
 
     private static boolean hasEnoughItems(Team team, int option, Player player) {
         Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
-        for (int i =  0; i < Currency.itemsforcore.length; i++) {
-            for (int j =  0; j < Currency.itemsforcore[i].length; j++) {
+        for (int i =   0; i < Currency.itemsforcore.length; i++) {
+            for (int j =   0; j < Currency.itemsforcore[i].length; j++) {
                 Item item = Currency.itemsforcore[i][j];
-                int requiredAmount = selectedItems.getOrDefault(item,  0); // Use the quantity the player wants to purchase
-                if (team.items().get(item) < requiredAmount || team.items().get(item) < Currency.MinQuantity[i][j]) {
+                int requiredAmount = selectedItems.getOrDefault(item,   0); // Use the quantity the player wants to purchase
+                if (team.items().get(item) < requiredAmount) {
                     return false;
                 }
             }
