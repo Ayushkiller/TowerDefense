@@ -62,7 +62,8 @@ public class SuperPowers {
         }
     }
 
-    // Define PlayerIndependentAI as an inner class
+// I will fix it later asssssssssssssssssss
+
     private static class PlayerIndependentAI extends AIController {
         private final Unit targetUnit;
 
