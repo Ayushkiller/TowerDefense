@@ -28,41 +28,52 @@ public class Players {
 
     public static void forEach() {
         Groups.player.each(player -> {
-            if(Players.getPlayer(player).getUnit() != null && player.unit() != Players.getPlayer(player).getUnit()) {
-                player.unit(Players.getPlayer(player).getUnit());
-            }
-    
-            // Check if stats are enabled for all players
-            if (Settings.isDisplayStatsForAll()) {
-                // Display stats for all players
-                displayStatsForAllPlayers(player);
-            }
             PlayerData playerData = Players.getPlayer(player);
-            if (!player.dead() && player.name().equals(playerData.getName()) && player.uuid().equals(playerData.getUuid())) {
-                float currentPoints = playerData.getPoints();
-                if (currentPoints != playerData.getLastUpdatedPoints()) {
-                    StringBuilder hud = new StringBuilder();
-                    hud.append("[green]Points "+"[crimson]"+player.name()).append((int) currentPoints);
-                    Call.setHudText(hud.toString());
-                    playerData.setLastUpdatedPoints(currentPoints);
+            // Ensure playerData is not null before proceeding
+            if (playerData != null) {
+                if(Players.getPlayer(player).getUnit() != null && player.unit() != Players.getPlayer(player).getUnit()) {
+                    player.unit(Players.getPlayer(player).getUnit());
+                }
+
+                // Check if stats are enabled for all players
+                if (Settings.isDisplayStatsForAll()) {
+                    // Display stats for all players
+                    displayStatsForAllPlayers(player);
+                }
+
+                if (!player.dead() && player.name().equals(playerData.getName()) && player.uuid().equals(playerData.getUuid())) {
+                    float currentPoints = playerData.getPoints();
+                    if (currentPoints != playerData.getLastUpdatedPoints()) {
+                        StringBuilder hud = new StringBuilder();
+                        hud.append("[green]Points "+ Players.getPlayer(player).getName()+ (int) Players.getPlayer(player).getPoints() + "\n  ");
+                        System.out.println("Displaying HUD text: " + hud.toString()); // Debug statement
+                        Call.setHudText(hud.toString());
+                        playerData.setLastUpdatedPoints(currentPoints);
+                    } else {
+                        System.out.println("Points have not changed."); // Debug statement
+                    }
+                } else {
+                    System.out.println("Player is dead or name/UUID does not match."); // Debug statement
                 }
             }
         });
     }
+    
 
     private static void displayStatsForAllPlayers(Player player) {
         if (Settings.isDisplayStatsForAll()) {
             Groups.player.each(p -> {
-                if (!p.dead()) {
+                if (!p.dead() && p.uuid().equals(player.uuid())) {
                     String message = "[scarlet]" + (int) p.unit().health + "/" + (int) p.unit().type.health + "\n" +
                             "[accent]" + (int) p.unit().shield + " " +
                             "[green]" + (int) Players.getPlayer(p).getPoints() + "\n  ";
-                    Call.label(player.con, message.replace("  ", Players.getPlayer(p).stats() ? "[lime]true" : "[scarlet]false"),  0.017f, p.x, p.y-16);
+                    Call.label(player.con, message.replace("  ", Players.getPlayer(p).stats() ? "[lime]true" : "[scarlet]false"),   0.017f, p.x, p.y-16);
                 }
             });
         }
     }
 }
+
 
 
 
