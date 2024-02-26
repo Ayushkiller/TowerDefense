@@ -4,91 +4,65 @@ import arc.graphics.Color;
 import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
+import mindustry.content.UnitTypes;
 import mindustry.core.World;
 import mindustry.entities.bullet.LaserBulletType;
 import mindustry.gen.Player;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
-import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
-import mindustry.type.UnitType;
 import mindustry.type.Weapon;
-import mindustry.type.ammo.PowerAmmoType;
 import mindustry.world.Tile;
 
 public class SuperPowers {
     private static final float tilesize =  1.0f; // Adjust the value as needed
-    private static UnitType customCorvus;
+        private static final Weapon customCorvusWeapon = new Weapon("customCorvusWeapon") {{
+                shootSound = Sounds.laserblast;
+                chargeSound = Sounds.lasercharge;
+                soundPitchMin = 1f;
+                top = false;
+                mirror = false;
+                shake = 14f;
+                shootY = 5f;
+                x = y = 0;
+                reload = 35f;
+                recoil = 0f;
 
-    public static void onContentInit() {
-        if (customCorvus == null) {
-            customCorvus = new UnitType("customCorvus") {{
-                hitSize =  29f;
-                health =  18000f;
-                armor =  9f;
-                stepShake =  1.5f;
-                rotateSpeed =  1.5f;
-                drownTimeMultiplier =  6f;
+                cooldownTime = 35f;
 
-                hovering = true;
-                shadowElevation =  0.2f;
-                ammoType = new PowerAmmoType(40000);
-                groundLayer = Layer.flyingUnit;
+                shootStatusDuration = 60f * 2f;
+                shootStatus = StatusEffects.unmoving;
+                shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
+                parentizeEffects = true;
 
-                speed =  0.3f;
+                bullet = new LaserBulletType(){{
+                    length = 460f;
+                    damage = 560f;
+                    width = 75f;
 
-                drawShields = false;
+                    lifetime = 65f;
 
-                weapons.add(new Weapon("corvus-weapon") {{
-                    shootSound = Sounds.laserblast;
-                    chargeSound = Sounds.lasercharge;
-                    soundPitchMin =  1f;
-                    top = false;
-                    mirror = false;
-                    shake =  14f;
-                    shootY =  5f;
-                    x = y =  0;
-                    reload =  100f;
-                    recoil =  0f;
-                    alwaysContinuous = true;
-                    cooldownTime =  100f;
+                    lightningSpacing = 35f;
+                    lightningLength = 5;
+                    lightningDelay = 1.1f;
+                    lightningLengthRand = 15;
+                    lightningDamage = 50;
+                    lightningAngleRand = 40f;
+                    largeHit = true;
+                    lightColor = lightningColor = Pal.heal;
 
-                    shootStatusDuration =  60f *  2f;
-                    shootStatus = StatusEffects.unmoving;
-                    shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
-                    parentizeEffects = true;
+                    chargeEffect = Fx.greenLaserCharge;
 
-                    bullet = new LaserBulletType() {{
-                        length =  460f;
-                        damage =  560f;
-                        width =  75f;
+                    healPercent = 25f;
+                    collidesTeam = true;
 
-                        lifetime =  65f;
+                    sideAngle = 15f;
+                    sideWidth = 0f;
+                    sideLength = 0f;
+                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                }};
 
-                        lightningSpacing =  35f;
-                        lightningLength =  5;
-                        lightningDelay =  1.1f;
-                        lightningLengthRand =  15;
-                        lightningDamage =  50;
-                        lightningAngleRand =  40f;
-                        largeHit = true;
-                        lightColor = lightningColor = Pal.heal;
-
-                        chargeEffect = Fx.greenLaserCharge;
-
-                        healPercent =  25f;
-                        collidesTeam = true;
-
-                        sideAngle =  15f;
-                        sideWidth =  0f;
-                        sideLength =  0f;
-                        colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
-                    }};
-                }});
-            }};
-        }
-    }
-
+    }};
     public static void execute(Player player) {
 
         player.sendMessage("Super Powers menu option selected.");
@@ -122,9 +96,10 @@ public class SuperPowers {
 
             Tile tile = world.tileWorld(worldX, worldY);
             if (tile != null) {
-                Unit unit = customCorvus.spawn(worldX, worldY);
+                Unit unit = UnitTypes.corvus.spawn(worldX, worldY);
                 if (unit != null) {
-                    // Additional logic for the spawned unit
+               UnitTypes.corvus.weapons.add(customCorvusWeapon);
+                    
                 }
             }
         }
