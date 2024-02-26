@@ -52,7 +52,7 @@ public class SuperPowers {
 
     private static void spawnUnit(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
-        if (playerData.getPoints() >=   150) {
+        if (playerData.getPoints() >=   100) {
             float radius =   80f;
             float angle = (float) (Math.random() *  360f); // Random angle for spawning
             double radians = Math.toRadians(angle);
@@ -88,7 +88,7 @@ public class SuperPowers {
                     unitType.weapons.get(0).reload =   10f;
                     unitType.weapons.get(0).cooldownTime =   10f;
                 }
-                playerData.subtractPoints(150, player);
+                playerData.subtractPoints(100, player);
             }
         } else {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
@@ -96,10 +96,14 @@ public class SuperPowers {
     }
     private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
-        if (playerData.getPoints() >=  150 *  20) { // Assuming each unit costs  150 points
+        int unitCost =  100; // Assuming each unit costs  100 points
+        int totalCost = unitCost *  20; // Total cost for  20 units
+
+        if (playerData.getPoints() >= totalCost) {
             float radius =  80f;
             float arcAngle =  60f;
             float angleStep = arcAngle /  20; // Divide the arc by the number of units
+
             for (int i =  0; i <  20; i++) {
                 float angle = i * angleStep - arcAngle /  2; // Calculate the angle for each unit
                 double radians = Math.toRadians(angle);
@@ -122,8 +126,11 @@ public class SuperPowers {
                     },  30, TimeUnit.SECONDS);
                 }
             }
-            playerData.subtractPoints(100 , player); // Subtract the total cost
-        player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
+            playerData.subtractPoints(totalCost, player); // Subtract the total cost
+            player.sendMessage(Bundle.get("spawn.arc-of-units.success", player.locale()));
+        } else {
+            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
         }
     }
+    
 }
