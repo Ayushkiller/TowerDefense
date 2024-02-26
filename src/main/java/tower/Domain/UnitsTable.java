@@ -1,15 +1,9 @@
 package tower.Domain;
 
 import mindustry.content.UnitTypes;
-import mindustry.gen.Player;
-import mindustry.gen.Unit;
-import mindustry.type.UnitType;
-import mindustry.world.Tile;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class UnitsTable {
     public static List<Map<String, Object>> units = new ArrayList<>();
@@ -74,12 +68,4 @@ public class UnitsTable {
         units.add(Map.of("unit", UnitTypes.renale, "price",   12));
         units.add(Map.of("unit", UnitTypes.latum, "price",   60));
     }
-  public static Unit spawnUnit(Tile tile, Player player) {
-
-    Random random = new Random();
-    int index = random.nextInt(units.size());
-    Map<String, Object> unitMap = units.get(index);
-    UnitType unitType = (UnitType) unitMap.get("unit");
-    return unitType.spawn(tile.worldx(), tile.worldy());
- }
 }
