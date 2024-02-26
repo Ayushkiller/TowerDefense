@@ -59,13 +59,14 @@ public class SuperPowers {
     private static void spawnUnitWithType(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getPoints() >=  40) {
-            float radius =  80f;
-            for (int i =  0; i <  6; i++) { // Loop to spawn  6 units
-                float angle = (float) (Math.random() *  360f); // Random angle for spawning
+            float angleStep =  360f /  6;
+            float radius =  100f; // Calculate the angle step for evenly spaced spawns
+            for (int i =  0; i <  6; i++) {
+                float angle = i * angleStep; // Calculate the angle for each unit
                 double radians = Math.toRadians(angle);
                 float x = playerX + radius * (float) Math.cos(radians);
                 float y = playerY + radius * (float) Math.sin(radians);
-    
+            
                 int intX = (int) x;
                 int intY = (int) y;
                 float worldX = intX * tilesize;
@@ -80,7 +81,7 @@ public class SuperPowers {
                             if (unit != null && unit.isValid()) {
                                 unit.kill();
                             }
-                        },  60, TimeUnit.SECONDS);
+                        },  50, TimeUnit.SECONDS);
     
                         if (unitType == UnitTypes.corvus) {
                             unitType.groundLayer = Layer.flyingUnit;
@@ -109,7 +110,7 @@ public class SuperPowers {
         int totalCost = unitCost; // Total cost remains   40 for all units
 
         if (playerData.getPoints() >= totalCost) {
-            float radius =   80f;
+            float radius =   140f;
             float arcAngle =   180f;
             float angleStep = arcAngle /   20; // Divide the arc by the number of units
             boolean allUnitsSpawned = true;
@@ -137,7 +138,7 @@ public class SuperPowers {
                         if (unit != null && unit.isValid()) {
                             unit.kill();
                         }
-                    },   15, TimeUnit.SECONDS); // Adjusted to  5 seconds
+                    },   10, TimeUnit.SECONDS); // Adjusted to  5 seconds
                 } else {
                     allUnitsSpawned = false;
                     break;
