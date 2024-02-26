@@ -56,10 +56,12 @@ public class SuperPowers {
                 if (unit != null) {
                 UnitTypes.corvus.groundLayer = Layer.flyingUnit;
                 UnitTypes.corvus.weapons.get(0).reload = 10f;
-                UnitTypes.corvus.weapons.get(0).cooldownTime = 10f;        
+                UnitTypes.corvus.weapons.get(0).cooldownTime = 10f;
+                UnitTypes.latum.crushDamage= 50f/10f;        
                 }
             }
         }
     }
+    
 
 }

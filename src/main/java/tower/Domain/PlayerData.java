@@ -22,6 +22,12 @@ public class PlayerData {
     private boolean showStats;
     private float points;
 
+    public void addPointsWithReduction(float reductionPercentage) {
+        float basePoints =  19; // Base points to be added
+        float reduction = this.points * reductionPercentage /  100; // Calculate reduction
+        float pointsToAdd = basePoints - reduction; // Calculate points to add after reduction
+        this.points += pointsToAdd;
+    }
     public void addKills (int amount) {
     }
 
@@ -32,7 +38,10 @@ public class PlayerData {
         this.points += amount;
    
     }
+    public float calculateReductionPercentage(float points) {
 
+        return points *   0.08f;
+    }
     public void subtractPoints(float amount, Player player) {
         this.points -= amount;
     }

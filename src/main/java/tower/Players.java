@@ -9,6 +9,7 @@ import tower.Domain.PlayerData;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class Players {
     private static final Map<String, PlayerData> players = new HashMap<>();
@@ -24,6 +25,9 @@ public class Players {
     }
     public static void clearMap() {
         players.clear();
+    }
+        public static void forEach(Consumer<PlayerData> action) {
+        players.values().forEach(action);
     }
 
     public static void forEach() {
