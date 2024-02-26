@@ -3,9 +3,7 @@ package tower.commands;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
 import mindustry.core.World;
-import mindustry.entities.units.AIController;
 import mindustry.gen.Player;
-import mindustry.gen.Teamc;
 import mindustry.gen.Unit;
 import mindustry.world.Tile;
 
@@ -55,27 +53,9 @@ public class SuperPowers {
                 // Spawn a Corvus unit at the tile
                 Unit unit = UnitTypes.corvus.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
                 if (unit != null) {
-                    // Set the unit's target to the player's position
-                    unit.controller(new PlayerIndependentAI(playerUnit));
+             
                 }
             }
         }
-    }
-
-// I will fix it later asssssssssssssssssss
-
-    private static class PlayerIndependentAI extends AIController {
-        private final Unit targetUnit;
-
-        public PlayerIndependentAI(Unit targetUnit) {
-            this.targetUnit = targetUnit;
-        }
-
-        @Override
-        public boolean checkTarget(Teamc target, float x, float y, float range) {
-            // Check if the target is the player's unit
-            return ((AIController) target).unit() == targetUnit;
-        }
-
     }
 }
