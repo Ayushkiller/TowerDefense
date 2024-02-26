@@ -55,18 +55,13 @@ public class BuyPoint {
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
             if (opt <   6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
-                if (adjustment <   0) {
-                    // Reduce the quantity if the adjustment is negative
-                    int currentQuantity = quantities.getOrDefault(selectedItem,   0);
-                    if (currentQuantity + adjustment <   0) {
-                        sendMessageToPlayer(player, "menu.buypoint.negativeQuantity");
-                        return;
-                    }
-                    quantities.put(selectedItem, currentQuantity + adjustment);
-                } else {
-                    // Increase the quantity if the adjustment is positive
-                    quantities.put(selectedItem, quantities.getOrDefault(selectedItem,   0) + adjustment);
+                int currentQuantity = quantities.getOrDefault(selectedItem,   0);
+                int minQuantity = getMinQuantityForItem(selectedItem);
+                if (adjustment <   0 && currentQuantity + adjustment <  minQuantity) {
+                    sendMessageToPlayer(player, "menu.buypoint.negativeQuantity");
+                    return;
                 }
+                quantities.put(selectedItem, currentQuantity + adjustment);
                 openQuantityAdjustmentMenu(player, option);
             } else if (opt ==   6) { // Buy button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
@@ -89,7 +84,6 @@ public class BuyPoint {
             }
         }), title, description, buttons);
     }
-
     private static boolean hasEnoughItems(Team team, int option, Player player) {
         Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
         for (int i =  0; i < Currency.items.size(); i++) {

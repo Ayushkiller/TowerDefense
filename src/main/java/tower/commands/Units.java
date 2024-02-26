@@ -18,13 +18,16 @@ import java.util.concurrent.TimeUnit;
 
 public class Units {
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
-
+    private static final Map<UnitType, String> unitNames = new HashMap<>();
     public static void initUnitsTable() {
-        // Initialize the unitPrices map based on the size of UnitsTable.units
+        // Initialize the unitPrices and unitNames maps based on the size of UnitsTable.units
         for (Map<String, Object> unitMap : UnitsTable.units) {
             UnitType unitType = (UnitType) unitMap.get("unit");
+            String name = (String) unitMap.get("name");
             int price = (int) unitMap.get("price");
+            unitNames.put(unitType, name);
             unitPrices.put(unitType, price);
+            
         }
     }
 
