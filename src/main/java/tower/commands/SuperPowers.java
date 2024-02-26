@@ -7,7 +7,11 @@ import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
-
+import tower.Players;
+import tower.Domain.PlayerData;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 public class SuperPowers {
     private static final float tilesize =  1.0f; // Adjust the value as needed
 
@@ -28,6 +32,12 @@ public class SuperPowers {
     }
 
     private static void spawnUnitsAroundPlayer(Player player, World world, float playerX, float playerY, Unit playerUnit) {
+        PlayerData playerData = Players.getPlayer(player);
+        if (playerData.getPoints() <  150) {
+            player.sendMessage("Not enough points to activate Super Powers.");
+            return;
+        }
+
         float radius =  80f;
         int numberOfUnits =  6; // Number of units to spawn
         float angleStep =  360f / numberOfUnits; // Calculate the angle step for even spacing
@@ -54,15 +64,43 @@ public class SuperPowers {
                 // Spawn a Corvus unit at the tile
                 Unit corvusUnit = UnitTypes.corvus.spawn(worldX, worldY);
                 Unit collarisunit = UnitTypes.collaris.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
-                if (collarisunit == null && corvusUnit == null) {
                 UnitTypes.corvus.groundLayer = Layer.flyingUnit;
+
                 UnitTypes.corvus.weapons.get(0).reload = 10f;
+
                 UnitTypes.corvus.weapons.get(0).cooldownTime = 10f;
-                UnitTypes.latum.crushDamage= 50f/10f;        
+                UnitTypes.collaris.groundLayer = Layer.flyingUnit;
+
+                UnitTypes.collaris.weapons.get(0).reload = 10f;
+
+                UnitTypes.collaris.weapons.get(0).cooldownTime = 10f;
+                UnitTypes.collaris.weapons.get(1).reload = 10f;
+
+                UnitTypes.collaris.weapons.get(1).cooldownTime = 10f;
+
+
+                UnitTypes.latum.crushDamage= 50f/10f;    
+                 // Inside the spawnUnitsAroundPlayer method, after spawning the units
+                  ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                  if (corvusUnit != null) {
+                    executor.schedule(() -> {
+                        if (corvusUnit != null && !corvusUnit.dead()) {
+                            corvusUnit.kill();
+                        }
+                    },  60, TimeUnit.SECONDS); // Schedule to kill after  60 seconds
+                }
+                
+                if (collarisunit != null) {
+                    executor.schedule(() -> {
+                        if (collarisunit != null && !collarisunit.dead()) {
+                            collarisunit.kill();
+                        }
+                    },  60, TimeUnit.SECONDS); // Schedule to kill after  60 seconds
                 }
             }
         }
-    }
-    
 
+        // Deduct the points for activating Super Powers
+        playerData.subtractPoints(150, player);
+    }
 }

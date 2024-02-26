@@ -23,7 +23,7 @@ public class PlayerData {
     private float points;
 
     public void addPointsWithReduction(float reductionPercentage) {
-        float basePoints =  19; // Base points to be added
+        float basePoints =  1f; // Base points to be added
         float reduction = this.points * reductionPercentage /  100; // Calculate reduction
         float pointsToAdd = basePoints - reduction; // Calculate points to add after reduction
         this.points += pointsToAdd;
@@ -40,7 +40,7 @@ public class PlayerData {
     }
     public float calculateReductionPercentage(float points) {
 
-        return points *   0.08f;
+        return points *   0.1f;
     }
     public void subtractPoints(float amount, Player player) {
         this.points -= amount;
