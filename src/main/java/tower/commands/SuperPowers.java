@@ -31,6 +31,13 @@ public class SuperPowers {
             player.sendMessage(Bundle.get("player.unit.not-available", player.locale()));
         }
     }
+    private static void spawnCorvusUnit(Player player, World world, float playerX, float playerY) {
+        spawnUnitWithType(player, world, playerX, playerY, UnitTypes.corvus);
+    }
+    
+    private static void spawnCollarisUnit(Player player, World world, float playerX, float playerY) {
+        spawnUnitWithType(player, world, playerX, playerY, UnitTypes.collaris);
+    }
 
     private static void openUnitSelectionMenu(Player player, World world, float playerX, float playerY) {
         String[][] buttons = {
@@ -39,56 +46,56 @@ public class SuperPowers {
             {"Squad"}
         };
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            if (option ==  0) {
-                spawnUnit(player, world, playerX, playerY, UnitTypes.corvus);
-            } else if (option ==  1) {
-                spawnUnit(player, world, playerX, playerY, UnitTypes.collaris);
-            } else if (option ==  2) {
-                spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt); 
+            if (option ==   0) {
+                spawnCorvusUnit(player, world, playerX, playerY);
+            } else if (option ==   1) {
+                spawnCollarisUnit(player, world, playerX, playerY);
+            } else if (option ==   2) {
+                spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt);  
             }
         }), "[lime]Choose a ability to use:", "", buttons);
     }
     
-
-    private static void spawnUnit(Player player, World world, float playerX, float playerY, UnitType unitType) {
+    private static void spawnUnitWithType(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
-        if (playerData.getPoints() >=   100) {
+        if (playerData.getPoints() >=   40) {
             float radius =   80f;
-            float angle = (float) (Math.random() *  360f); // Random angle for spawning
+            float angle = (float) (Math.random() *   360f); // Random angle for spawning
             double radians = Math.toRadians(angle);
             float x = playerX + radius * (float) Math.cos(radians);
             float y = playerY + radius * (float) Math.sin(radians);
-
+    
             int intX = (int) x;
             int intY = (int) y;
             float worldX = intX * tilesize;
             float worldY = intY * tilesize;
-
+    
             Tile tile = world.tileWorld(worldX, worldY);
             if (tile != null) {
-                // Inside your spawnUnit method, after spawning the unit
                 Unit unit = unitType.spawn(worldX, worldY);
-
-                // Create a ScheduledExecutorService
-                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-
-                // Schedule a task to kill the unit after  60 seconds
-                executor.schedule(() -> {
-                    if (unit != null && unit.isValid()) {
-                        unit.kill();
+                if (unit != null && unit.isValid()) {
+                    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                    executor.schedule(() -> {
+                        if (unit != null && unit.isValid()) {
+                            unit.kill();
+                        }
+                    },   60, TimeUnit.SECONDS);
+    
+                    if (unitType == UnitTypes.corvus) {
+                        unitType.groundLayer = Layer.flyingUnit;
+                        unitType.weapons.get(0).reload =   10f;
+                        unitType.weapons.get(0).cooldownTime =   10f;
+                    } else if (unitType == UnitTypes.collaris) {
+                        unitType.groundLayer = Layer.flyingUnit;
+                        unitType.weapons.get(0).reload =   10f;
+                        unitType.weapons.get(0).cooldownTime =   10f;
                     }
-                },  60, TimeUnit.SECONDS);
-
-                if (unitType == UnitTypes.corvus) {
-                    unitType.groundLayer = Layer.flyingUnit;
-                    unitType.weapons.get(0).reload =   10f;
-                    unitType.weapons.get(0).cooldownTime =   10f;
-                } else if (unitType == UnitTypes.collaris) {
-                    unitType.groundLayer = Layer.flyingUnit;
-                    unitType.weapons.get(0).reload =   10f;
-                    unitType.weapons.get(0).cooldownTime =   10f;
+                } else {
+                    playerData.addPoints(40, player);
+                    player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
                 }
-                playerData.subtractPoints(100, player);
+            } else {
+                player.sendMessage(Bundle.get("spawn.unit.invalid-location", player.locale()));
             }
         } else {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
@@ -96,16 +103,17 @@ public class SuperPowers {
     }
     private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
-        int unitCost =  100; // Assuming each unit costs  100 points
-        int totalCost = unitCost *  20; // Total cost for  20 units
+        int unitCost =   40; // Cost per unit
+        int totalCost = unitCost; // Total cost remains   40 for all units
 
         if (playerData.getPoints() >= totalCost) {
-            float radius =  80f;
-            float arcAngle =  60f;
-            float angleStep = arcAngle /  20; // Divide the arc by the number of units
+            float radius =   80f;
+            float arcAngle =   60f;
+            float angleStep = arcAngle /   20; // Divide the arc by the number of units
+            boolean allUnitsSpawned = true;
 
-            for (int i =  0; i <  20; i++) {
-                float angle = i * angleStep - arcAngle /  2; // Calculate the angle for each unit
+            for (int i =   0; i <   20; i++) {
+                float angle = i * angleStep - arcAngle /   2; // Calculate the angle for each unit
                 double radians = Math.toRadians(angle);
                 float x = playerX + radius * (float) Math.cos(radians);
                 float y = playerY + radius * (float) Math.sin(radians);
@@ -118,19 +126,35 @@ public class SuperPowers {
                 Tile tile = world.tileWorld(worldX, worldY);
                 if (tile != null) {
                     Unit unit = unitType.spawn(worldX, worldY);
+                    if (unit == null || !unit.isValid()) {
+                        allUnitsSpawned = false;
+                        break;
+                    }
                     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                     executor.schedule(() -> {
                         if (unit != null && unit.isValid()) {
                             unit.kill();
                         }
-                    },  30, TimeUnit.SECONDS);
+                    },   5, TimeUnit.SECONDS); // Adjusted to  5 seconds
+                } else {
+                    allUnitsSpawned = false;
+                    break;
                 }
             }
-            playerData.subtractPoints(totalCost, player); // Subtract the total cost
-            player.sendMessage(Bundle.get("spawn.arc-of-units.success", player.locale()));
+
+            if (allUnitsSpawned) {
+                playerData.subtractPoints(totalCost, player); // Subtract the total cost
+                player.sendMessage(Bundle.get("spawn.arc-of-units.success", player.locale()));
+            } else {
+                // If any unit was not successfully spawned, give back the points
+                playerData.addPoints(totalCost, player);
+                player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
+            }
         } else {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
         }
     }
+    
+    
     
 }
