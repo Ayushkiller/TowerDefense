@@ -93,13 +93,14 @@ public class Units {
 
     private static void openGui(Player player) {
         String[][] buttons = new String[UnitsTable.units.size()][1];
-        for (int i =   0; i < UnitsTable.units.size(); i++) {
+        for (int i =  0; i < UnitsTable.units.size(); i++) {
             Map<String, Object> unitMap = UnitsTable.units.get(i);
             UnitType unitType = (UnitType) unitMap.get("unit");
-            buttons[i][0] = unitType.emoji();
+            String name = (String) unitMap.get("name"); // Get the unit name
+            buttons[i][0] = unitType.emoji() + " " + name; // Include the unit name in the button text
         }
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            if (option >=   0 && option < UnitsTable.units.size()) {
+            if (option >=  0 && option < UnitsTable.units.size()) {
                 Map<String, Object> unitMap = UnitsTable.units.get(option);
                 UnitType unitType = (UnitType) unitMap.get("unit");
                 openUnitMenuGui(unitType, player);
@@ -108,4 +109,5 @@ public class Units {
             }
         }), Bundle.get("menu.units.title", player.locale()), "", buttons);
     }
+    
 }
