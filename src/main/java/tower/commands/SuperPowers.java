@@ -60,14 +60,14 @@ public class SuperPowers {
             Tile tile = world.tileWorld(worldX, worldY);
             if (tile != null) {
                 // Spawn a Corvus unit at the tile
-                Unit unit = SuperPowers.phoenix.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
+                Unit unit = SuperPowers.collaris.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
                 if (unit != null) {
              
                 }
             }
         }
     }
-        private static final UnitType phoenix = new UnitType("phoenix") {
+        private static final UnitType collaris = new UnitType("collaris") {
         {
             hitSize = 29f;
             health = 18000f;
@@ -82,9 +82,9 @@ public class SuperPowers {
             legMoveSpace = 1.5f;
             legForwardScl = 0.58f;
             hovering = true;
-            shadowElevation = 0.2f;
+            shadowElevation = 5f;
             ammoType = new PowerAmmoType(4000);
-            groundLayer = Layer.legUnit;
+            groundLayer = Layer.flyingUnit;
 
             speed = 0.3f;
 
