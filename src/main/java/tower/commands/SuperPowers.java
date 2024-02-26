@@ -1,10 +1,19 @@
 package tower.commands;
 
+import arc.graphics.Color;
 import mindustry.Vars;
-import mindustry.content.UnitTypes;
+import mindustry.content.Fx;
+import mindustry.content.StatusEffects;
 import mindustry.core.World;
+import mindustry.entities.bullet.LaserBulletType;
 import mindustry.gen.Player;
+import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
+import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
+import mindustry.type.UnitType;
+import mindustry.type.Weapon;
+import mindustry.type.ammo.PowerAmmoType;
 import mindustry.world.Tile;
 
 public class SuperPowers {
@@ -51,17 +60,76 @@ public class SuperPowers {
             Tile tile = world.tileWorld(worldX, worldY);
             if (tile != null) {
                 // Spawn a Corvus unit at the tile
-                Unit unit = UnitTypes.corvus.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
-                if (unit != null) {
-            
-                UnitTypes.corvus.weapons.get(0).alwaysShooting=true; 
-                UnitTypes.corvus.weapons.get(0).reload = 12f;
-                UnitTypes.corvus.weapons.get(0).cooldownTime = 12f;
-                
-             
+                Unit unit = SuperPowers.customCorvus.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
+                if (unit != null) {             
                 }
             }
         }
     }
 
+    public static final UnitType customCorvus = new UnitType("customCorvus") {{
+            hitSize = 29f;
+            health = 18000f;
+            armor = 9f;
+            stepShake = 1.5f;
+            rotateSpeed = 1.5f;
+            drownTimeMultiplier = 6f;
+
+
+            hovering = true;
+            shadowElevation = 0.2f;
+            ammoType = new PowerAmmoType(40000);
+            groundLayer = Layer.flyingUnit;
+
+            speed = 0.3f;
+
+            drawShields = false;
+
+            weapons.add(new Weapon("corvus-weapon"){{
+                shootSound = Sounds.laserblast;
+                chargeSound = Sounds.lasercharge;
+                soundPitchMin = 1f;
+                top = false;
+                mirror = false;
+                shake = 14f;
+                shootY = 5f;
+                x = y = 0;
+                reload = 100f;
+                recoil = 0f;
+                alwaysContinuous = true;
+                cooldownTime = 100f;
+
+                shootStatusDuration = 60f * 2f;
+                shootStatus = StatusEffects.unmoving;
+                shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
+                parentizeEffects = true;
+
+                bullet = new LaserBulletType(){{
+                    length = 460f;
+                    damage = 560f;
+                    width = 75f;
+
+                    lifetime = 65f;
+
+                    lightningSpacing = 35f;
+                    lightningLength = 5;
+                    lightningDelay = 1.1f;
+                    lightningLengthRand = 15;
+                    lightningDamage = 50;
+                    lightningAngleRand = 40f;
+                    largeHit = true;
+                    lightColor = lightningColor = Pal.heal;
+
+                    chargeEffect = Fx.greenLaserCharge;
+
+                    healPercent = 25f;
+                    collidesTeam = true;
+
+                    sideAngle = 15f;
+                    sideWidth = 0f;
+                    sideLength = 0f;
+                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                }};
+            }});
+        }};
 }
