@@ -52,8 +52,9 @@ public class SuperPowers {
             Tile tile = world.tileWorld(worldX, worldY);
             if (tile != null) {
                 // Spawn a Corvus unit at the tile
-                Unit unit = UnitTypes.corvus.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
-                if (unit != null) {
+                Unit corvusUnit = UnitTypes.corvus.spawn(worldX, worldY);
+                Unit collarisunit = UnitTypes.collaris.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
+                if (collarisunit == null && corvusUnit == null) {
                 UnitTypes.corvus.groundLayer = Layer.flyingUnit;
                 UnitTypes.corvus.weapons.get(0).reload = 10f;
                 UnitTypes.corvus.weapons.get(0).cooldownTime = 10f;

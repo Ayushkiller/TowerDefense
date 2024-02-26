@@ -15,7 +15,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
-import tower.Domain.PlayerData;
 import useful.Bundle;
 
 import static mindustry.Vars.*;
