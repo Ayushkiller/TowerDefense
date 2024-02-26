@@ -7,6 +7,7 @@ import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
+import mindustry.world.draw.DrawLiquidRegion;
 import tower.Players;
 import tower.Domain.PlayerData;
 import java.util.concurrent.Executors;
@@ -16,8 +17,7 @@ public class SuperPowers {
     private static final float tilesize =  1.0f; // Adjust the value as needed
 
     public static void execute(Player player) {
-        // Implement the logic for the Super Powers menu option here
-        player.sendMessage("Super Powers menu option selected.");
+
 
         // Spawn  6 units around the player within a  40f radius
         Unit playerUnit = player.unit(); // Get the player's unit
@@ -34,7 +34,7 @@ public class SuperPowers {
     private static void spawnUnitsAroundPlayer(Player player, World world, float playerX, float playerY, Unit playerUnit) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getPoints() <  150) {
-            player.sendMessage("Not enough points to activate Super Powers.");
+            player.sendMessage("Not enough points to activate Super Powers.You need 150 points.");
             return;
         }
 
