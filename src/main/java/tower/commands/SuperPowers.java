@@ -1,5 +1,7 @@
 package tower.commands;
 
+import static mindustry.content.UnitTypes.flare;
+
 import java.util.Map;
 
 import mindustry.Vars;
@@ -10,6 +12,7 @@ import mindustry.core.World;
 import mindustry.gen.Player;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
+import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.world.Tile;
@@ -35,6 +38,7 @@ public class SuperPowers {
                 shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
                 parentizeEffects = true;
     }};
+    
     public static void execute(Player player) {
 
         player.sendMessage("Super Powers menu option selected.");
@@ -69,7 +73,21 @@ public class SuperPowers {
             if (tile != null) {
                 Unit unit = UnitTypes.corvus.spawn(worldX, worldY);
                 if (unit != null) {
+                    
                     UnitTypes.corvus.weapons.add(customCorvusWeapon);
+                    UnitTypes.corvus.weapons.get(1).bullet.fragBullet = flare.weapons.get(0).bullet;
+                    UnitTypes.corvus.weapons.get(1).bullet.lightningColor.argb8888(132);
+
+                    UnitTypes.corvus.weapons.get(1).bullet.despawnHit=true;
+                    UnitTypes.corvus.weapons.get(1).bullet.damage = 460f;
+                    UnitTypes.corvus.weapons.get(1).bullet.lifetime = 65f;
+                    UnitTypes.corvus.weapons.get(1).bullet.lightningLength = 5;
+                    UnitTypes.corvus.weapons.get(1).bullet.lightningLengthRand = 15;
+                    UnitTypes.corvus.weapons.get(1).bullet.lightningDamage = 50;
+                    UnitTypes.corvus.weapons.get(1).bullet.lightColor = Pal.heal;
+                    UnitTypes.corvus.weapons.get(1).bullet.chargeEffect = Fx.greenLaserCharge;
+                    UnitTypes.corvus.weapons.get(1).bullet.healPercent = 25f;
+                    UnitTypes.corvus.weapons.get(1).bullet.collidesTeam = true;
                     for (Map<String, Object> unitMap : UnitsTable.units) {
                         UnitType unitType = (UnitType) unitMap.get("unit");
                         if (unitType == playerUnit.type()) {
