@@ -36,7 +36,7 @@ public class BuyPoint {
     }
 
     private static void openQuantityAdjustmentMenu(Player player, int option) {
-        if (option <  0 || option >= Currency.items.size()) {
+        if (option <   0 || option >= Currency.items.size()) {
             player.sendMessage("Invalid selection. Please try again.");
             return;
         }
@@ -52,17 +52,23 @@ public class BuyPoint {
         String description = "Select quantity adjustment\n\n" + updatedQuantities;
         String[][] buttons = new String[][]{{"-2000", "-1000", "-100", "+400", "+1000", "+2000"}, {"Buy", "Close", "Back"}};
     
-
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-            if (opt <  6) { // Adjustment buttons
+            if (opt <   6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
-                if (adjustment <  0) {
-                    sendMessageToPlayer(player, "menu.buypoint.negativeQuantity");
-                    return;
+                if (adjustment <   0) {
+                    // Reduce the quantity if the adjustment is negative
+                    int currentQuantity = quantities.getOrDefault(selectedItem,   0);
+                    if (currentQuantity + adjustment <   0) {
+                        sendMessageToPlayer(player, "menu.buypoint.negativeQuantity");
+                        return;
+                    }
+                    quantities.put(selectedItem, currentQuantity + adjustment);
+                } else {
+                    // Increase the quantity if the adjustment is positive
+                    quantities.put(selectedItem, quantities.getOrDefault(selectedItem,   0) + adjustment);
                 }
-                quantities.put(selectedItem, quantities.getOrDefault(selectedItem,  0) + adjustment);
                 openQuantityAdjustmentMenu(player, option);
-            } else if (opt ==  6) { // Buy button
+            } else if (opt ==   6) { // Buy button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
                 if (hasEnoughItems(player.team(), option, player)) {
                     int totalPoints = calculateTotalPoints(selectedItems);
@@ -75,10 +81,10 @@ public class BuyPoint {
                     player.sendMessage(Bundle.get("critical.resource"));
                     selectedItemsQuantities.put(player, new HashMap<>());
                 }
-            } else if (opt ==  7) { // Close button
+            } else if (opt ==   7) { // Close button
                 player.sendMessage(Bundle.get("menu.buypoint.close"));
                 selectedItemsQuantities.remove(player);
-            } else if (opt ==  8) { // Back button
+            } else if (opt ==   8) { // Back button
                 openMenu(player);
             }
         }), title, description, buttons);
@@ -97,38 +103,39 @@ public class BuyPoint {
         return true;
     }
 
-    @SuppressWarnings("unused")
-    private static int calculateTotalPoints(java.util.Map<Item, Integer> selectedItems) {
-        int totalPoints =  0;
-        for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
+    private static int calculateTotalPoints(Map<Item, Integer> selectedItems) {
+        int totalPoints =   0;
+        for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
-            int quantity = entry.getValue();
+            int quantity = Math.abs(entry.getValue()); // Use absolute value to calculate points
             int minQuantity = getMinQuantityForItem(item);
             int actualQuantity = Math.min(quantity, minQuantity);
             int excessQuantity = Math.max(0, quantity - minQuantity);
-
-            // Initialize i and j outside the loop to make them accessible for excess quantity calculation
-            int i = -1;
-            int j = -1;
-
+    
             // Calculate points for actualQuantity
-            for (int row =  0; row < Currency.items.size(); row++) {
+            for (int row =   0; row < Currency.items.size(); row++) {
                 Map<String, Object> itemMap = Currency.items.get(row);
                 if (itemMap.get("item") == item) {
-                    i = row;
-                    j =  0; // Since we're using a single column for buttons, j is always  0
                     int pointGain = (int) itemMap.get("gain");
                     int itemPrice = (int) itemMap.get("price");
                     totalPoints += (float) pointGain / itemPrice * actualQuantity;
                     break;
                 }
             }
-
-            // If there's excess quantity, calculate points for it
-            if (excessQuantity >  0) {
-                totalPoints += (float) ((int) Currency.items.get(i).get("gain")) / ((int) Currency.items.get(i).get("price")) * excessQuantity;
-            }
+  // If there's excess quantity, calculate points for it
+        if (excessQuantity >  0) {
+    int itemIndex = -1;
+    for (int i =  0; i < Currency.items.size(); i++) {
+        if (Currency.items.get(i).get("item") == item) {
+            itemIndex = i;
+            break;
         }
+    }
+     if (itemIndex != -1) { 
+        totalPoints += (float) ((int) Currency.items.get(itemIndex).get("gain")) / ((int) Currency.items.get(itemIndex).get("price")) * excessQuantity;
+    }
+                                    }
+                                }
         return totalPoints;
     }
 
@@ -141,14 +148,17 @@ public class BuyPoint {
         }
         return  0; // Return  0 if the item is not found in the items list
     }
-
-    private static void removeItemsFromTeam(Team team, java.util.Map<Item, Integer> selectedItems) {
-        for (java.util.Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
+    private static void removeItemsFromTeam(Team team, Map<Item, Integer> selectedItems) {
+        for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
             int quantity = entry.getValue();
-            int minQuantity = getMinQuantityForItem(item);
-            int actualQuantity = Math.min(quantity, minQuantity);
-            team.items().remove(item, actualQuantity);
+            if (quantity <  0) {
+                // Add items back to the team if the quantity is negative
+                team.items().add(item, Math.abs(quantity));
+            } else {
+                // Remove items from the team if the quantity is positive
+                team.items().remove(item, quantity);
+            }
         }
     }
 

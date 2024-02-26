@@ -1,48 +1,21 @@
 package tower.commands;
 
-import static mindustry.content.UnitTypes.flare;
-
-import java.util.Map;
-
 import mindustry.Vars;
-import mindustry.content.Fx;
-import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.core.World;
 import mindustry.gen.Player;
-import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
-import mindustry.graphics.Pal;
-import mindustry.type.UnitType;
-import mindustry.type.Weapon;
+import mindustry.graphics.Layer;
 import mindustry.world.Tile;
-import tower.Domain.UnitsTable;
+
 public class SuperPowers {
     private static final float tilesize =  1.0f; // Adjust the value as needed
-        private static final Weapon customCorvusWeapon = new Weapon("customCorvusWeapon") {{
-                shootSound = Sounds.laserblast;
-                chargeSound = Sounds.lasercharge;
-                soundPitchMin = 1f;
-                top = false;
-                mirror = false;
-                shake = 14f;
-                shootY = 5f;
-                x = y = 0;
-                reload =10f;
-                recoil = 0f;
-                alwaysContinuous = true;
-                cooldownTime = 10f;
-                autoTarget=true;
-                shootStatusDuration = 60f * 2f;
-                shootStatus = StatusEffects.unmoving;
-                shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
-                parentizeEffects = true;
-    }};
-    
-    public static void execute(Player player) {
 
+    public static void execute(Player player) {
+        // Implement the logic for the Super Powers menu option here
         player.sendMessage("Super Powers menu option selected.");
 
+        // Spawn  6 units around the player within a  40f radius
         Unit playerUnit = player.unit(); // Get the player's unit
         if (playerUnit != null) {
             float playerX = playerUnit.x; // Get the player's X position
@@ -53,71 +26,40 @@ public class SuperPowers {
             player.sendMessage("Player unit is not available.");
         }
     }
+
     private static void spawnUnitsAroundPlayer(Player player, World world, float playerX, float playerY, Unit playerUnit) {
-        float radius =   80f;
-        int numberOfUnits =   6; // Number of units to spawn
-        float angleStep =   360f / numberOfUnits; // Calculate the angle step for even spacing
-    
-        for (int i =   0; i < numberOfUnits; i++) {
+        float radius =  80f;
+        int numberOfUnits =  6; // Number of units to spawn
+        float angleStep =  360f / numberOfUnits; // Calculate the angle step for even spacing
+
+        for (int i =  0; i < numberOfUnits; i++) {
+            // Calculate the angle for the current unit
             float angle = i * angleStep;
+            // Convert the angle to radians
             double radians = Math.toRadians(angle);
+            // Calculate the spawn position
             float x = playerX + radius * (float) Math.cos(radians);
             float y = playerY + radius * (float) Math.sin(radians);
-    
+
+            // Convert the float coordinates to integers
             int intX = (int) x;
             int intY = (int) y;
+            // Convert the integer coordinates to world coordinates
             float worldX = intX * tilesize;
             float worldY = intY * tilesize;
-    
+
+            // Find the tile at the world position
             Tile tile = world.tileWorld(worldX, worldY);
             if (tile != null) {
-                Unit unit = UnitTypes.corvus.spawn(worldX, worldY);
+                // Spawn a Corvus unit at the tile
+                Unit unit = UnitTypes.corvus.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
                 if (unit != null) {
-                    
-                    UnitTypes.corvus.weapons.add(customCorvusWeapon);
-                    UnitTypes.corvus.weapons.add(sex);
-                    UnitTypes.corvus.weapons.get(1).bullet.fragBullet = flare.weapons.get(0).bullet;
-                    UnitTypes.corvus.weapons.get(1).bullet.lightningColor.argb8888(132);
-
-                    UnitTypes.corvus.weapons.get(1).bullet.despawnHit=true;
-                    UnitTypes.corvus.weapons.get(1).bullet.damage = 460f;
-                    UnitTypes.corvus.weapons.get(1).bullet.lifetime = 65f;
-                    UnitTypes.corvus.weapons.get(1).bullet.lightningLength = 5;
-                    UnitTypes.corvus.weapons.get(1).bullet.lightningLengthRand = 15;
-                    UnitTypes.corvus.weapons.get(1).bullet.lightningDamage = 50;
-                    UnitTypes.corvus.weapons.get(1).bullet.lightColor = Pal.darkFlame;
-                    UnitTypes.corvus.weapons.get(1).bullet.chargeEffect = Fx.greenLaserCharge;
-                    UnitTypes.corvus.weapons.get(1).bullet.healPercent = 25f;
-                    UnitTypes.corvus.weapons.get(1).bullet.collidesTeam = true;
-                    for (Map<String, Object> unitMap : UnitsTable.units) {
-                        UnitType unitType = (UnitType) unitMap.get("unit");
-                        if (unitType == playerUnit.type()) {
-                            unitType.weapons.add(sex);
-                            break;
-                        }
-                    }
+                UnitTypes.corvus.groundLayer = Layer.flyingUnit;
+                UnitTypes.corvus.weapons.get(0).reload = 10f;
+                UnitTypes.corvus.weapons.get(0).cooldownTime = 10f;        
                 }
             }
         }
     }
-    private static final Weapon sex = new Weapon("sex") {{
-        shootSound = Sounds.laserblast;
-        chargeSound = Sounds.lasercharge;
-        soundPitchMin = 1f;
-        top = false;
-        mirror = false;
-        shake = 14f;
-        shootY = 5f;
-        x = y = 0;
-        reload = 10f;
-        recoil = 0f;
-        alwaysShooting=true;
-        cooldownTime = 10f;
-        autoTarget=true;
-        shootStatusDuration = 60f * 2f;
-        shootStatus = StatusEffects.unmoving;
-        shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
-        parentizeEffects = true;
-}};
 
 }
