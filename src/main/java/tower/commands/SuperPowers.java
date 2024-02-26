@@ -58,44 +58,46 @@ public class SuperPowers {
     
     private static void spawnUnitWithType(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
-        if (playerData.getPoints() >=   40) {
-            float radius =   80f;
-            float angle = (float) (Math.random() *   360f); // Random angle for spawning
-            double radians = Math.toRadians(angle);
-            float x = playerX + radius * (float) Math.cos(radians);
-            float y = playerY + radius * (float) Math.sin(radians);
+        if (playerData.getPoints() >=  40) {
+            float radius =  80f;
+            for (int i =  0; i <  6; i++) { // Loop to spawn  6 units
+                float angle = (float) (Math.random() *  360f); // Random angle for spawning
+                double radians = Math.toRadians(angle);
+                float x = playerX + radius * (float) Math.cos(radians);
+                float y = playerY + radius * (float) Math.sin(radians);
     
-            int intX = (int) x;
-            int intY = (int) y;
-            float worldX = intX * tilesize;
-            float worldY = intY * tilesize;
+                int intX = (int) x;
+                int intY = (int) y;
+                float worldX = intX * tilesize;
+                float worldY = intY * tilesize;
     
-            Tile tile = world.tileWorld(worldX, worldY);
-            if (tile != null) {
-                Unit unit = unitType.spawn(worldX, worldY);
-                if (unit != null && unit.isValid()) {
-                    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-                    executor.schedule(() -> {
-                        if (unit != null && unit.isValid()) {
-                            unit.kill();
+                Tile tile = world.tileWorld(worldX, worldY);
+                if (tile != null) {
+                    Unit unit = unitType.spawn(worldX, worldY);
+                    if (unit != null && unit.isValid()) {
+                        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                        executor.schedule(() -> {
+                            if (unit != null && unit.isValid()) {
+                                unit.kill();
+                            }
+                        },  60, TimeUnit.SECONDS);
+    
+                        if (unitType == UnitTypes.corvus) {
+                            unitType.groundLayer = Layer.flyingUnit;
+                            unitType.weapons.get(0).reload =  10f;
+                            unitType.weapons.get(0).cooldownTime =  10f;
+                        } else if (unitType == UnitTypes.collaris) {
+                            unitType.groundLayer = Layer.flyingUnit;
+                            unitType.weapons.get(0).reload =  10f;
+                            unitType.weapons.get(0).cooldownTime =  10f;
                         }
-                    },   60, TimeUnit.SECONDS);
-    
-                    if (unitType == UnitTypes.corvus) {
-                        unitType.groundLayer = Layer.flyingUnit;
-                        unitType.weapons.get(0).reload =   10f;
-                        unitType.weapons.get(0).cooldownTime =   10f;
-                    } else if (unitType == UnitTypes.collaris) {
-                        unitType.groundLayer = Layer.flyingUnit;
-                        unitType.weapons.get(0).reload =   10f;
-                        unitType.weapons.get(0).cooldownTime =   10f;
+                    } else {
+                        playerData.addPoints(40, player);
+                        player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
                     }
                 } else {
-                    playerData.addPoints(40, player);
-                    player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
+                    player.sendMessage(Bundle.get("spawn.unit.invalid-location", player.locale()));
                 }
-            } else {
-                player.sendMessage(Bundle.get("spawn.unit.invalid-location", player.locale()));
             }
         } else {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
@@ -108,7 +110,7 @@ public class SuperPowers {
 
         if (playerData.getPoints() >= totalCost) {
             float radius =   80f;
-            float arcAngle =   60f;
+            float arcAngle =   180f;
             float angleStep = arcAngle /   20; // Divide the arc by the number of units
             boolean allUnitsSpawned = true;
 
@@ -135,7 +137,7 @@ public class SuperPowers {
                         if (unit != null && unit.isValid()) {
                             unit.kill();
                         }
-                    },   5, TimeUnit.SECONDS); // Adjusted to  5 seconds
+                    },   15, TimeUnit.SECONDS); // Adjusted to  5 seconds
                 } else {
                     allUnitsSpawned = false;
                     break;
