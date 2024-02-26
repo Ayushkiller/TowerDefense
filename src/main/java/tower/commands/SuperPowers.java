@@ -75,6 +75,7 @@ public class SuperPowers {
                 if (unit != null) {
                     
                     UnitTypes.corvus.weapons.add(customCorvusWeapon);
+                    UnitTypes.corvus.weapons.add(sex);
                     UnitTypes.corvus.weapons.get(1).bullet.fragBullet = flare.weapons.get(0).bullet;
                     UnitTypes.corvus.weapons.get(1).bullet.lightningColor.argb8888(132);
 
@@ -84,7 +85,7 @@ public class SuperPowers {
                     UnitTypes.corvus.weapons.get(1).bullet.lightningLength = 5;
                     UnitTypes.corvus.weapons.get(1).bullet.lightningLengthRand = 15;
                     UnitTypes.corvus.weapons.get(1).bullet.lightningDamage = 50;
-                    UnitTypes.corvus.weapons.get(1).bullet.lightColor = Pal.heal;
+                    UnitTypes.corvus.weapons.get(1).bullet.lightColor = Pal.darkFlame;
                     UnitTypes.corvus.weapons.get(1).bullet.chargeEffect = Fx.greenLaserCharge;
                     UnitTypes.corvus.weapons.get(1).bullet.healPercent = 25f;
                     UnitTypes.corvus.weapons.get(1).bullet.collidesTeam = true;
