@@ -18,12 +18,81 @@ import mindustry.world.Tile;
 
 public class SuperPowers {
     private static final float tilesize =  1.0f; // Adjust the value as needed
+    private static UnitType customCorvus;
+
+    public static void onContentInit() {
+        if (customCorvus == null) {
+            customCorvus = new UnitType("customCorvus") {{
+                hitSize =  29f;
+                health =  18000f;
+                armor =  9f;
+                stepShake =  1.5f;
+                rotateSpeed =  1.5f;
+                drownTimeMultiplier =  6f;
+
+                hovering = true;
+                shadowElevation =  0.2f;
+                ammoType = new PowerAmmoType(40000);
+                groundLayer = Layer.flyingUnit;
+
+                speed =  0.3f;
+
+                drawShields = false;
+
+                weapons.add(new Weapon("corvus-weapon") {{
+                    shootSound = Sounds.laserblast;
+                    chargeSound = Sounds.lasercharge;
+                    soundPitchMin =  1f;
+                    top = false;
+                    mirror = false;
+                    shake =  14f;
+                    shootY =  5f;
+                    x = y =  0;
+                    reload =  100f;
+                    recoil =  0f;
+                    alwaysContinuous = true;
+                    cooldownTime =  100f;
+
+                    shootStatusDuration =  60f *  2f;
+                    shootStatus = StatusEffects.unmoving;
+                    shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
+                    parentizeEffects = true;
+
+                    bullet = new LaserBulletType() {{
+                        length =  460f;
+                        damage =  560f;
+                        width =  75f;
+
+                        lifetime =  65f;
+
+                        lightningSpacing =  35f;
+                        lightningLength =  5;
+                        lightningDelay =  1.1f;
+                        lightningLengthRand =  15;
+                        lightningDamage =  50;
+                        lightningAngleRand =  40f;
+                        largeHit = true;
+                        lightColor = lightningColor = Pal.heal;
+
+                        chargeEffect = Fx.greenLaserCharge;
+
+                        healPercent =  25f;
+                        collidesTeam = true;
+
+                        sideAngle =  15f;
+                        sideWidth =  0f;
+                        sideLength =  0f;
+                        colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                    }};
+                }});
+            }};
+        }
+    }
 
     public static void execute(Player player) {
-        // Implement the logic for the Super Powers menu option here
+
         player.sendMessage("Super Powers menu option selected.");
 
-        // Spawn  6 units around the player within a  40f radius
         Unit playerUnit = player.unit(); // Get the player's unit
         if (playerUnit != null) {
             float playerX = playerUnit.x; // Get the player's X position
@@ -41,95 +110,23 @@ public class SuperPowers {
         float angleStep =  360f / numberOfUnits; // Calculate the angle step for even spacing
 
         for (int i =  0; i < numberOfUnits; i++) {
-            // Calculate the angle for the current unit
             float angle = i * angleStep;
-            // Convert the angle to radians
             double radians = Math.toRadians(angle);
-            // Calculate the spawn position
             float x = playerX + radius * (float) Math.cos(radians);
             float y = playerY + radius * (float) Math.sin(radians);
 
-            // Convert the float coordinates to integers
             int intX = (int) x;
             int intY = (int) y;
-            // Convert the integer coordinates to world coordinates
             float worldX = intX * tilesize;
             float worldY = intY * tilesize;
 
-            // Find the tile at the world position
             Tile tile = world.tileWorld(worldX, worldY);
             if (tile != null) {
-                // Spawn a Corvus unit at the tile
-                Unit unit = SuperPowers.customCorvus.spawn(worldX, worldY); // Adjusted to use UnitType.spawn
-                if (unit != null) {             
+                Unit unit = customCorvus.spawn(worldX, worldY);
+                if (unit != null) {
+                    // Additional logic for the spawned unit
                 }
             }
         }
     }
-
-    public static final UnitType customCorvus = new UnitType("customCorvus") {{
-            hitSize = 29f;
-            health = 18000f;
-            armor = 9f;
-            stepShake = 1.5f;
-            rotateSpeed = 1.5f;
-            drownTimeMultiplier = 6f;
-
-
-            hovering = true;
-            shadowElevation = 0.2f;
-            ammoType = new PowerAmmoType(40000);
-            groundLayer = Layer.flyingUnit;
-
-            speed = 0.3f;
-
-            drawShields = false;
-
-            weapons.add(new Weapon("corvus-weapon"){{
-                shootSound = Sounds.laserblast;
-                chargeSound = Sounds.lasercharge;
-                soundPitchMin = 1f;
-                top = false;
-                mirror = false;
-                shake = 14f;
-                shootY = 5f;
-                x = y = 0;
-                reload = 100f;
-                recoil = 0f;
-                alwaysContinuous = true;
-                cooldownTime = 100f;
-
-                shootStatusDuration = 60f * 2f;
-                shootStatus = StatusEffects.unmoving;
-                shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
-                parentizeEffects = true;
-
-                bullet = new LaserBulletType(){{
-                    length = 460f;
-                    damage = 560f;
-                    width = 75f;
-
-                    lifetime = 65f;
-
-                    lightningSpacing = 35f;
-                    lightningLength = 5;
-                    lightningDelay = 1.1f;
-                    lightningLengthRand = 15;
-                    lightningDamage = 50;
-                    lightningAngleRand = 40f;
-                    largeHit = true;
-                    lightColor = lightningColor = Pal.heal;
-
-                    chargeEffect = Fx.greenLaserCharge;
-
-                    healPercent = 25f;
-                    collidesTeam = true;
-
-                    sideAngle = 15f;
-                    sideWidth = 0f;
-                    sideLength = 0f;
-                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
-                }};
-            }});
-        }};
 }
