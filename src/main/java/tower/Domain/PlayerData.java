@@ -23,9 +23,17 @@ public class PlayerData {
     private float points;
 
     public void addPointsWithReduction(float reductionPercentage) {
-        float basePoints =  1f; // Base points to be added
-        float reduction = this.points * reductionPercentage /  100; // Calculate reduction
+        float basePoints =   1f; // Base points to be added
+        float reduction = this.points * reductionPercentage /   100; // Calculate reduction
         float pointsToAdd = basePoints - reduction; // Calculate points to add after reduction
+
+        // Check if points to add is negative
+        if (pointsToAdd <=  0) {
+            // If points to add is negative, do not add any points
+            return;
+        }
+
+        // If points to add is positive, add them to the player's points
         this.points += pointsToAdd;
     }
     public void addKills (int amount) {
