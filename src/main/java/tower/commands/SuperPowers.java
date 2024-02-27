@@ -167,50 +167,35 @@ public class SuperPowers {
     }
     private static void spawnDisruptUnit(Player player, World world, float playerX, float playerY) {
         PlayerData playerData = Players.getPlayer(player);
-        int price =   100; // Set the price to   100
+        int price =  100; // Set the price to  100
         if (playerData.getPoints() >= price) {
             playerData.subtractPoints((float) price, player);
     
             // Spawn both disrupt and eclipse units for the player
             UnitType spawnType1 = UnitTypes.disrupt;
             UnitType spawnType2 = UnitTypes.eclipse;
-            Unit spawned1 = spawnType1.spawn(player.x, player.y);
-            Unit spawned2 = spawnType2.spawn(player.x, player.y);
+            ScheduledExecutorService spawnExecutor = Executors.newSingleThreadScheduledExecutor();
+            Unit spawned1 = spawnType1.spawn(playerX, playerY);
+            Unit spawned2 = spawnType2.spawn(playerX, playerY);
     
-            // Check if the spawned units are alive
-            if ((spawned1 != null && !spawned1.dead()) || (spawned2 != null && !spawned2.dead())) {
-                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-                executor.schedule(() -> {
-                    if (spawned1 != null && !spawned1.dead()) {
-                        Call.unitControl(player, spawned1);
-                        if (player.unit() == spawned1) {
-                            spawned2.kill();
-                        }
-                    } else if (spawned2 != null && !spawned2.dead()) {
-                        Call.unitControl(player, spawned2);
-                        if (player.unit() == spawned2) {
-                            spawned1.kill();
-                        }
-                    }
-                },   100, TimeUnit.MILLISECONDS); // Wait for  0.1 seconds before attempting to use Call.unitControl
+            // Schedule a task to continuously spawn units within a radius of  80 units from the player
+            spawnExecutor.scheduleAtFixedRate(() -> {
+                if (player.unit() == spawned1 || player.unit() == spawned2) { // Check if the player is still controlling either of the spawned units
+                    spawnUnitsWithinRadius(player, world, playerX, playerY,  80f, UnitTypes.zenith, UnitTypes.quell);
+                    spawnUnitsWithinRadius(player, world, playerX, playerY,  140f, UnitTypes.flare, UnitTypes.avert);
+                }
+            },  0,  1, TimeUnit.SECONDS); // Check every second
     
-                player.sendMessage(Bundle.get("unit.brought", player.locale));
+            // Schedule a task to check every  5 seconds if the player is still controlling either of the spawned units
+            ScheduledExecutorService controlCheckExecutor = Executors.newSingleThreadScheduledExecutor();
+            controlCheckExecutor.scheduleAtFixedRate(() -> {
+                if (player.unit() != spawned1 && player.unit() != spawned2) {
+                    spawnExecutor.shutdown(); // Stop spawning if the player leaves the units
+                    controlCheckExecutor.shutdown(); // Shutdown the control check executor as well
+                }
+            },  0,  5, TimeUnit.SECONDS); // Check every  5 seconds
     
-                // Schedule a task to continuously spawn zenith and quell units within a radius of   80 units from the player
-                ScheduledExecutorService spawnExecutor = Executors.newSingleThreadScheduledExecutor();
-                spawnExecutor.scheduleAtFixedRate(() -> {
-                    if (player.unit() == spawned1 || player.unit() == spawned2) { // Check if the player is still controlling either of the spawned units
-                        spawnUnitsWithinRadius(player, world, playerX, playerY,   80f, UnitTypes.zenith, UnitTypes.quell);
-                        spawnUnitsWithinRadius(player, world, playerX, playerY,   140f, UnitTypes.flare, UnitTypes.avert);
-                    } else {
-                        spawnExecutor.shutdown(); // Stop spawning if the player leaves the units
-                    }
-                },   0,   1, TimeUnit.SECONDS); // Check every second
-            } else {
-                // Handle the case where the units could not be spawned
-                playerData.addPoints((float) price, player); // Return the points to the player
-                player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
-            }
+            player.sendMessage(Bundle.get("unit.brought", player.locale));
         } else {
             player.sendMessage(Bundle.get("menu.units.not-enough.l", player.locale()));
         }
@@ -254,36 +239,33 @@ public class SuperPowers {
 }
 private static void spawnUnitsWithinRadius(Player player, World world, float playerX, float playerY, float radius, UnitType... unitTypes) {
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    int unitsPerBatch =  6;
-    int batchCount = (int) Math.ceil((double) unitTypes.length / unitsPerBatch);
+    int totalUnits = unitTypes.length;
+    double angleStep =  360.0 / totalUnits; // Calculate the angle step for evenly spaced spawns
 
     executor.scheduleAtFixedRate(() -> {
-        for (int batch =  0; batch < batchCount; batch++) {
-            for (int i = batch * unitsPerBatch; i < Math.min((batch +  1) * unitsPerBatch, unitTypes.length); i++) {
-                float angle = i * (360f / unitTypes.length);
-                double radians = Math.toRadians(angle);
-                float x = playerX + radius * (float) Math.cos(radians);
-                float y = playerY + radius * (float) Math.sin(radians);
+        for (int i =  0; i < totalUnits; i++) {
+            double radians = Math.toRadians(i * angleStep);
+            float x = playerX + radius * (float) Math.cos(radians);
+            float y = playerY + radius * (float) Math.sin(radians);
 
-                int intX = (int) x;
-                int intY = (int) y;
-                float worldX = intX * tilesize;
-                float worldY = intY * tilesize;
+            int intX = (int) x;
+            int intY = (int) y;
+            float worldX = intX * tilesize;
+            float worldY = intY * tilesize;
 
-                Tile tile = world.tileWorld(worldX, worldY);
-                if (tile != null) {
-                    Unit unit = unitTypes[i].spawn(worldX, worldY);
-                    if (unit != null && unit.isValid()) {
-                        // Schedule a single executor for all units to be killed after  6 seconds
-                        executor.schedule(() -> {
-                            if (unit != null && unit.isValid()) {
-                                unit.kill();
-                            }
-                        },  6, TimeUnit.SECONDS);
-                    }
+            Tile tile = world.tileWorld(worldX, worldY);
+            if (tile != null) {
+                Unit unit = unitTypes[i].spawn(worldX, worldY);
+                if (unit != null && unit.isValid()) {
+                    // Schedule a single executor for all units to be killed after   6 seconds
+                    executor.schedule(() -> {
+                        if (unit != null && unit.isValid()) {
+                            unit.kill();
+                        }
+                    },   6, TimeUnit.SECONDS);
                 }
             }
         }
-    },  0,  4, TimeUnit.SECONDS); // Spawn units every  4 seconds
+    },   0,   4, TimeUnit.SECONDS); // Spawn units every   4 seconds
 }
 }
