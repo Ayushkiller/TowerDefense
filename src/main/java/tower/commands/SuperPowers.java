@@ -194,16 +194,6 @@ public class SuperPowers {
                     }
                 },   100, TimeUnit.MILLISECONDS); // Wait for  0.1 seconds before attempting to use Call.unitControl
     
-                ScheduledExecutorService checkExecutor = Executors.newSingleThreadScheduledExecutor();
-                checkExecutor.schedule(() -> {
-                    if ((spawned1 != null && spawned1.dead()) || (spawned2 != null && spawned2.dead())) {
-                        // Return the item to the player
-                        playerData.addPoints((float) price, player);
-                        player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
-                        player.sendMessage(Bundle.get("unit.died", player.locale));
-                    }
-                },   2, TimeUnit.SECONDS); // Check if the units are dead within   2 seconds
-    
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
     
                 // Schedule a task to continuously spawn zenith and quell units within a radius of   80 units from the player
@@ -284,16 +274,16 @@ private static void spawnUnitsWithinRadius(Player player, World world, float pla
                 if (tile != null) {
                     Unit unit = unitTypes[i].spawn(worldX, worldY);
                     if (unit != null && unit.isValid()) {
-                        ScheduledExecutorService unitExecutor = Executors.newSingleThreadScheduledExecutor();
-                        unitExecutor.schedule(() -> {
+                        // Schedule a single executor for all units to be killed after  6 seconds
+                        executor.schedule(() -> {
                             if (unit != null && unit.isValid()) {
                                 unit.kill();
                             }
-                        },  6, TimeUnit.SECONDS); // Kill the units after  6 seconds
+                        },  6, TimeUnit.SECONDS);
                     }
                 }
             }
         }
-    },  0,  5, TimeUnit.SECONDS); // Spawn units every  5 seconds
+    },  0,  4, TimeUnit.SECONDS); // Spawn units every  4 seconds
 }
 }
