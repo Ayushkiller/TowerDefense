@@ -1,6 +1,7 @@
 package tower.commands;
 
 import mindustry.Vars;
+import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.core.World;
 import mindustry.gen.Call;
@@ -38,21 +39,28 @@ public class SuperPowers {
     private static void spawnCollarisUnit(Player player, World world, float playerX, float playerY) {
         spawnUnitWithType(player, world, playerX, playerY, UnitTypes.collaris);
     }
-
     private static void openUnitSelectionMenu(Player player, World world, float playerX, float playerY) {
         String[][] buttons = {
             {"Corvus"},
             {"Collaris"},
-            {"Squad"}
+            {"Squad"},
+            {"Disrupt"},
+            {"Omni Tower"} 
         };
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            if (option ==   0) {
+            if (option ==  0) {
                 spawnCorvusUnit(player, world, playerX, playerY);
-            } else if (option ==   1) {
+            } else if (option ==  1) {
                 spawnCollarisUnit(player, world, playerX, playerY);
-            } else if (option ==   2) {
-                spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt);  
+            } else if (option ==  2) {
+                spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt);
+            } else if (option ==  3) { // Add this block
+                spawnDisruptUnit(player, world, playerX, playerY);
             }
+             else if (option ==  4) { // Add this block
+            specialSpawn(player, world, playerX, playerY);
+            }
+            
         }), "[lime]Choose a ability to use:", "", buttons);
     }
     
@@ -157,7 +165,109 @@ public class SuperPowers {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
         }
     }
+    private static void spawnDisruptUnit(Player player, World world, float playerX, float playerY) {
+        PlayerData playerData = Players.getPlayer(player);
+        int price =   100; // Set the price to   100
+        if (playerData.getPoints() >= price) {
+            playerData.subtractPoints((float) price, player);
     
+            // Spawn the disrupt unit for the player
+            Unit oldUnit = player.unit();
+            Unit spawned = UnitTypes.disrupt.spawn(player.x, player.y);
     
+            // Check if the spawned unit is alive
+            if (spawned != null && !spawned.dead()) {
+                Call.unitControl(player, spawned);
+                oldUnit.kill();
     
+                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                executor.schedule(() -> {
+                    if (spawned.dead()) {
+                        // Return the item to the player
+                        playerData.addPoints((float) price, player);
+                        player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
+                        player.sendMessage(Bundle.get("unit.died", player.locale));
+                    }
+                },   3, TimeUnit.SECONDS);
+    
+                player.sendMessage(Bundle.get("unit.brought", player.locale));
+    
+                // Spawn zenith and quell units within a radius of   80 units from the player
+                float radius =   80f;
+                float angleStep =   360f /   6; // Divide the circle into   6 equal parts for even spacing
+                int zenithSpawned =   0;
+                int quellSpawned =   0;
+                for (int i =   0; i <   6; i++) {
+                    float angle = i * angleStep;
+                    double radians = Math.toRadians(angle);
+                    float x = playerX + radius * (float) Math.cos(radians);
+                    float y = playerY + radius * (float) Math.sin(radians);
+    
+                    int intX = (int) x;
+                    int intY = (int) y;
+                    float worldX = intX * tilesize;
+                    float worldY = intY * tilesize;
+    
+                    Tile tile = world.tileWorld(worldX, worldY);
+                    if (tile != null) {
+                        UnitType unitType = i %   2 ==   0 ? UnitTypes.flare : UnitTypes.avert; // Alternate between flare and avert
+                        if ((unitType == UnitTypes.flare && zenithSpawned <  10) || (unitType == UnitTypes.avert && quellSpawned <  10)) {
+                            Unit unit = unitType.spawn(worldX, worldY);
+                            if (unit != null && unit.isValid()) {
+                                if (unitType == UnitTypes.flare) {
+                                    zenithSpawned++;
+                                } else {
+                                    quellSpawned++;
+                                }
+                                ScheduledExecutorService unitExecutor = Executors.newSingleThreadScheduledExecutor();
+                                unitExecutor.schedule(() -> {
+                                    if (unit != null && unit.isValid()) {
+                                        unit.kill();
+                                    }
+                                },   2, TimeUnit.SECONDS);
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Handle the case where the unit could not be spawned
+                playerData.addPoints((float) price, player); // Return the points to the player
+                player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
+            }
+        } else {
+            player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
+        }
+    }
+    private static void specialSpawn(Player player, World world, float playerX, float playerY) {
+    PlayerData playerData = Players.getPlayer(player);
+    int price =  200; // Set the price to  200
+    if (playerData.getPoints() >= price) {
+        playerData.subtractPoints(price, player);
+
+        // Define the units to spawn
+        UnitType[] unitsToSpawn = {
+            UnitTypes.corvus,
+            UnitTypes.disrupt,
+            UnitTypes.collaris,
+            UnitTypes.conquer,
+            UnitTypes.eclipse,
+            UnitTypes.oct,
+            UnitTypes.toxopid,
+            UnitTypes.reign
+        };
+
+        // Spawn the units and apply the unmoving status effect
+        for (UnitType unitType : unitsToSpawn) {
+            Unit unit = unitType.spawn(playerX, playerY);
+            if (unit != null && unit.isValid()) {
+                unit.apply(StatusEffects.unmoving, Float.POSITIVE_INFINITY);
+                unit.type.physics = false;
+            }
+        }
+
+        player.sendMessage(Bundle.get("special.spawn.success", player.locale));
+    } else {
+        player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
+    }
+}
 }
