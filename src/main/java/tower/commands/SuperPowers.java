@@ -4,6 +4,7 @@ import mindustry.Vars;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.core.World;
+import mindustry.game.EventType.PlayerLeave;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
@@ -16,7 +17,10 @@ import tower.Players;
 import tower.Domain.PlayerData;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import arc.Events;
 
 public class SuperPowers {
     private static final float tilesize =   1.0f; // Adjust the value as needed
@@ -165,57 +169,56 @@ public class SuperPowers {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
         }
     }
-    private static void spawnDisruptUnit(Player player, World world, float playerX, float playerY) {
-        PlayerData playerData = Players.getPlayer(player);
-        int unitCost =   40; // Cost per unit
-        int totalCost = unitCost; // Total cost for   4 unit types
-    
-        if (playerData.getPoints() >= totalCost) {
-            float radius =   140f;
-            float arcAngle =   180f;
-            float angleStep = arcAngle /   20; // Divide the arc by the number of units
-            boolean allUnitsSpawned = true;
-    
-            // Define the duration for spawning units in seconds
-            long spawnDuration =   10; //   10 seconds
-            long startTime = System.currentTimeMillis();
-    
-            while (System.currentTimeMillis() - startTime < spawnDuration *   1000) {
-                for (int i =   0; i <   20; i++) {
-                    float angle = i * angleStep - arcAngle /   2; // Calculate the angle for each unit
-                    double radians = Math.toRadians(angle);
-                    float x = playerX + radius * (float) Math.cos(radians);
-                    float y = playerY + radius * (float) Math.sin(radians);
-    
-                    int intX = (int) x;
-                    int intY = (int) y;
-                    float worldX = intX * tilesize;
-                    float worldY = intY * tilesize;
-    
-                    Tile tile = world.tileWorld(worldX, worldY);
-                    if (tile != null) {
-                        // Spawn Zenith, Quell, Avert, and Flare units
-                        for (UnitType unitType : new UnitType[]{UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert, UnitTypes.flare}) {
-                            Unit unit = unitType.spawn(worldX, worldY);
-                            if (unit == null || !unit.isValid()) {
-                                allUnitsSpawned = false;
-                                break;
-                            }
-                            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-                            executor.schedule(() -> {
-                                if (unit != null && unit.isValid()) {
-                                    unit.kill();
-                                }
-                            },   10, TimeUnit.SECONDS); // Adjusted to   5 seconds
+private static void spawnDisruptUnit(Player player, World world, float playerX, float playerY) {
+    PlayerData playerData = Players.getPlayer(player);
+    int unitCost =   40; // Cost per unit
+    int totalCost = unitCost; // Total cost for   4 unit types
+
+    if (playerData.getPoints() >= totalCost) {
+        float radius =   140f;
+        float arcAngle =   180f;
+        float angleStep = arcAngle /   20; // Divide the arc by the number of units
+        boolean[] allUnitsSpawned = new boolean[]{true};
+
+        // Define the duration for spawning units in seconds
+        long spawnDuration =   10; //   10 seconds
+
+        // Schedule the spawning of units over the specified duration
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        ScheduledFuture<?> scheduledTask = executor.schedule(() -> {
+            for (int i =   0; i <   20; i++) {
+                float angle = i * angleStep - arcAngle /   2; // Calculate the angle for each unit
+                double radians = Math.toRadians(angle);
+                float x = playerX + radius * (float) Math.cos(radians);
+                float y = playerY + radius * (float) Math.sin(radians);
+
+                int intX = (int) x;
+                int intY = (int) y;
+                float worldX = intX * tilesize;
+                float worldY = intY * tilesize;
+
+                Tile tile = world.tileWorld(worldX, worldY);
+                if (tile != null) {
+                    // Spawn Zenith, Quell, Avert, and Flare units
+                    for (UnitType unitType : new UnitType[]{UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert, UnitTypes.flare}) {
+                        Unit unit = unitType.spawn(worldX, worldY);
+                        if (unit == null || !unit.isValid()) {
+                            allUnitsSpawned[0] = false;
+                            break;
                         }
-                    } else {
-                        allUnitsSpawned = false;
-                        break;
+                        executor.schedule(() -> {
+                            if (unit != null && unit.isValid()) {
+                                unit.kill();
+                            }
+                        },   5, TimeUnit.SECONDS); // Adjusted to   5 seconds
                     }
+                } else {
+                    allUnitsSpawned[0] = false;
+                    break;
                 }
             }
-    
-            if (allUnitsSpawned) {
+
+            if (allUnitsSpawned[0]) {
                 playerData.subtractPoints(totalCost, player); // Subtract the total cost
                 player.sendMessage(Bundle.get("spawn.arc-of-units.success", player.locale()));
             } else {
@@ -223,10 +226,18 @@ public class SuperPowers {
                 playerData.addPoints(totalCost, player);
                 player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
             }
-        } else {
-            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
-        }
+        }, spawnDuration, TimeUnit.SECONDS);
+
+        // Add a listener for the PlayerLeave event to cancel the scheduled task
+        Events.on(PlayerLeave.class, event -> {
+            if (event.player == player) {
+                scheduledTask.cancel(false); // Cancel the scheduled task
+            }
+        });
+    } else {
+        player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
     }
+}
     private static void specialSpawn(Player player, World world, float playerX, float playerY) {
     PlayerData playerData = Players.getPlayer(player);
     int price =  100; // Set the price to  200
