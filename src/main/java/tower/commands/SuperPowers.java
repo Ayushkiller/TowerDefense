@@ -44,7 +44,7 @@ public class SuperPowers {
             {"Corvus"},
             {"Collaris"},
             {"Squad"},
-            {"Disrupt"},
+            {"Magic"},
             {"Omni Tower"} 
         };
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
@@ -167,37 +167,64 @@ public class SuperPowers {
     }
     private static void spawnDisruptUnit(Player player, World world, float playerX, float playerY) {
         PlayerData playerData = Players.getPlayer(player);
-        int price =  100; // Set the price to  100
-        if (playerData.getPoints() >= price) {
-            playerData.subtractPoints((float) price, player);
+        int unitCost =   40; // Cost per unit
+        int totalCost = unitCost; // Total cost for   4 unit types
     
-            // Spawn both disrupt and eclipse units for the player
-            UnitType spawnType1 = UnitTypes.disrupt;
-            UnitType spawnType2 = UnitTypes.eclipse;
-            ScheduledExecutorService spawnExecutor = Executors.newSingleThreadScheduledExecutor();
-            Unit spawned1 = spawnType1.spawn(playerX, playerY);
-            Unit spawned2 = spawnType2.spawn(playerX, playerY);
+        if (playerData.getPoints() >= totalCost) {
+            float radius =   140f;
+            float arcAngle =   180f;
+            float angleStep = arcAngle /   20; // Divide the arc by the number of units
+            boolean allUnitsSpawned = true;
     
-            // Schedule a task to continuously spawn units within a radius of  80 units from the player
-            spawnExecutor.scheduleAtFixedRate(() -> {
-                if (player.unit() == spawned1 || player.unit() == spawned2) { // Check if the player is still controlling either of the spawned units
-                    spawnUnitsWithinRadius(player, world, playerX, playerY,  80f, UnitTypes.zenith, UnitTypes.quell);
-                    spawnUnitsWithinRadius(player, world, playerX, playerY,  140f, UnitTypes.flare, UnitTypes.avert);
+            // Define the duration for spawning units in seconds
+            long spawnDuration =   10; //   10 seconds
+            long startTime = System.currentTimeMillis();
+    
+            while (System.currentTimeMillis() - startTime < spawnDuration *   1000) {
+                for (int i =   0; i <   20; i++) {
+                    float angle = i * angleStep - arcAngle /   2; // Calculate the angle for each unit
+                    double radians = Math.toRadians(angle);
+                    float x = playerX + radius * (float) Math.cos(radians);
+                    float y = playerY + radius * (float) Math.sin(radians);
+    
+                    int intX = (int) x;
+                    int intY = (int) y;
+                    float worldX = intX * tilesize;
+                    float worldY = intY * tilesize;
+    
+                    Tile tile = world.tileWorld(worldX, worldY);
+                    if (tile != null) {
+                        // Spawn Zenith, Quell, Avert, and Flare units
+                        for (UnitType unitType : new UnitType[]{UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert, UnitTypes.flare}) {
+                            Unit unit = unitType.spawn(worldX, worldY);
+                            if (unit == null || !unit.isValid()) {
+                                allUnitsSpawned = false;
+                                break;
+                            }
+                            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                            executor.schedule(() -> {
+                                if (unit != null && unit.isValid()) {
+                                    unit.kill();
+                                }
+                            },   10, TimeUnit.SECONDS); // Adjusted to   5 seconds
+                        }
+                    } else {
+                        allUnitsSpawned = false;
+                        break;
+                    }
                 }
-            },  0,  1, TimeUnit.SECONDS); // Check every second
+            }
     
-            // Schedule a task to check every  5 seconds if the player is still controlling either of the spawned units
-            ScheduledExecutorService controlCheckExecutor = Executors.newSingleThreadScheduledExecutor();
-            controlCheckExecutor.scheduleAtFixedRate(() -> {
-                if (player.unit() != spawned1 && player.unit() != spawned2) {
-                    spawnExecutor.shutdown(); // Stop spawning if the player leaves the units
-                    controlCheckExecutor.shutdown(); // Shutdown the control check executor as well
-                }
-            },  0,  5, TimeUnit.SECONDS); // Check every  5 seconds
-    
-            player.sendMessage(Bundle.get("unit.brought", player.locale));
+            if (allUnitsSpawned) {
+                playerData.subtractPoints(totalCost, player); // Subtract the total cost
+                player.sendMessage(Bundle.get("spawn.arc-of-units.success", player.locale()));
+            } else {
+                // If any unit was not successfully spawned, give back the points
+                playerData.addPoints(totalCost, player);
+                player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
+            }
         } else {
-            player.sendMessage(Bundle.get("menu.units.not-enough.l", player.locale()));
+            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
         }
     }
     private static void specialSpawn(Player player, World world, float playerX, float playerY) {
@@ -237,35 +264,5 @@ public class SuperPowers {
         player.sendMessage(Bundle.get("menu.units.not-enough.l", player.locale()));
     }
 }
-private static void spawnUnitsWithinRadius(Player player, World world, float playerX, float playerY, float radius, UnitType... unitTypes) {
-    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    int totalUnits = unitTypes.length;
-    double angleStep =  360.0 / totalUnits; // Calculate the angle step for evenly spaced spawns
 
-    executor.scheduleAtFixedRate(() -> {
-        for (int i =  0; i < totalUnits; i++) {
-            double radians = Math.toRadians(i * angleStep);
-            float x = playerX + radius * (float) Math.cos(radians);
-            float y = playerY + radius * (float) Math.sin(radians);
-
-            int intX = (int) x;
-            int intY = (int) y;
-            float worldX = intX * tilesize;
-            float worldY = intY * tilesize;
-
-            Tile tile = world.tileWorld(worldX, worldY);
-            if (tile != null) {
-                Unit unit = unitTypes[i].spawn(worldX, worldY);
-                if (unit != null && unit.isValid()) {
-                    // Schedule a single executor for all units to be killed after   6 seconds
-                    executor.schedule(() -> {
-                        if (unit != null && unit.isValid()) {
-                            unit.kill();
-                        }
-                    },   6, TimeUnit.SECONDS);
-                }
-            }
-        }
-    },   0,   4, TimeUnit.SECONDS); // Spawn units every   4 seconds
-}
 }
