@@ -239,6 +239,8 @@ public class SuperPowers {
             if (unit != null && unit.isValid()) {
                 unit.apply(StatusEffects.unmoving, Float.POSITIVE_INFINITY);
                 unit.type.physics = false;
+                unit.type.autoFindTarget = true;
+                unit.type.alwaysUnlocked = true;
             }
         }
 
@@ -248,30 +250,37 @@ public class SuperPowers {
     }
 }
 private static void spawnUnitsWithinRadius(Player player, World world, float playerX, float playerY, float radius, UnitType... unitTypes) {
-    float angleStep =  360f / unitTypes.length; // Divide the circle into equal parts for even spacing
-    for (int i =  0; i < unitTypes.length; i++) {
-        float angle = i * angleStep;
-        double radians = Math.toRadians(angle);
-        float x = playerX + radius * (float) Math.cos(radians);
-        float y = playerY + radius * (float) Math.sin(radians);
+    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    int unitsPerBatch =  6;
+    int batchCount = (int) Math.ceil((double) unitTypes.length / unitsPerBatch);
 
-        int intX = (int) x;
-        int intY = (int) y;
-        float worldX = intX * tilesize;
-        float worldY = intY * tilesize;
+    executor.scheduleAtFixedRate(() -> {
+        for (int batch =  0; batch < batchCount; batch++) {
+            for (int i = batch * unitsPerBatch; i < Math.min((batch +  1) * unitsPerBatch, unitTypes.length); i++) {
+                float angle = i * (360f / unitTypes.length);
+                double radians = Math.toRadians(angle);
+                float x = playerX + radius * (float) Math.cos(radians);
+                float y = playerY + radius * (float) Math.sin(radians);
 
-        Tile tile = world.tileWorld(worldX, worldY);
-        if (tile != null) {
-            Unit unit = unitTypes[i].spawn(worldX, worldY);
-            if (unit != null && unit.isValid()) {
-                ScheduledExecutorService unitExecutor = Executors.newSingleThreadScheduledExecutor();
-                unitExecutor.schedule(() -> {
+                int intX = (int) x;
+                int intY = (int) y;
+                float worldX = intX * tilesize;
+                float worldY = intY * tilesize;
+
+                Tile tile = world.tileWorld(worldX, worldY);
+                if (tile != null) {
+                    Unit unit = unitTypes[i].spawn(worldX, worldY);
                     if (unit != null && unit.isValid()) {
-                        unit.kill();
+                        ScheduledExecutorService unitExecutor = Executors.newSingleThreadScheduledExecutor();
+                        unitExecutor.schedule(() -> {
+                            if (unit != null && unit.isValid()) {
+                                unit.kill();
+                            }
+                        },  6, TimeUnit.SECONDS); // Kill the units after  6 seconds
                     }
-                },  6, TimeUnit.SECONDS); // Kill the units after  6 seconds
+                }
             }
         }
-    }
+    },  0,  5, TimeUnit.SECONDS); // Spawn units every  5 seconds
 }
 }
