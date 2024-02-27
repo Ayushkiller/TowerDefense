@@ -167,12 +167,12 @@ public class SuperPowers {
     }
     private static void spawnDisruptUnit(Player player, World world, float playerX, float playerY) {
         PlayerData playerData = Players.getPlayer(player);
-        int price =  100; // Set the price to  100
+        int price =   100; // Set the price to   100
         if (playerData.getPoints() >= price) {
             playerData.subtractPoints((float) price, player);
     
             // Spawn either disrupt or eclipse unit for the player
-            UnitType spawnType = Math.random() <  0.5 ? UnitTypes.disrupt : UnitTypes.eclipse;
+            UnitType spawnType = Math.random() <   0.5 ? UnitTypes.disrupt : UnitTypes.eclipse;
             Unit spawned = spawnType.spawn(player.x, player.y);
     
             // Check if the spawned unit is alive
@@ -184,106 +184,27 @@ public class SuperPowers {
                 ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                 executor.schedule(() -> {
                     if (spawned.dead()) {
-                        // Return the item to the player
-                        playerData.addPoints((float) price, player);
-                        player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
-                        player.sendMessage(Bundle.get("unit.died", player.locale));
+                        // Respawn the unit if it's dead within  2 seconds
+                        Unit respawned = spawnType.spawn(player.x, player.y);
+                        if (respawned != null && !respawned.dead()) {
+                            Call.unitControl(player, respawned);
+                           
+                        } else {
+                            // Return the item to the player
+                            playerData.addPoints((float) price, player);
+                            player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
+                            player.sendMessage(Bundle.get("unit.died", player.locale));
+                        }
                     }
-                },  3, TimeUnit.SECONDS);
+                },   1, TimeUnit.SECONDS); // Check if the unit is dead within  2 seconds
     
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
     
-                // Spawn zenith or obviate units within a radius of  80 units from the player
-                float radius =  80f;
-                float angleStep =  360f /  6; // Divide the circle into  6 equal parts for even spacing
-                int zenithSpawned =  0;
-                int obviateSpawned =  0;
-                for (int i =  0; i <  6; i++) {
-                    float angle = i * angleStep;
-                    double radians = Math.toRadians(angle);
-                    float x = playerX + radius * (float) Math.cos(radians);
-                    float y = playerY + radius * (float) Math.sin(radians);
+                // Spawn zenith and quell units within a radius of   80 units from the player
+                spawnUnitsWithinRadius(player, world, playerX, playerY,   80f, UnitTypes.zenith, UnitTypes.quell);
     
-                    int intX = (int) x;
-                    int intY = (int) y;
-                    float worldX = intX * tilesize;
-                    float worldY = intY * tilesize;
-    
-                    Tile tile = world.tileWorld(worldX, worldY);
-                    if (tile != null) {
-                        UnitType unitType = spawnType == UnitTypes.disrupt ? UnitTypes.zenith : UnitTypes.obviate;
-                        if ((unitType == UnitTypes.zenith && zenithSpawned <  6) || (unitType == UnitTypes.obviate && obviateSpawned <  6)) {
-                            Unit unit = unitType.spawn(worldX, worldY);
-                            if (unit != null && unit.isValid()) {
-                                if (unitType == UnitTypes.zenith) {
-                                    zenithSpawned++;
-                                } else {
-                                    obviateSpawned++;
-                                }
-                                ScheduledExecutorService unitExecutor = Executors.newSingleThreadScheduledExecutor();
-                                unitExecutor.schedule(() -> {
-                                    if (unit != null && unit.isValid()) {
-                                        unit.kill();
-                                    }
-                                },  6, TimeUnit.SECONDS); // Kill the zenith or obviate units after  6 seconds
-                            }
-                        }
-                    }
-                }
-    
-                // Spawn flare or avert units in a larger radius
-                radius =  140f; // Increase the radius for the larger spawn
-                angleStep =  360f /  6; // Divide the circle into  6 equal parts for even spacing
-                int flareSpawned =  0;
-                int avertSpawned =  0;
-                ScheduledExecutorService flareExecutor = Executors.newSingleThreadScheduledExecutor();
-                ScheduledExecutorService avertExecutor = Executors.newSingleThreadScheduledExecutor();
-                for (int i =  0; i <  6; i++) {
-                    float angle = i * angleStep;
-                    double radians = Math.toRadians(angle);
-                    float x = playerX + radius * (float) Math.cos(radians);
-                    float y = playerY + radius * (float) Math.sin(radians);
-    
-    
-                    int intX = (int) x;
-                    int intY = (int) y;
-                    float worldX = intX * tilesize;
-                    float worldY = intY * tilesize;
-    
-                    Tile tile = world.tileWorld(worldX, worldY);
-                    if (tile != null) {
-                        UnitType unitType = i %  2 ==  0 ? UnitTypes.flare : UnitTypes.avert; // Alternate between flare and avert
-                        Unit unit = unitType.spawn(worldX, worldY);
-                        if (unit != null && unit.isValid()) {
-                            if (unitType == UnitTypes.flare) {
-                                flareSpawned++;
-                            } else {
-                                avertSpawned++;
-                            }
-                            ScheduledExecutorService unitExecutor = Executors.newSingleThreadScheduledExecutor();
-                            unitExecutor.schedule(() -> {
-                                if (unit != null && unit.isValid()) {
-                                    unit.kill();
-                                }
-                            },  9, TimeUnit.SECONDS); // Kill the flare or avert units after  9 seconds
-                            if (flareSpawned >  8 || avertSpawned >  8) {
-                                flareExecutor.shutdown();
-                                avertExecutor.shutdown();
-                                break;
-                            }
-                        }
-                    }
-                }
-    
-                // Check if the player has left the spawned unit
-                ScheduledExecutorService checkPlayerExecutor = Executors.newSingleThreadScheduledExecutor();
-                checkPlayerExecutor.schedule(() -> {
-                    if (!player.unit().equals(spawned)) {
-                        flareExecutor.shutdown();
-                        avertExecutor.shutdown();
-                        player.sendMessage(Bundle.get("unit.spawn.player.left", player.locale));
-                    }
-                },  10, TimeUnit.SECONDS); // Check every  10 seconds
+                // Spawn flare and avert units in a larger radius
+                spawnUnitsWithinRadius(player, world, playerX, playerY,   140f, UnitTypes.flare, UnitTypes.avert);
             } else {
                 // Handle the case where the unit could not be spawned
                 playerData.addPoints((float) price, player); // Return the points to the player
@@ -302,10 +223,11 @@ public class SuperPowers {
         // Define the units to spawn
         UnitType[] unitsToSpawn = {
             UnitTypes.corvus,
-            UnitTypes.quell,
-            UnitTypes.quell,
-            UnitTypes.quell,
+            UnitTypes.corvus,
+            UnitTypes.corvus,
             UnitTypes.collaris,
+            UnitTypes.collaris,
+            UnitTypes.conquer,
             UnitTypes.conquer,
             UnitTypes.eclipse,
             UnitTypes.oct,
@@ -325,6 +247,33 @@ public class SuperPowers {
         player.sendMessage(Bundle.get("special.spawn.success", player.locale));
     } else {
         player.sendMessage(Bundle.get("menu.units.not-enough.l", player.locale()));
+    }
+}
+private static void spawnUnitsWithinRadius(Player player, World world, float playerX, float playerY, float radius, UnitType... unitTypes) {
+    float angleStep =  360f / unitTypes.length; // Divide the circle into equal parts for even spacing
+    for (int i =  0; i < unitTypes.length; i++) {
+        float angle = i * angleStep;
+        double radians = Math.toRadians(angle);
+        float x = playerX + radius * (float) Math.cos(radians);
+        float y = playerY + radius * (float) Math.sin(radians);
+
+        int intX = (int) x;
+        int intY = (int) y;
+        float worldX = intX * tilesize;
+        float worldY = intY * tilesize;
+
+        Tile tile = world.tileWorld(worldX, worldY);
+        if (tile != null) {
+            Unit unit = unitTypes[i].spawn(worldX, worldY);
+            if (unit != null && unit.isValid()) {
+                ScheduledExecutorService unitExecutor = Executors.newSingleThreadScheduledExecutor();
+                unitExecutor.schedule(() -> {
+                    if (unit != null && unit.isValid()) {
+                        unit.kill();
+                    }
+                },  6, TimeUnit.SECONDS); // Kill the units after  6 seconds
+            }
+        }
     }
 }
 }
