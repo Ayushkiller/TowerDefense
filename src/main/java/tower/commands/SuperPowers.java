@@ -184,27 +184,25 @@ public class SuperPowers {
                 ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                 executor.schedule(() -> {
                     if (spawned.dead()) {
-                        // Respawn the unit if it's dead within  2 seconds
-                        Unit respawned = spawnType.spawn(player.x, player.y);
-                        if (respawned != null && !respawned.dead()) {
-                            Call.unitControl(player, respawned);
-                           
-                        } else {
-                            // Return the item to the player
-                            playerData.addPoints((float) price, player);
-                            player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
-                            player.sendMessage(Bundle.get("unit.died", player.locale));
-                        }
+                        // Return the item to the player
+                        playerData.addPoints((float) price, player);
+                        player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
+                        player.sendMessage(Bundle.get("unit.died", player.locale));
                     }
-                },   1, TimeUnit.SECONDS); // Check if the unit is dead within  2 seconds
+                },   2, TimeUnit.SECONDS); // Check if the unit is dead within   2 seconds
     
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
     
-                // Spawn zenith and quell units within a radius of   80 units from the player
-                spawnUnitsWithinRadius(player, world, playerX, playerY,   80f, UnitTypes.zenith, UnitTypes.quell);
-    
-                // Spawn flare and avert units in a larger radius
-                spawnUnitsWithinRadius(player, world, playerX, playerY,   140f, UnitTypes.flare, UnitTypes.avert);
+                // Schedule a task to continuously spawn zenith and quell units within a radius of  80 units from the player
+                ScheduledExecutorService spawnExecutor = Executors.newSingleThreadScheduledExecutor();
+                spawnExecutor.scheduleAtFixedRate(() -> {
+                    if (player.unit() == spawned) { // Check if the player is still controlling the spawned unit
+                        spawnUnitsWithinRadius(player, world, playerX, playerY,   80f, UnitTypes.zenith, UnitTypes.quell);
+                        spawnUnitsWithinRadius(player, world, playerX, playerY,   140f, UnitTypes.flare, UnitTypes.avert);
+                    } else {
+                        spawnExecutor.shutdown(); // Stop spawning if the player leaves the unit
+                    }
+                },  0,  1, TimeUnit.SECONDS); // Check every second
             } else {
                 // Handle the case where the unit could not be spawned
                 playerData.addPoints((float) price, player); // Return the points to the player
