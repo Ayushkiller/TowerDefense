@@ -171,40 +171,53 @@ public class SuperPowers {
         if (playerData.getPoints() >= price) {
             playerData.subtractPoints((float) price, player);
     
-            // Spawn either disrupt or eclipse unit for the player
-            UnitType spawnType = Math.random() <   0.5 ? UnitTypes.disrupt : UnitTypes.eclipse;
-            Unit spawned = spawnType.spawn(player.x, player.y);
+            // Spawn both disrupt and eclipse units for the player
+            UnitType spawnType1 = UnitTypes.disrupt;
+            UnitType spawnType2 = UnitTypes.eclipse;
+            Unit spawned1 = spawnType1.spawn(player.x, player.y);
+            Unit spawned2 = spawnType2.spawn(player.x, player.y);
     
-            // Check if the spawned unit is alive
-            if (spawned != null && !spawned.dead()) {
-                Call.unitControl(player, spawned);
-                Unit oldUnit = player.unit();
-                oldUnit.kill();
-    
+            // Check if the spawned units are alive
+            if ((spawned1 != null && !spawned1.dead()) || (spawned2 != null && !spawned2.dead())) {
                 ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                 executor.schedule(() -> {
-                    if (spawned.dead()) {
+                    if (spawned1 != null && !spawned1.dead()) {
+                        Call.unitControl(player, spawned1);
+                        if (player.unit() == spawned1) {
+                            spawned2.kill();
+                        }
+                    } else if (spawned2 != null && !spawned2.dead()) {
+                        Call.unitControl(player, spawned2);
+                        if (player.unit() == spawned2) {
+                            spawned1.kill();
+                        }
+                    }
+                },   100, TimeUnit.MILLISECONDS); // Wait for  0.1 seconds before attempting to use Call.unitControl
+    
+                ScheduledExecutorService checkExecutor = Executors.newSingleThreadScheduledExecutor();
+                checkExecutor.schedule(() -> {
+                    if ((spawned1 != null && spawned1.dead()) || (spawned2 != null && spawned2.dead())) {
                         // Return the item to the player
                         playerData.addPoints((float) price, player);
                         player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
                         player.sendMessage(Bundle.get("unit.died", player.locale));
                     }
-                },   2, TimeUnit.SECONDS); // Check if the unit is dead within   2 seconds
+                },   2, TimeUnit.SECONDS); // Check if the units are dead within   2 seconds
     
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
     
-                // Schedule a task to continuously spawn zenith and quell units within a radius of  80 units from the player
+                // Schedule a task to continuously spawn zenith and quell units within a radius of   80 units from the player
                 ScheduledExecutorService spawnExecutor = Executors.newSingleThreadScheduledExecutor();
                 spawnExecutor.scheduleAtFixedRate(() -> {
-                    if (player.unit() == spawned) { // Check if the player is still controlling the spawned unit
+                    if (player.unit() == spawned1 || player.unit() == spawned2) { // Check if the player is still controlling either of the spawned units
                         spawnUnitsWithinRadius(player, world, playerX, playerY,   80f, UnitTypes.zenith, UnitTypes.quell);
                         spawnUnitsWithinRadius(player, world, playerX, playerY,   140f, UnitTypes.flare, UnitTypes.avert);
                     } else {
-                        spawnExecutor.shutdown(); // Stop spawning if the player leaves the unit
+                        spawnExecutor.shutdown(); // Stop spawning if the player leaves the units
                     }
-                },  0,  1, TimeUnit.SECONDS); // Check every second
+                },   0,   1, TimeUnit.SECONDS); // Check every second
             } else {
-                // Handle the case where the unit could not be spawned
+                // Handle the case where the units could not be spawned
                 playerData.addPoints((float) price, player); // Return the points to the player
                 player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
             }
