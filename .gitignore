@@ -11,3 +11,4 @@
 .gradle/7.6/fileHashes/fileHashes.bin
 .gradle/buildOutputCleanup/buildOutputCleanup.lock
 *.lock
+*.bin
