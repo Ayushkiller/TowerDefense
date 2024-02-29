@@ -172,7 +172,7 @@ public class PluginLogic {
             event.unit.type.range = -1f;
             event.unit.type.hovering = true;
             event.unit.type.abilities.clear();
-
+            event.unit.type.crashDamageMultiplier = 0f;
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
 

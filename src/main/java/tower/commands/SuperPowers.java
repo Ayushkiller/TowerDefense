@@ -70,7 +70,7 @@ public class SuperPowers {
     
     private static void spawnUnitWithType(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
-        if (playerData.getPoints() >=  40) {
+        if (playerData.getPoints() >=  100) {
             float angleStep =  360f /  6;
             float radius =  100f; // Calculate the angle step for evenly spaced spawns
             for (int i =  0; i <  6; i++) {
@@ -92,6 +92,8 @@ public class SuperPowers {
                         executor.schedule(() -> {
                             if (unit != null && unit.isValid()) {
                                 unit.kill();
+                                playerData.subtractPoints(100, player);
+                                
                             }
                         },  50, TimeUnit.SECONDS);
     
@@ -118,7 +120,7 @@ public class SuperPowers {
     }
     private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
-        int unitCost =   40; // Cost per unit
+        int unitCost =   100; // Cost per unit
         int totalCost = unitCost; // Total cost remains   40 for all units
 
         if (playerData.getPoints() >= totalCost) {
@@ -149,6 +151,7 @@ public class SuperPowers {
                     executor.schedule(() -> {
                         if (unit != null && unit.isValid()) {
                             unit.kill();
+                            
                         }
                     },   10, TimeUnit.SECONDS); // Adjusted to  5 seconds
                 } else {
@@ -240,7 +243,7 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
 }
     private static void specialSpawn(Player player, World world, float playerX, float playerY) {
     PlayerData playerData = Players.getPlayer(player);
-    int price =  100; // Set the price to  200
+    int price =  400; // Set the price to  200
     if (playerData.getPoints() >= price) {
         playerData.subtractPoints(price, player);
 
