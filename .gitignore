@@ -10,3 +10,4 @@
 .gradle/7.6/executionHistory/executionHistory.bin
 .gradle/7.6/fileHashes/fileHashes.bin
 .gradle/buildOutputCleanup/buildOutputCleanup.lock
+*.lock
