@@ -2,8 +2,10 @@ package tower.Domain;
 
 
 
+
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
+import tower.commands.Trail;
 
 
 
@@ -13,7 +15,7 @@ import mindustry.gen.Unit;
  * the unit they are controlling, points accumulated, and other game-related data.
  */
 public class PlayerData {
-
+    private Trail trail;
     private Unit unit;
     private float hp;
     private String uuid;
@@ -22,6 +24,7 @@ public class PlayerData {
     private boolean showStats;
     private float points;
 
+    private Trail currentTrail;
     public void addPointsWithReduction(float reductionPercentage) {
         float basePoints =   1f; // Base points to be added
         float reduction = this.points * reductionPercentage /   100; // Calculate reduction
@@ -38,10 +41,22 @@ public class PlayerData {
     }
     public void addKills (int amount) {
     }
+    public void setCurrentTrail(Trail trail) {
+        this.currentTrail = trail;
+    }
+
+    public Trail getCurrentTrail() {
+        return currentTrail;
+    }
 
     public void setKills (int amount) {
     }
-
+    public Trail getTrail() {
+        return trail;
+    }
+    public void setTrail(Trail trail) {
+        this.trail = trail;
+    }
     public void addPoints(float amount, Player player) {
         this.points += amount;
    
@@ -64,8 +79,6 @@ public class PlayerData {
         this.points = points;
 
     }
-
-
     public float getPoints() {
         return points;
     }
