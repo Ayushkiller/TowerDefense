@@ -25,42 +25,34 @@ import java.util.Map;
 public class PluginLogic {
     public static float multiplier = 1f;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
-
     public static void init() {
         drops = new ObjectMap<>();
         for (Map<String, Object> dropEntry : Unitsdrops.drops) {
             UnitType unit = (UnitType) dropEntry.get("unit");
             Object dropsObject = dropEntry.get("drops");
             if (dropsObject instanceof Seq<?>) {
-     
                 @SuppressWarnings("unchecked")
                 Seq<ItemStack> itemStacks = (Seq<ItemStack>) dropsObject;
                 drops.put(unit, itemStacks);
             } else {
-            
                 System.err.println("Unexpected type for drops: " + dropsObject.getClass().getName());
             }
         }
         netServer.admins.addActionFilter(action->{
             if(action.tile == null) return true;
-
             if(action.type == Administration.ActionType.placeBlock || action.type == Administration.ActionType.breakBlock){
                 if(!(canBePlaced(action.tile, action.block)|| action.block instanceof ShockMine || action.block instanceof CoreBlock)){
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                     return false; // Explicitly return false here
                 }
             }
-
-            return true; // Return true if no conditions are met that would return false
+            return true; 
         });
 
         Timer.schedule(()->state.rules.waveTeam.data().units.each(unit->{
             var core = unit.closestEnemyCore();
             if(core == null || unit.dst(core) > 60f) return;
-
             core.damage(unit.health / Mathf.sqrt(multiplier), true);
-            
-
             unit.kill();
 
         }), 0f, 1f);
@@ -68,35 +60,35 @@ public class PluginLogic {
         Timer.schedule(()->Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
 
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
-        Events.on(EventType.WaveEvent.class, event->multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.5f), multiplier, 100f));
+        Events.on(EventType.WaveEvent.class, event->multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.4f), multiplier, 100f));
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
         Events.on(EventType.UnitDestroyEvent.class, event -> {
-    if (event.unit.team != state.rules.waveTeam) return;
+        if (event.unit.team != state.rules.waveTeam) return;
 
-    var core = event.unit.closestEnemyCore();
-    var drop = drops.get(event.unit.type);
+        var core = event.unit.closestEnemyCore();
+        var drop = drops.get(event.unit.type);
 
-    if (core == null || drop == null) return;
+        if (core == null || drop == null) return;
 
-    var builder = new StringBuilder();
+        var builder = new StringBuilder();
 
-    drop.each(stack -> {
+        drop.each(stack -> {
         int amount = Mathf.random(stack.amount - stack.amount /   2, stack.amount + stack.amount /   2);
 
-        builder.append("[accent]+").append(amount).append(" [green]").append(stack.item.emoji()).append("  ");
+        builder.append("[accent]+").append(amount).append(stack.item.emoji()).append("  ");
         Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
-    });
+        });
 
-    Call.label(builder.toString(),   1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
+        Call.label(builder.toString(),   1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
 
-    // Distribute points to all players
-    Players.forEach(playerData -> {
-        if (playerData != null) {
+        // Distribute points to all players
+        Players.forEach(playerData -> {
+         if (playerData != null) {
             float reductionPercentage = playerData.calculateReductionPercentage(playerData.getPoints());
             playerData.addPointsWithReduction(reductionPercentage);
-        }
-    });
-});
+          }
+         });
+      });
         Events.on(EventType.UnitSpawnEvent.class, event->{
 
             if(event.unit.team != state.rules.waveTeam) 
@@ -126,7 +118,6 @@ public class PluginLogic {
             return;
         });
     }
-
     public static boolean isPath(Tile tile) {
         return tile.floor() == Blocks.darkPanel5 || tile.floor() == Blocks.sandWater;
     }
