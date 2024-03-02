@@ -23,8 +23,10 @@ import static mindustry.Vars.*;
 import java.util.Map;
 
 public class PluginLogic {
+
     public static float multiplier = 1f;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
+    
     public static void init() {
         drops = new ObjectMap<>();
         for (Map<String, Object> dropEntry : Unitsdrops.drops) {
@@ -56,6 +58,7 @@ public class PluginLogic {
             unit.kill();
 
         }), 0f, 1f);
+        
 
         Timer.schedule(()->Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
 
