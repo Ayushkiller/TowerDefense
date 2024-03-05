@@ -14,17 +14,16 @@ public class Menu {
     private static final int menu = Menus.registerMenu((player, option) -> {
         switch (option) {
             case 0 -> Units.execute(player);
-            case 1 -> Info.execute(player);
+            case 1 -> Info.execute(player, 1); // Adjusted to include the selectedOption argument
             case 2 -> SuperPowers.execute(player);
             case 3 -> BuyPoint.execute(player);
             case 4 -> Statuseffects.execute(player);
-  
         }
     });
 
     private static final String[][] buttons = {
-            {"[lime]Units", "[red]Info","[purple]SuperPowers"},
-            {"[cyan]BuyPoints","[blue]Powerups", "[lightgray]Close"}
+        {"[lime]Units", "[red]Info","[purple]Super[lime]Pow"},
+        {"[cyan]BuyPoints","[blue]Powerups", "[lightgray]Close"}
     };
 
     public static void execute(Player player) {
