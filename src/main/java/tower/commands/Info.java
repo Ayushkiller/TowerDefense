@@ -24,7 +24,11 @@ public class Info {
     public static void openGui(Player player, int selectedOption) {
         String[][] buttons = {
             {"[gray]Close"},
-            {"[gray]" + Bundle.get("info." + getOptionName(selectedOption), player.locale)}
+            {"[lime]" + Bundle.get("info." + getOptionName(2), player.locale)},
+            {"[purple]" + Bundle.get("info." + getOptionName(3), player.locale)},
+            {"[red]" + Bundle.get("info." + getOptionName(4), player.locale)},
+            {"[gold]" + Bundle.get("info." + getOptionName(5), player.locale)},
+            {"[alphaaa]" + Bundle.get("info." + getOptionName(6), player.locale)}
         };
         Call.menu(player.con, menu, Bundle.get("settings.title", player.locale), Bundle.get("settings.message", player.locale), buttons);
     }
