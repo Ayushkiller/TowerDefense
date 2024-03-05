@@ -184,7 +184,7 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
         boolean[] allUnitsSpawned = new boolean[]{true};
 
         // Define the duration for spawning units in seconds
-        long spawnDuration =   10; //   10 seconds
+        long spawnDuration =   4; //   10 seconds
 
         // Schedule the spawning of units over the specified duration
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -213,7 +213,7 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
                             if (unit != null && unit.isValid()) {
                                 unit.kill();
                             }
-                        },   5, TimeUnit.SECONDS); // Adjusted to   5 seconds
+                        },   120, TimeUnit.SECONDS); // Adjusted to   5 seconds
                     }
                 } else {
                     allUnitsSpawned[0] = false;

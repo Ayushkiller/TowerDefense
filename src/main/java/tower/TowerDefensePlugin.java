@@ -25,7 +25,7 @@ public class TowerDefensePlugin extends Plugin {
     handler.register("menu", "Opens a menu", (String[] args, Player player) -> Menu.execute(player));
   }
   public void registerServerCommands(CommandHandler handler) {
-      handler.register("death <points>", "Adds points to every player", (String[] args, Player player) -> {
+      handler.register("death", "<points>", "Adds points to every player", (String[] args, Player player) -> {
           if (args.length > 0) {
               try {
                   int pointsToAdd = Integer.parseInt(args[0]);
@@ -44,4 +44,5 @@ public class TowerDefensePlugin extends Plugin {
           }
       });
   }
+  
 }
