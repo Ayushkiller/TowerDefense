@@ -25,23 +25,23 @@ public class TowerDefensePlugin extends Plugin {
     handler.register("menu", "Opens a menu", (String[] args, Player player) -> Menu.execute(player));
   }
   public void registerServerCommands(CommandHandler handler) {
-    handler.register("death", "Adds points to every player", (String[] args, Player player) -> {
-        if (args.length > 0) {
-            try {
-                int pointsToAdd = Integer.parseInt(args[0]);
-                Groups.player.each(p -> {
-                    PlayerData playerData = Players.getPlayer(p);
-                    if (playerData != null) {
-                        playerData.addPoints(pointsToAdd, p);
-                    }
-                });
-            } catch (NumberFormatException e) {
-                // Handle the case where the argument is not a valid integer
-                System.out.println("Invalid number of points provided.");
-            }
-        } else {
-            System.out.println("No points specified.");
-        }
-    });
-}
+      handler.register("death <points>", "Adds points to every player", (String[] args, Player player) -> {
+          if (args.length > 0) {
+              try {
+                  int pointsToAdd = Integer.parseInt(args[0]);
+                  Groups.player.each(p -> {
+                      PlayerData playerData = Players.getPlayer(p);
+                      if (playerData != null) {
+                          playerData.addPoints(pointsToAdd, p);
+                      }
+                  });
+              } catch (NumberFormatException e) {
+                  // Handle the case where the argument is not a valid integer
+                  System.out.println("Invalid number of points provided.");
+              }
+          } else {
+              System.out.println("No points specified.");
+          }
+      });
+  }
 }

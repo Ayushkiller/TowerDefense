@@ -71,6 +71,7 @@ public class SuperPowers {
     private static void spawnUnitWithType(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getPoints() >= 100) { // Ensure the player has enough points
+            playerData.subtractPoints(100, player); // Subtract points as soon as the player confirms the purchase
             float angleStep = 360f / 6;
             float radius = 100f; // Calculate the angle step for evenly spaced spawns
             for (int i = 0; i < 6; i++) {
@@ -78,12 +79,12 @@ public class SuperPowers {
                 double radians = Math.toRadians(angle);
                 float x = playerX + radius * (float) Math.cos(radians);
                 float y = playerY + radius * (float) Math.sin(radians);
-            
+
                 int intX = (int) x;
                 int intY = (int) y;
                 float worldX = intX * tilesize;
                 float worldY = intY * tilesize;
-        
+
                 Tile tile = world.tileWorld(worldX, worldY);
                 if (tile != null) {
                     Unit unit = unitType.spawn(worldX, worldY);
@@ -92,10 +93,9 @@ public class SuperPowers {
                         executor.schedule(() -> {
                             if (unit != null && unit.isValid()) {
                                 unit.kill();
-                                playerData.subtractPoints(100, player); // Subtract points only if the unit is valid
                             }
                         }, 50, TimeUnit.SECONDS);
-        
+
                         if (unitType == UnitTypes.corvus) {
                             unitType.groundLayer = Layer.flyingUnit;
                             unitType.weapons.get(0).reload = 10f;
@@ -106,7 +106,7 @@ public class SuperPowers {
                             unitType.weapons.get(0).cooldownTime = 10f;
                         }
                     } else {
-                        playerData.addPoints(40, player);
+                        playerData.addPoints(100, player);
                         player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
                     }
                 } else {
@@ -117,6 +117,7 @@ public class SuperPowers {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
         }
     }
+    
     private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
         int unitCost =   100; // Cost per unit
