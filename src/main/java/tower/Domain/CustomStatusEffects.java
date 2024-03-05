@@ -6,7 +6,7 @@ import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 
 public class CustomStatusEffects {
-    public static StatusEffect overdriveBuffed, overclockBuffed, shieldedBuffed, bossBuffed, speedBuffed,invincibleBuffed;
+    public static StatusEffect overdriveBuffed, overclockBuffed, shieldedBuffed, bossBuffed, speedBuffed,slowAsShit,invincibleBuffed;
 
     public static void load() {
         overdriveBuffed = new StatusEffect("overdriveBuffed"){{
@@ -50,6 +50,9 @@ public class CustomStatusEffects {
         invincibleBuffed = new StatusEffect("invincibleBuffed"){{
             healthMultiplier = Float.POSITIVE_INFINITY;
             reloadMultiplier = 2f; 
+        }};
+        slowAsShit = new StatusEffect("slowAsShit"){{
+           speedMultiplier = 0.5f;
         }};
     }
 }

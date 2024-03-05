@@ -81,7 +81,7 @@ public class Statuseffects {
         // Find the position of the current unit type within the UnitsTable.units array
         int row = -1;
         Map<String, Object> unitMap = null; // Declare unitMap outside the loop
-        for (int i =   0; i < UnitsTable.units.size(); i++) {
+        for (int i = 0; i < UnitsTable.units.size(); i++) {
             unitMap = UnitsTable.units.get(i); // Use 'i' here
             UnitType unitType = (UnitType) unitMap.get("unit");
             if (unitType == currentUnitType) {
@@ -99,16 +99,20 @@ public class Statuseffects {
         // Directly access the price for the current unit type from the unitMap
         int currentUnitPrice = (int) unitMap.get("price");
     
-        // Calculate   75% of the current unit's price
-        int additionalPrice = (int) (currentUnitPrice *   0.75);
+        // Calculate 75% of the current unit's price
+        int additionalPrice = (int) (currentUnitPrice * 0.75);
         // Add the calculated amount to the status effect's price
         int totalPrice = effectPrice + additionalPrice;
     
         if (playerData.getPoints() >= totalPrice) {
-            playerData.subtractPoints(totalPrice, player);
-            player.unit().apply(effect, Float.POSITIVE_INFINITY);
-            // Modify the message to include the emoji, base effect price, and the additional price
-            player.sendMessage(effect.emoji() + " " + Bundle.get("effect.bought.with.additional", player.locale) + effectPrice + " + " + additionalPrice + " = " + totalPrice);
+            if (effect != null) { // Ensure the effect is not null before applying it
+                playerData.subtractPoints(totalPrice, player);
+                player.unit().apply(effect, Float.POSITIVE_INFINITY);
+                // Modify the message to include the emoji, base effect price, and the additional price
+                player.sendMessage(effect.emoji() + " " + Bundle.get("effect.bought.with.additional", player.locale) + effectPrice + " + " + additionalPrice + " = " + totalPrice);
+            } else {
+                player.sendMessage("Error: The effect could not be applied. Please try again.");
+            }
         } else {
             player.sendMessage(Bundle.get("menu.effects.not-enough", player.locale()));
         }
