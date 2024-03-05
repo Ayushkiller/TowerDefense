@@ -14,7 +14,7 @@ public class Menu {
     private static final int menu = Menus.registerMenu((player, option) -> {
         switch (option) {
             case 0 -> Units.execute(player);
-            case 1 -> Info.execute(player, 1); // Adjusted to include the selectedOption argument
+            case 1 -> Info.execute(player);
             case 2 -> SuperPowers.execute(player);
             case 3 -> BuyPoint.execute(player);
             case 4 -> Statuseffects.execute(player);
