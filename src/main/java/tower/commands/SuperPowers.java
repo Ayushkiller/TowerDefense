@@ -70,10 +70,10 @@ public class SuperPowers {
     
     private static void spawnUnitWithType(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
-        if (playerData.getPoints() >=  100) {
-            float angleStep =  360f /  6;
-            float radius =  100f; // Calculate the angle step for evenly spaced spawns
-            for (int i =  0; i <  6; i++) {
+        if (playerData.getPoints() >= 100) { // Ensure the player has enough points
+            float angleStep = 360f / 6;
+            float radius = 100f; // Calculate the angle step for evenly spaced spawns
+            for (int i = 0; i < 6; i++) {
                 float angle = i * angleStep; // Calculate the angle for each unit
                 double radians = Math.toRadians(angle);
                 float x = playerX + radius * (float) Math.cos(radians);
@@ -83,7 +83,7 @@ public class SuperPowers {
                 int intY = (int) y;
                 float worldX = intX * tilesize;
                 float worldY = intY * tilesize;
-    
+        
                 Tile tile = world.tileWorld(worldX, worldY);
                 if (tile != null) {
                     Unit unit = unitType.spawn(worldX, worldY);
@@ -92,19 +92,18 @@ public class SuperPowers {
                         executor.schedule(() -> {
                             if (unit != null && unit.isValid()) {
                                 unit.kill();
-                                playerData.subtractPoints(100, player);
-                                
+                                playerData.subtractPoints(100, player); // Subtract points only if the unit is valid
                             }
-                        },  50, TimeUnit.SECONDS);
-    
+                        }, 50, TimeUnit.SECONDS);
+        
                         if (unitType == UnitTypes.corvus) {
                             unitType.groundLayer = Layer.flyingUnit;
-                            unitType.weapons.get(0).reload =  10f;
-                            unitType.weapons.get(0).cooldownTime =  10f;
+                            unitType.weapons.get(0).reload = 10f;
+                            unitType.weapons.get(0).cooldownTime = 10f;
                         } else if (unitType == UnitTypes.collaris) {
                             unitType.groundLayer = Layer.flyingUnit;
-                            unitType.weapons.get(0).reload =  10f;
-                            unitType.weapons.get(0).cooldownTime =  10f;
+                            unitType.weapons.get(0).reload = 10f;
+                            unitType.weapons.get(0).cooldownTime = 10f;
                         }
                     } else {
                         playerData.addPoints(40, player);
