@@ -6,7 +6,7 @@ import mindustry.ui.Menus;
 import tower.Bundle;
 
 public class Info {
-    private static final String[] infoKeys = {"settings.message", "info.buypoint","info.powerup", "info.superpower", "info.points", "info.units"};
+    private static final String[] infoKeys = {"settings.Overview", "info.Buypoint","info.Powerup", "info.SuperPow", "info.Points", "info.Units"};
 
     private static final int menu = Menus.registerMenu((player, option) -> {
         if (option >= 0 && option < infoKeys.length) {
@@ -20,7 +20,9 @@ public class Info {
     private static final String[][] buttons = new String[infoKeys.length][];
     static {
         for (int i = 0; i < infoKeys.length; i++) {
-            buttons[i] = new String[] {infoKeys[i]};
+            String[] parts = infoKeys[i].split("\\.");
+            String label = parts[parts.length - 1]; // Extract the part after "info."
+            buttons[i] = new String[] {label, infoKeys[i]}; // Each button has a label and an associated key
         }
     }
 
@@ -30,5 +32,4 @@ public class Info {
     private static void openGui(Player player) {
         Call.menu(player.con, menu, Bundle.get("settings.title", player.locale), "", buttons);
     }
-
 }
