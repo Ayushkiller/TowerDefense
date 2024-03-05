@@ -64,12 +64,14 @@ public class Statuseffects {
         int rows = Effects.effects.size();
         buttons = new String[rows][1];
 
-        for (int i =  0; i < Effects.effects.size(); i++) {
+        for (int i = 0; i < Effects.effects.size(); i++) {
             StatusEffect effect = (StatusEffect) Effects.effects.get(i).get("effect");
             int effectPrice = effectPrices.get(effect);
-            buttons[i][0] = effect.emoji() + " Total Price: " + effectPrice;
+            String effectName = (String) Effects.effects.get(i).get("name"); // Fetch the name of the effect
+            buttons[i][0] = effect.emoji() + " " + effectName + " Total Price: " + effectPrice;
         }
     }
+    
     private static void buyEffect(StatusEffect effect, Player player) {
         PlayerData playerData = Players.getPlayer(player);
         int effectPrice = effectPrices.get(effect);
