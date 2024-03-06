@@ -49,8 +49,8 @@ public class Info {
     private static void handleMenuOption(Player player, int option) {
         logger.info("Handling menu option for player: " + player.name + ", option: " + option);
         switch (option) {
-            case 1 -> Menuforunits.execute(player); // Back
-            case 2 -> nextMessage(player); // Next
+            case 0 -> Menuforunits.execute(player); // Back
+            case 1 -> nextMessage(player); // Next
         }
     }
 }
