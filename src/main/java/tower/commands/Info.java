@@ -10,10 +10,6 @@ public class Info {
 
     private static final int menu = Menus.registerMenu((player, option) -> {
         if (option >= 0 && option < infoKeys.length) {
-            String title = Bundle.get("settings.title", player.locale); // Use settings.title as the title
-            String message = Bundle.get(infoKeys[option], player.locale);
-            // Concatenate the title with the message
-            Call.infoMessage(player.con, title + ": " + message);
         }
     });
 
