@@ -17,16 +17,10 @@ public class Info {
         {"[accent]Next"}
     };
     private static int currentMessageIndex = 0;
-    private static String[] messages = {
-        Bundle.get("settings.Overview", "en"), 
-        Bundle.get("info.Buypoint", "en"),
-        Bundle.get("info.Powerup", "en"),
-        Bundle.get("info.SuperPow", "en"),
-        Bundle.get("info.Points", "en"),
-        Bundle.get("info.Units", "en"),
-    };
+    private static String[] messages;
 
     public static void execute(Player player) {
+        initializeMessages(player.locale);
         openGui(player);
     }
 
@@ -37,5 +31,16 @@ public class Info {
     private static void nextMessage(Player player) {
         currentMessageIndex = (currentMessageIndex + 1) % messages.length;
         openGui(player);
+    }
+
+    private static void initializeMessages(String locale) {
+        messages = new String[]{
+            Bundle.get("settings.Overview", locale),
+            Bundle.get("info.Buypoint", locale),
+            Bundle.get("info.Powerup", locale),
+            Bundle.get("info.SuperPow", locale),
+            Bundle.get("info.Points", locale),
+            Bundle.get("info.Units", locale)
+        };
     }
 }
