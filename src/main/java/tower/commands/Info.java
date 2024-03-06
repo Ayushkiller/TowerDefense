@@ -5,52 +5,37 @@ import mindustry.gen.Player;
 import mindustry.ui.Menus;
 import tower.Bundle;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class Info {
-    private static final List<String> infoKeys = Arrays.asList("settings.Overview", "info.Buypoint", "info.Powerup", "info.SuperPow", "info.Points", "info.Units");
-    private static int currentPage = 0; // Store the current page as a class-level variable
-
-    private static int registerMenu() {
-        return Menus.registerMenu((player, option) -> {
-            handleMenuOption(player, option);
-        });
-    }
-
-    private static void handleMenuOption(Player player, int option) {
-        if (option == 0) { // Close button
-            displayMenu(player);
-        } else if (option == 1) { // Next button
-            navigateToNextPage(player);
+    private static final int menu = Menus.registerMenu((player, option) -> {
+        switch (option) {
+            case 1 -> Menuforunits.execute(player); // Back
+            case 2 -> nextMessage(player); // Next
         }
-    }
-
-    private static void displayMenu(Player player) {
-        String[][] buttonArray = new String[][]{
-                {"Next"},
-                {"Close"}
-        };
-        Call.menu(player.con, registerMenu(), Bundle.get("settings.title", player.locale), "", buttonArray);
-    }
-
-    private static void navigateToNextPage(Player player) {
-        if (currentPage < infoKeys.size() - 1) {
-            currentPage++;
-            displayInfo(player);
-        } else {
-            displayMenu(player);
-        }
-    }
-
-    private static void displayInfo(Player player) {
-        String infoKey = infoKeys.get(currentPage);
-        String message = Bundle.get(infoKey, player.locale);
-        Call.infoMessage(player.con, message);
-    }
+    });
+    private static final String[][] buttons = {
+        {"[gray]Close"},
+        {"[accent]Next"}
+    };
+    private static int currentMessageIndex = 0;
+    private static String[] messages = {
+        Bundle.get("settings.Overview", "en"), 
+        Bundle.get("info.Buypoint", "en"),
+        Bundle.get("info.Powerup", "en"),
+        Bundle.get("info.SuperPow", "en"),
+        Bundle.get("info.Points", "en"),
+        Bundle.get("info.Units", "en"),
+    };
 
     public static void execute(Player player) {
-        currentPage = 0; // Reset current page to 0
-        displayMenu(player);
+        openGui(player);
+    }
+
+    public static void openGui(Player player) {
+        Call.menu(player.con, menu, Bundle.get("settings.title", player.locale), messages[currentMessageIndex], buttons);
+    }
+
+    private static void nextMessage(Player player) {
+        currentMessageIndex = (currentMessageIndex + 1) % messages.length;
+        openGui(player);
     }
 }
