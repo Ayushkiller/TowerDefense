@@ -4,7 +4,6 @@ import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.ui.Menus;
 import tower.Bundle;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -18,19 +17,43 @@ public class Info {
                     key -> new String[]{key.split("\\.")[1], key} // Each button has a label and an associated key
             ));
 
-    private static final int menu = Menus.registerMenu((player, option) -> {
-        if (option >= 0 && option < infoKeys.size()) {
-            String infoKey = infoKeys.get(option);
-            String message = Bundle.get(infoKey, player.locale);
-            Call.infoMessage(player.con, message);
-        }
-    });
+    private static int currentPage = 0; // Store the current page as a class-level variable
 
-    public static void execute(Player player) {
-        openGui(player);
+    private static int registerMenu() {
+        return Menus.registerMenu((player, option) -> {
+            handleMenuOption(player, option);
+        });
     }
 
-    private static void openGui(Player player) {
-        Call.menu(player.con, menu, Bundle.get("settings.title", player.locale), "", buttons.values().toArray(new String[0][]));
+    private static void handleMenuOption(Player player, int option) {
+        if (option == 0) { // Close button
+            displayMenu(player);
+        } else if (option == 1) { // Next button
+            navigateToNextPage(player);
+        }
+    }
+
+    private static void displayMenu(Player player) {
+        Call.menu(player.con, registerMenu(), Bundle.get("settings.title", player.locale), "", buttons.values().toArray(new String[0][]));
+    }
+
+    private static void navigateToNextPage(Player player) {
+        if (currentPage < infoKeys.size() - 1) {
+            currentPage++;
+            displayInfo(player);
+        } else {
+            displayMenu(player);
+        }
+    }
+
+    private static void displayInfo(Player player) {
+        String infoKey = infoKeys.get(currentPage);
+        String message = Bundle.get(infoKey, player.locale);
+        Call.infoMessage(player.con, message);
+    }
+
+    public static void execute(Player player) {
+        currentPage = 0; // Reset current page to 0
+        displayMenu(player);
     }
 }
