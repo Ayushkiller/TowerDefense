@@ -9,7 +9,6 @@ public class UnitsTable {
     public static List<Map<String, Object>> units = new ArrayList<>();
 
     static {
-        
         units.add(Map.of("unit", UnitTypes.alpha, "price", 4, "name", "Alpha", "tier", 0));
         units.add(Map.of("unit", UnitTypes.beta, "price",   5, "name", "Beta", "tier", 0));
         units.add(Map.of("unit", UnitTypes.gamma, "price",   6, "name", "Gamma", "tier", 0));
