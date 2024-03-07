@@ -1,5 +1,7 @@
 package tower.commands;
 
+import mindustry.entities.abilities.Ability;
+import mindustry.entities.abilities.RepairFieldAbility;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
@@ -9,7 +11,6 @@ import tower.Bundle;
 import tower.Domain.PlayerData;
 import tower.Domain.UnitsTable;
 import tower.Players;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +38,24 @@ public class Units {
         int price = unitPrices.get(unitType);
         if (playerData.getPoints() >= price) {
             playerData.subtractPoints((float) price, player);
-
+    
             Unit oldUnit = player.unit();
             Unit spawned = unitType.spawn(player.x, player.y);
-
+    
             if (spawned != null && !spawned.dead()) {
                 Call.unitControl(player, spawned);
                 oldUnit.kill();
-
+    
+                // Check if the unit has an ability defined in UnitsTable.java
+                Map<String, Object> unitMap = UnitsTable.units.stream()
+                        .filter(u -> u.get("unit").equals(unitType))
+                        .findFirst()
+                        .orElse(null);
+    
+                if (unitMap != null && unitMap.containsKey("Ability")) {
+                
+                }
+    
                 ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                 executor.schedule(() -> {
                     if (spawned.dead()) {
@@ -53,7 +64,7 @@ public class Units {
                         player.sendMessage(Bundle.get("unit.died", player.locale));
                     }
                 }, 3, TimeUnit.SECONDS);
-
+    
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
             } else {
                 playerData.addPoints((float) price, player);
@@ -63,15 +74,14 @@ public class Units {
             player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
         }
     }
-
     private static void openTierMenuGui(Player player) {
-        String[][] buttons = new String[3][1];
-        for (int i = 0; i < 3; i++) {
-            buttons[i][0] = "Tier " + (i + 1);
+        String[][] buttons = new String[7][1]; 
+        for (int i = 0; i < 7; i++) {
+            buttons[i][0] = "Tier " + i;
         }
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            if (option >= 0 && option < 3) {
-                openTierUnitsMenuGui(option + 1, player);
+            if (option >= 0 && option < 7) {
+                openTierUnitsMenuGui(option, player); 
             } else {
                 player.sendMessage("Invalid selection. Please try again.");
             }
