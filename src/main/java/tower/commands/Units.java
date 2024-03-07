@@ -11,23 +11,24 @@ import tower.Domain.UnitsTable;
 import tower.Players;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Units {
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
     private static final Map<UnitType, String> unitNames = new HashMap<>();
+
     public static void initUnitsTable() {
-        // Initialize the unitPrices and unitNames maps based on the size of UnitsTable.units
         for (Map<String, Object> unitMap : UnitsTable.units) {
             UnitType unitType = (UnitType) unitMap.get("unit");
             String name = (String) unitMap.get("name");
             int price = (int) unitMap.get("price");
             unitNames.put(unitType, name);
             unitPrices.put(unitType, price);
-            
         }
     }
 
@@ -37,11 +38,9 @@ public class Units {
         if (playerData.getPoints() >= price) {
             playerData.subtractPoints((float) price, player);
 
-            // Spawn the unit for the player
             Unit oldUnit = player.unit();
             Unit spawned = unitType.spawn(player.x, player.y);
 
-            // Check if the spawned unit is alive
             if (spawned != null && !spawned.dead()) {
                 Call.unitControl(player, spawned);
                 oldUnit.kill();
@@ -49,22 +48,57 @@ public class Units {
                 ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                 executor.schedule(() -> {
                     if (spawned.dead()) {
-                        // Return the item to the player
                         playerData.addPoints((float) price, player);
                         player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
                         player.sendMessage(Bundle.get("unit.died", player.locale));
                     }
-                },   3, TimeUnit.SECONDS);
+                }, 3, TimeUnit.SECONDS);
 
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
             } else {
-                // Handle the case where the unit could not be spawned
-                playerData.addPoints((float) price, player); // Return the points to the player
+                playerData.addPoints((float) price, player);
                 player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
             }
         } else {
             player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
         }
+    }
+
+    private static void openTierMenuGui(Player player) {
+        String[][] buttons = new String[3][1];
+        for (int i = 0; i < 3; i++) {
+            buttons[i][0] = "Tier " + (i + 1);
+        }
+        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
+            if (option >= 0 && option < 3) {
+                openTierUnitsMenuGui(option + 1, player);
+            } else {
+                player.sendMessage("Invalid selection. Please try again.");
+            }
+        }), "Select Tier", "", buttons);
+    }
+
+    private static void openTierUnitsMenuGui(int tier, Player player) {
+        List<Map<String, Object>> tierUnits = UnitsTable.units.stream()
+                .filter(unit -> (int) unit.get("tier") == tier)
+                .collect(Collectors.toList());
+
+        String[][] buttons = new String[tierUnits.size()][1];
+        for (int i = 0; i < tierUnits.size(); i++) {
+            Map<String, Object> unitMap = tierUnits.get(i);
+            UnitType unitType = (UnitType) unitMap.get("unit");
+            String name = (String) unitMap.get("name");
+            buttons[i][0] = unitType.emoji() + " " + name;
+        }
+        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
+            if (option >= 0 && option < tierUnits.size()) {
+                Map<String, Object> unitMap = tierUnits.get(option);
+                UnitType unitType = (UnitType) unitMap.get("unit");
+                openUnitMenuGui(unitType, player);
+            } else {
+                player.sendMessage("Invalid selection. Please try again.");
+            }
+        }), "Select Unit", "", buttons);
     }
 
     private static void openUnitMenuGui(UnitType unitType, Player player) {
@@ -76,8 +110,8 @@ public class Units {
 
         int menu = Menus.registerMenu(((player1, option) -> {
             switch (option) {
-                case   0 -> buyUnit(unitType, player);
-                case   1 -> openGui(player);
+                case 0 -> buyUnit(unitType, player);
+                case 1 -> openGui(player);
             }
         }));
 
@@ -88,26 +122,10 @@ public class Units {
     }
 
     public static void execute(Player player) {
-        openGui(player);
+        openTierMenuGui(player);
     }
 
     private static void openGui(Player player) {
-        String[][] buttons = new String[UnitsTable.units.size()][1];
-        for (int i =  0; i < UnitsTable.units.size(); i++) {
-            Map<String, Object> unitMap = UnitsTable.units.get(i);
-            UnitType unitType = (UnitType) unitMap.get("unit");
-            String name = (String) unitMap.get("name"); // Get the unit name
-            buttons[i][0] = unitType.emoji() + " " + name; // Include the unit name in the button text
-        }
-        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            if (option >=  0 && option < UnitsTable.units.size()) {
-                Map<String, Object> unitMap = UnitsTable.units.get(option);
-                UnitType unitType = (UnitType) unitMap.get("unit");
-                openUnitMenuGui(unitType, player);
-            } else {
-                player.sendMessage("Invalid selection. Please try again.");
-            }
-        }), Bundle.get("menu.units.title", player.locale()), "", buttons);
+        openTierMenuGui(player);
     }
-    
 }
