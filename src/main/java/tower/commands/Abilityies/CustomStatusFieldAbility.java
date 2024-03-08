@@ -44,16 +44,19 @@ public class CustomStatusFieldAbility extends Ability{
     @Override
     public void update(Unit unit){
         timer += Time.delta;
-
+    
         if(timer >= reload && (!onShoot || unit.isShooting)){
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
-                other.apply(effect, duration);
-                applyEffect.at(other, parentizeEffects);
+                // Check if 'other' is on the opposing team before applying the effect
+                if(other.team != unit.team){
+                    other.apply(effect, duration);
+                    applyEffect.at(other, parentizeEffects);
+                }
             });
-
+    
             float x = unit.x + Angles.trnsx(unit.rotation, effectY, effectX), y = unit.y + Angles.trnsy(unit.rotation, effectY, effectX);
             activeEffect.at(x, y, effectSizeParam ? range : unit.rotation, parentizeEffects ? unit : null);
-
+    
             timer = 0f;
         }
     }
