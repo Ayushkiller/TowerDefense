@@ -268,15 +268,12 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
         for (UnitType unitType : unitsToSpawn) {
             Unit unit = unitType.spawn(playerX, playerY);
             if (unit != null && unit.isValid()) {
-         
                 for(Weapon wpn: weaponsToAdd){unit.type.weapons.add(wpn);}
                 unit.type.speed=0.000001f;
-                unit.type.playerControllable=false;
                 unit.type.alwaysShootWhenMoving=true;
                 unit.type.physics = false;
                 unit.type.autoFindTarget = true;
                 unit.type.alwaysUnlocked = true;
-                unit.type.abilities.add(UnitTypes.oct.abilities.get(0), UnitTypes.oct.abilities.get(1));
             }
         }
 
