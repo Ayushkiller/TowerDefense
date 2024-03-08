@@ -260,12 +260,11 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
             UnitTypes.toxopid,
             UnitTypes.reign
         };
-
-        // Spawn the units and apply the unmoving status effect
         for (UnitType unitType : unitsToSpawn) {
             Unit unit = unitType.spawn(playerX, playerY);
             if (unit != null && unit.isValid()) {
-                unit.apply(CustomStatusEffects.slowAsShit,Float.POSITIVE_INFINITY );
+                unit.apply(CustomStatusEffects.overdriveBuffed,Float.POSITIVE_INFINITY );
+                unit.apply(CustomStatusEffects.overclockBuffed,Float.POSITIVE_INFINITY );
                 unit.type.speed=0.000001f;
                 unit.type.playerControllable=false;
                 unit.type.alwaysShootWhenMoving=true;
