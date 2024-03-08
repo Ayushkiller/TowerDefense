@@ -24,9 +24,6 @@ import arc.Events;
 
 public class SuperPowers {
     private static final float tilesize =   1.0f; // Adjust the value as needed
-    static {
-        CustomStatusEffects.load();
-    }
     public static void execute(Player player) {
         Unit playerUnit = player.unit(); // Get the player's unit
         if (playerUnit != null) {

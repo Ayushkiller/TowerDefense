@@ -41,7 +41,7 @@ public class Info {
             Bundle.get("info.points", locale),
             Bundle.get("info.Buypoint", locale),
             Bundle.get("info.powerup", locale),
-            Bundle.get("info.superpowe", locale),
+            Bundle.get("info.superpower", locale),
             Bundle.get("info.units", locale)
         };
     }
