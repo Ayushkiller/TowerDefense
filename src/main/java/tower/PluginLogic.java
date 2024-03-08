@@ -15,7 +15,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
-import tower.Domain.CustomStatusEffects;
+
 import tower.Domain.Unitsdrops;
 import useful.Bundle;
 
@@ -24,9 +24,7 @@ import static mindustry.Vars.*;
 import java.util.Map;
 
 public class PluginLogic {
-     static {
-        CustomStatusEffects.load();
-    }
+
     public static float multiplier = 1f;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
     
