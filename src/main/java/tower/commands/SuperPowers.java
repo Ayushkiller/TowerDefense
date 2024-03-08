@@ -265,12 +265,7 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
         for (UnitType unitType : unitsToSpawn) {
             Unit unit = unitType.spawn(playerX, playerY);
             if (unit != null && unit.isValid()) {
-                if (CustomStatusEffects.overclockBuffed != null) {
-                    unit.apply(CustomStatusEffects.overclockBuffed, Float.POSITIVE_INFINITY);
-                } else {
-                    // Handle the case where the status effect is null, e.g., log an error or initialize the effect
-                    System.err.println("CustomStatusEffects.overclockBuffed is null");
-                }
+                unit.apply(CustomStatusEffects.slowAsShit,Float.POSITIVE_INFINITY );
                 unit.type.speed=0.000001f;
                 unit.type.playerControllable=false;
                 unit.type.alwaysShootWhenMoving=true;
