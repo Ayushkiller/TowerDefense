@@ -9,14 +9,11 @@ import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 import mindustry.type.UnitType;
-import mindustry.type.Weapon;
 import mindustry.ui.Menus;
 import mindustry.world.Tile;
 import tower.Bundle;
 import tower.Players;
 import tower.Domain.PlayerData;
-import tower.commands.Abilityies.CustomUnitType;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -49,8 +46,7 @@ public class SuperPowers {
             {"Corvus"},
             {"Collaris"},
             {"Squad"},
-            {"Magic"},
-            {"Omni Tower"} 
+            {"Magic"}
         };
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
             if (option ==  0) {
@@ -61,9 +57,6 @@ public class SuperPowers {
                 spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt);
             } else if (option ==  3) { // Add this block
                 spawnDisruptUnit(player, world, playerX, playerY);
-            }
-             else if (option ==  4) { // Add this block
-            specialSpawn(player, world, playerX, playerY);
             }
             
         }), "[lime]Choose a ability to use:", "", buttons);
@@ -240,58 +233,6 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
         });
     } else {
         player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
-    }
-}
-private static void specialSpawn(Player player, World world, float playerX, float playerY) {
-    PlayerData playerData = Players.getPlayer(player);
-    int price = 400; // Set the price to 400
-    if (playerData.getPoints() >= price) {
-        playerData.subtractPoints(price, player);
-
-        // Define the units to spawn
-        UnitType[] unitsToSpawn = {
-            UnitTypes.corvus,
-            UnitTypes.collaris,
-            UnitTypes.conquer,
-            UnitTypes.eclipse,
-            UnitTypes.oct,
-            UnitTypes.toxopid,
-            UnitTypes.reign
-        };
-
-        // Define the weapons to add
-        Weapon[] weaponsToAdd = {
-            UnitTypes.corvus.weapons.get(0),
-            UnitTypes.reign.weapons.get(0),
-            UnitTypes.reign.weapons.get(1),
-            UnitTypes.conquer.weapons.get(0),
-            UnitTypes.toxopid.weapons.get(0),
-            UnitTypes.toxopid.weapons.get(1),
-            UnitTypes.eclipse.weapons.get(2)
-        };
-
-        for (UnitType unitType : unitsToSpawn) {
-            CustomUnitType customUnitType = new CustomUnitType(unitType);
-            customUnitType.speed = 0.000001f;
-            customUnitType.alwaysShootWhenMoving = true;
-            customUnitType.physics = false;
-            customUnitType.autoFindTarget = true;
-            customUnitType.alwaysUnlocked = true;
-
-            for (Weapon wpn : weaponsToAdd) {
-                customUnitType.weapons.add(wpn);
-            }
-
-     
-            Unit unit = unitType.spawn(playerX, playerY);
-            if (unit != null && unit.isValid()) {
-                
-            }
-        }
-
-        player.sendMessage(Bundle.get("special.spawn.success", player.locale));
-    } else {
-        player.sendMessage(Bundle.get("menu.units.not-enough.l", player.locale()));
     }
 }
 
