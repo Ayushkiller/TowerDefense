@@ -54,18 +54,18 @@ public class UnitsTable {
         units.add(Map.of("unit", UnitTypes.locus, "price",   8, "name", "Locus", "tier", 2));
         units.add(Map.of("unit", UnitTypes.precept, "price",   18, "name", "Precept", "tier", 3));
         units.add(Map.of("unit", UnitTypes.vanquish, "price",   40, "name", "Vanquish", "tier", 4));
-        units.add(Map.of("unit", UnitTypes.conquer, "price",   65, "name", "Conquer", "tier", 5, "Ability",7));
+        units.add(Map.of("unit", UnitTypes.conquer, "price",   65, "name", "Conquer", "tier", 5, "Ability",8));
         units.add(Map.of("unit", UnitTypes.merui, "price",   3, "name", "Merui", "tier", 1));
         units.add(Map.of("unit", UnitTypes.cleroi, "price",   9, "name", "Cleroi", "tier", 2));
         units.add(Map.of("unit", UnitTypes.anthicus, "price",   20, "name", "Anthicus", "tier", 3));
         units.add(Map.of("unit", UnitTypes.tecta, "price",   42, "name", "Tecta", "tier", 4));
-        units.add(Map.of("unit", UnitTypes.collaris, "price",   65, "name", "Collaris", "tier", 5, "Ability",8));
+        units.add(Map.of("unit", UnitTypes.collaris, "price",   65, "name", "Collaris", "tier", 5, "Ability",9));
         units.add(Map.of("unit", UnitTypes.elude, "price",   3, "name", "Elude", "tier", 1));
         units.add(Map.of("unit", UnitTypes.avert, "price",   8, "name", "Avert", "tier", 2));
         units.add(Map.of("unit", UnitTypes.obviate, "price",   18, "name", "Obviate", "tier", 3));
         units.add(Map.of("unit", UnitTypes.quell, "price",   40, "name", "Quell", "tier", 4));
-        units.add(Map.of("unit", UnitTypes.disrupt, "price",   65, "name", "Disrupt", "tier", 5, "Ability",9));
-        units.add(Map.of("unit", UnitTypes.renale, "price",   12, "name", "Renale", "tier", 6, "Ability",10));
-        units.add(Map.of("unit", UnitTypes.latum, "price",   60, "name", "Latum", "tier", 6, "Ability",11));
+        units.add(Map.of("unit", UnitTypes.disrupt, "price",   65, "name", "Disrupt", "tier", 5, "Ability",10));
+        units.add(Map.of("unit", UnitTypes.renale, "price",   12, "name", "Renale", "tier", 6, "Ability",11));
+        units.add(Map.of("unit", UnitTypes.latum, "price",   60, "name", "Latum", "tier", 6, "Ability",12));
     }
 }

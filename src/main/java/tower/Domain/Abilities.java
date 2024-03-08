@@ -1,16 +1,94 @@
 package tower.Domain;
 
-public enum Abilities {
+import mindustry.content.StatusEffects;
+import mindustry.content.UnitTypes;
+import mindustry.entities.abilities.StatusFieldAbility;
+import mindustry.entities.abilities.UnitSpawnAbility;
+import tower.commands.Abilityies.CustomStatusFieldAbility;
 
-    ABILITY_1, // Corresponds to "Ability" value 1 in UnitsTable
-    ABILITY_2, // Corresponds to "Ability" value 2 in UnitsTable
-    ABILITY_3, // Corresponds to "Ability" value 3 in UnitsTable
-    ABILITY_4, // Corresponds to "Ability" value 4 in UnitsTable
-    ABILITY_5, // Corresponds to "Ability" value 5 in UnitsTable
-    ABILITY_6, // Corresponds to "Ability" value 6 in UnitsTable
-    ABILITY_7, // Corresponds to "Ability" value 7 in UnitsTable
-    ABILITY_8, // Corresponds to "Ability" value 8 in UnitsTable
-    ABILITY_9, // Corresponds to "Ability" value 9 in UnitsTable
-    ABILITY_10, // Corresponds to "Ability" value 10 in UnitsTable
-    ABILITY_11; // Corresponds to "Ability" value 11 in UnitsTable
+import java.util.List;
+import java.util.Arrays;
+
+public class Abilities {
+    public static List<StatusFieldAbility> getAbility1() {
+        float duration = 60f * 6;
+        float cooldown = 60f * 6f;
+        float range = 20f;
+        return Arrays.asList(
+                new StatusFieldAbility(StatusEffects.boss, duration,cooldown,range),
+                new CustomStatusFieldAbility(StatusEffects.sporeSlowed, duration,cooldown,range));
+    }
+    public static List<StatusFieldAbility> getAbility2() {
+        float duration = 60f * 6;
+        float cooldown = 60f * 6f;
+        float range = 30f;
+        return Arrays.asList(
+                new StatusFieldAbility(StatusEffects.overclock, duration,cooldown,range),
+                new CustomStatusFieldAbility(StatusEffects.electrified, duration,cooldown,range));
+    }
+
+    public static List<StatusFieldAbility> getAbility3() {
+        float duration = 60f * 6;
+        float cooldown = 60f * 6f;
+        float range = 60f;
+        return Arrays.asList(
+                new CustomStatusFieldAbility(StatusEffects.sapped, duration,cooldown,range),
+                new CustomStatusFieldAbility(StatusEffects.burning, duration,cooldown,range));
+    }
+    public static List<StatusFieldAbility> getAbility4() {
+        float duration = 60f * 6;
+        float cooldown = 60f * 6f;
+        float range = 60f;
+        return Arrays.asList(
+                new CustomStatusFieldAbility(StatusEffects.sporeSlowed, duration,cooldown,range),
+                new CustomStatusFieldAbility(StatusEffects.blasted, duration,cooldown,range));
+    }
+
+    public static List<UnitSpawnAbility> getAbility6() {
+        float spawnTime = 60f * 45f;
+        float x1 = 19.25f;
+        float y1 = -31.75f;
+        float x2 = -19.25f;
+        float y2 = -31.75f;
+
+        return Arrays.asList(
+                new UnitSpawnAbility(UnitTypes.zenith, spawnTime, x1, y1),
+                new UnitSpawnAbility(UnitTypes.zenith, spawnTime, x2, y2));
+    }
+    public static List<StatusFieldAbility> getAbility7() {
+        float duration = 60f * 6;
+        float cooldown = 60f * 6f;
+        float range = 30f;
+        return Arrays.asList(
+                new StatusFieldAbility(StatusEffects.overclock, duration,cooldown,range),
+                new CustomStatusFieldAbility(StatusEffects.melting, duration,cooldown,range),
+                new CustomStatusFieldAbility(StatusEffects.electrified, duration,cooldown,range));
+
+    }
+    public static List<StatusFieldAbility> getAbility8() {
+        float duration = 60f * 6;
+        float cooldown = 60f * 6f;
+        float range = 15f;
+        return Arrays.asList(
+                new CustomStatusFieldAbility(StatusEffects.melting, duration,cooldown,range),
+                new CustomStatusFieldAbility(StatusEffects.shocked, duration,cooldown,range));
+    }
+    public static List<StatusFieldAbility> getAbility9() {
+        float duration = 60f * 6;
+        float cooldown = 60f * 6f;
+        float range = 30f;
+        return Arrays.asList(
+                new StatusFieldAbility(StatusEffects.fast, duration,cooldown,range),
+                new CustomStatusFieldAbility(StatusEffects.freezing, duration,cooldown,range));
+
+    }
+    public static List<StatusFieldAbility> getAbility10() {
+        float duration = 60f * 6;
+        float cooldown = 60f * 6f;
+        float range = 30f;
+        return Arrays.asList(
+                new StatusFieldAbility(StatusEffects.overdrive, duration,cooldown,range),
+                new CustomStatusFieldAbility(StatusEffects.blasted, duration,cooldown,range));
+
+    }
 }
