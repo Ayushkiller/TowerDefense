@@ -249,11 +249,7 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
         // Define the units to spawn
         UnitType[] unitsToSpawn = {
             UnitTypes.corvus,
-            UnitTypes.corvus,
-            UnitTypes.corvus,
             UnitTypes.collaris,
-            UnitTypes.collaris,
-            UnitTypes.conquer,
             UnitTypes.conquer,
             UnitTypes.eclipse,
             UnitTypes.oct,
@@ -262,15 +258,11 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
         };
                 Weapon[] weaponsToAdd = {
             UnitTypes.corvus.weapons.get(0),
-            UnitTypes.corvus.weapons.get(0),
-            UnitTypes.corvus.weapons.get(0),
             UnitTypes.reign.weapons.get(0),
             UnitTypes.reign.weapons.get(1),
             UnitTypes.conquer.weapons.get(0),
             UnitTypes.toxopid.weapons.get(0),
             UnitTypes.toxopid.weapons.get(1),
-            UnitTypes.eclipse.weapons.get(0),
-            UnitTypes.eclipse.weapons.get(1),
             UnitTypes.eclipse.weapons.get(2)
         };
         for (UnitType unitType : unitsToSpawn) {
