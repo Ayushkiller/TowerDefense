@@ -22,8 +22,8 @@ public class CustomStatusEffects {
         overclockBuffed = new StatusEffect("overclockBuffed"){{
             color = Pal.accent;
             speedMultiplier = 1.5f; 
-            damageMultiplier = 1.4f; 
-            reloadMultiplier = 1.5f; 
+            damageMultiplier = 2f; 
+            reloadMultiplier = 3f; 
             effectChance = 0.1f;
             effect = Fx.overclocked;
         }};

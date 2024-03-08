@@ -37,10 +37,10 @@ public class Info {
     private static void initializeMessages(String locale) {
         logger.info("Initializing messages for locale: " + locale);
         messages = new String[]{
-            Bundle.get("settings.Overview", locale),
+            Bundle.get("settings.message", locale),
             Bundle.get("info.Buypoint", locale),
             Bundle.get("info.Powerup", locale),
-            Bundle.get("info.SuperPow", locale),
+            Bundle.get("info.superpower", locale),
             Bundle.get("info.Points", locale),
             Bundle.get("info.Units", locale)
         };

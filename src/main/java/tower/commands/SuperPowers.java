@@ -1,7 +1,6 @@
 package tower.commands;
 
 import mindustry.Vars;
-import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.core.World;
 import mindustry.game.EventType.PlayerLeave;
@@ -14,6 +13,7 @@ import mindustry.ui.Menus;
 import mindustry.world.Tile;
 import tower.Bundle;
 import tower.Players;
+import tower.Domain.CustomStatusEffects;
 import tower.Domain.PlayerData;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -266,10 +266,14 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
         for (UnitType unitType : unitsToSpawn) {
             Unit unit = unitType.spawn(playerX, playerY);
             if (unit != null && unit.isValid()) {
-                unit.apply(StatusEffects.unmoving, Float.POSITIVE_INFINITY);
+                unit.apply(CustomStatusEffects.overclockBuffed,Float.POSITIVE_INFINITY );
+                unit.type.speed=0.000001f;
+                unit.type.playerControllable=false;
+                unit.type.alwaysShootWhenMoving=true;
                 unit.type.physics = false;
                 unit.type.autoFindTarget = true;
                 unit.type.alwaysUnlocked = true;
+                unit.type.abilities.add(UnitTypes.oct.abilities.get(0), UnitTypes.oct.abilities.get(1));
             }
         }
 
