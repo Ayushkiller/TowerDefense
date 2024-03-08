@@ -2,7 +2,6 @@ package tower.commands;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import mindustry.gen.Call;
 import mindustry.gen.Player;
@@ -16,7 +15,7 @@ import tower.Domain.PlayerData;
 import tower.Domain.UnitsTable;
 
 public class Statuseffects {
-    private static final Logger logger = Logger.getLogger(Statuseffects.class.getName());
+   
     private static final java.util.Map<StatusEffect, Integer> effectPrices = new HashMap<>();
     private static String[][] buttons; // Declare the buttons variable here
 
@@ -34,7 +33,7 @@ public class Statuseffects {
 
     public static void execute(Player player) {
         if (player == null) {
-            logger.severe("Player object is null.");
+          
             return;
         }
 
