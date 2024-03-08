@@ -4,6 +4,7 @@ import arc.util.CommandHandler;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.mod.Plugin;
+import tower.Domain.CustomStatusEffects;
 import tower.Domain.PlayerData;
 import tower.game.Loader;
 import tower.menus.Menu;
@@ -18,6 +19,7 @@ public class TowerDefensePlugin extends Plugin {
         TowerPathfinder.init();
         PluginLogic.init();
         Loader.load();
+        CustomStatusEffects.load();
     }
 
 

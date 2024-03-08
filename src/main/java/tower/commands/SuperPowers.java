@@ -9,11 +9,11 @@ import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 import mindustry.type.UnitType;
+import mindustry.type.Weapon;
 import mindustry.ui.Menus;
 import mindustry.world.Tile;
 import tower.Bundle;
 import tower.Players;
-import tower.Domain.CustomStatusEffects;
 import tower.Domain.PlayerData;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -260,11 +260,24 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
             UnitTypes.toxopid,
             UnitTypes.reign
         };
+                Weapon[] weaponsToAdd = {
+            UnitTypes.corvus.weapons.get(0),
+            UnitTypes.corvus.weapons.get(0),
+            UnitTypes.corvus.weapons.get(0),
+            UnitTypes.reign.weapons.get(0),
+            UnitTypes.reign.weapons.get(1),
+            UnitTypes.conquer.weapons.get(0),
+            UnitTypes.toxopid.weapons.get(0),
+            UnitTypes.toxopid.weapons.get(1),
+            UnitTypes.eclipse.weapons.get(0),
+            UnitTypes.eclipse.weapons.get(1),
+            UnitTypes.eclipse.weapons.get(2)
+        };
         for (UnitType unitType : unitsToSpawn) {
             Unit unit = unitType.spawn(playerX, playerY);
             if (unit != null && unit.isValid()) {
-                unit.apply(CustomStatusEffects.overdriveBuffed,Float.POSITIVE_INFINITY );
-                unit.apply(CustomStatusEffects.overclockBuffed,Float.POSITIVE_INFINITY );
+         
+                for(Weapon wpn: weaponsToAdd){unit.type.weapons.add(wpn);}
                 unit.type.speed=0.000001f;
                 unit.type.playerControllable=false;
                 unit.type.alwaysShootWhenMoving=true;
