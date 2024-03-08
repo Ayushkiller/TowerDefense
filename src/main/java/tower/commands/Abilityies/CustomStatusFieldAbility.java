@@ -47,7 +47,7 @@ public class CustomStatusFieldAbility extends Ability{
     
         if(timer >= reload && (!onShoot || unit.isShooting)){
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
-                // Check if 'other' is on the opposing team before applying the effect
+
                 if(other.team != unit.team){
                     other.apply(effect, duration);
                     applyEffect.at(other, parentizeEffects);
@@ -56,7 +56,7 @@ public class CustomStatusFieldAbility extends Ability{
     
             float x = unit.x + Angles.trnsx(unit.rotation, effectY, effectX), y = unit.y + Angles.trnsy(unit.rotation, effectY, effectX);
             activeEffect.at(x, y, effectSizeParam ? range : unit.rotation, parentizeEffects ? unit : null);
-    
+            display=true;
             timer = 0f;
         }
     }
