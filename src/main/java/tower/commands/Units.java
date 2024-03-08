@@ -69,7 +69,7 @@ private static void buyUnit(UnitType unitType, Player player) {
                     spawned.abilities = Abilities.getAbility4().toArray(new Ability[0]);
                     break;
                 case 5:
-                    spawned.abilities = Abilities.getAbility4().toArray(new Ability[0]);
+                    spawned.abilities = Abilities.getAbility5().toArray(new Ability[0]);
                     break;
                 case 6:
                     spawned.abilities = Abilities.getAbility6().toArray(new Ability[0]);

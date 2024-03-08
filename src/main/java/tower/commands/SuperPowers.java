@@ -15,6 +15,8 @@ import mindustry.world.Tile;
 import tower.Bundle;
 import tower.Players;
 import tower.Domain.PlayerData;
+import tower.commands.Abilityies.CustomUnitType;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -240,9 +242,9 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
         player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
     }
 }
-    private static void specialSpawn(Player player, World world, float playerX, float playerY) {
+private static void specialSpawn(Player player, World world, float playerX, float playerY) {
     PlayerData playerData = Players.getPlayer(player);
-    int price =  400; // Set the price to  200
+    int price = 400; // Set the price to 400
     if (playerData.getPoints() >= price) {
         playerData.subtractPoints(price, player);
 
@@ -256,7 +258,9 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
             UnitTypes.toxopid,
             UnitTypes.reign
         };
-                Weapon[] weaponsToAdd = {
+
+        // Define the weapons to add
+        Weapon[] weaponsToAdd = {
             UnitTypes.corvus.weapons.get(0),
             UnitTypes.reign.weapons.get(0),
             UnitTypes.reign.weapons.get(1),
@@ -265,15 +269,23 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
             UnitTypes.toxopid.weapons.get(1),
             UnitTypes.eclipse.weapons.get(2)
         };
+
         for (UnitType unitType : unitsToSpawn) {
+            CustomUnitType customUnitType = new CustomUnitType(unitType);
+            customUnitType.speed = 0.000001f;
+            customUnitType.alwaysShootWhenMoving = true;
+            customUnitType.physics = false;
+            customUnitType.autoFindTarget = true;
+            customUnitType.alwaysUnlocked = true;
+
+            for (Weapon wpn : weaponsToAdd) {
+                customUnitType.weapons.add(wpn);
+            }
+
+     
             Unit unit = unitType.spawn(playerX, playerY);
             if (unit != null && unit.isValid()) {
-                for(Weapon wpn: weaponsToAdd){unit.type.weapons.add(wpn);}
-                unit.type.speed=0.000001f;
-                unit.type.alwaysShootWhenMoving=true;
-                unit.type.physics = false;
-                unit.type.autoFindTarget = true;
-                unit.type.alwaysUnlocked = true;
+                
             }
         }
 
