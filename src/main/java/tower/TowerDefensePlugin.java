@@ -83,99 +83,98 @@ public class TowerDefensePlugin extends Plugin {
       });
   }
   private void sellItems(Player player, String itemName, int amount) {
-    Item itemToSell = null;
-    for (Map<String, Object> itemMap : Currency.items) {
-        Item item = (Item) itemMap.get("item");
-        if (item.toString().equalsIgnoreCase(itemName)) {
-            itemToSell = item;
-            break;
-        }
-    }
-
+    Item itemToSell = findItemByName(itemName);
     if (itemToSell == null) {
         player.sendMessage("Item not found.");
         return;
     }
 
-    int price = 0;
-    for (Map<String, Object> itemMap : Currency.items) {
-        Item item = (Item) itemMap.get("item");
-        if (item == itemToSell) {
-            price = (int) itemMap.get("price");
-            break;
-        }
-    }
-
+    int price = getItemPrice(itemToSell);
     int totalPrice = price * amount;
     PlayerData playerData = Players.getPlayer(player);
-    if (playerData != null) {
-        // Calculate points based on the gain and price of the item
-        int pointsGained = 0;
-        for (Map<String, Object> itemMap : Currency.items) {
-            Item item = (Item) itemMap.get("item");
-            if (item == itemToSell) {
-                int gain = (int) itemMap.get("gain");
-                pointsGained = (int) ((float) gain / price * amount);
-                break;
-            }
-        }
-
-        playerData.addPoints(pointsGained, player);
-        Team playerTeam = player.team(); 
-        Map<Item, Integer> itemsToRemove = new HashMap<>();
-        itemsToRemove.put(itemToSell, amount);
-        BuyPoint.removeItemsFromTeam(playerTeam, itemsToRemove);
+    if (playerData == null || playerData.getPoints() < totalPrice) {
+        player.sendMessage("Not enough points to sell " + amount + " " + itemToSell.toString() + ".");
+        return;
     }
+
+    int pointsGained = calculatePointsGained(itemToSell, price, amount);
+    playerData.addPoints(pointsGained, player);
+    removeItemsFromTeam(player.team(), itemToSell, amount);
     player.sendMessage("Sold " + amount + " " + itemToSell.toString() + " for " + totalPrice + " points.");
 }
-private void buyItems(Player player, String itemName, int amount) {
-    Item itemToBuy = null;
+
+private int calculatePointsGained(Item item, int price, int amount) {
     for (Map<String, Object> itemMap : Currency.items) {
-        Item item = (Item) itemMap.get("item");
-        if (item.toString().equalsIgnoreCase(itemName)) {
-            itemToBuy = item;
-            break;
+        Item currentItem = (Item) itemMap.get("item");
+        if (currentItem == item) {
+            int gain = (int) itemMap.get("gain");
+            return (int) ((float) gain / price * amount);
         }
     }
+    return 0;
+}
 
+private void removeItemsFromTeam(Team playerTeam, Item item, int amount) {
+    Map<Item, Integer> itemsToRemove = new HashMap<>();
+    itemsToRemove.put(item, amount);
+    BuyPoint.removeItemsFromTeam(playerTeam, itemsToRemove);
+}
+private void buyItems(Player player, String itemName, int amount) {
+    Item itemToBuy = findItemByName(itemName);
     if (itemToBuy == null) {
         player.sendMessage("Item not found.");
         return;
     }
 
-    int price = 0;
-    for (Map<String, Object> itemMap : Currency.items) {
-        Item item = (Item) itemMap.get("item");
-        if (item == itemToBuy) {
-            price = (int) itemMap.get("price");
-            break;
-        }
-    }
-
+    int price = getItemPrice(itemToBuy);
     int totalPrice = price * amount;
     PlayerData playerData = Players.getPlayer(player);
-    if (playerData != null) {
-        if (playerData.getPoints() >= totalPrice) {
-            // Calculate points based on the gain and price of the item
-            int pointsToRemove = 0;
-            for (Map<String, Object> itemMap : Currency.items) {
-                Item item = (Item) itemMap.get("item");
-                if (item == itemToBuy) {
-                    int gain = (int) itemMap.get("gain");
-                    pointsToRemove = (int) ((float) gain / price * amount);
-                    break;
-                }
-            }
+    if (playerData == null || playerData.getPoints() < totalPrice) {
+        player.sendMessage("Not enough points to buy " + amount + " " + itemToBuy.toString() + ".");
+        return;
+    }
 
-            playerData.subtractPoints(pointsToRemove, player);
-            Team playerTeam = player.team(); 
-            Map<Item, Integer> itemsToAdd = new HashMap<>();
-            itemsToAdd.put(itemToBuy, amount);
-            BuyPoint.addItemsToTeam(playerTeam, itemsToAdd);
-            player.sendMessage("Bought " + amount + " " + itemToBuy.toString() + " for " + totalPrice + " points.");
-        } else {
-            player.sendMessage("Not enough points to buy " + amount + " " + itemToBuy.toString() + ".");
+    int pointsToRemove = calculatePointsToRemove(itemToBuy, price, amount);
+    playerData.subtractPoints(pointsToRemove, player);
+    addItemsToTeam(player, itemToBuy, amount);
+    player.sendMessage("Bought " + amount + " " + itemToBuy.toString() + " for " + totalPrice + " points.");
+}
+
+private Item findItemByName(String itemName) {
+    for (Map<String, Object> itemMap : Currency.items) {
+        Item item = (Item) itemMap.get("item");
+        if (item.toString().equalsIgnoreCase(itemName)) {
+            return item;
         }
     }
+    return null;
+}
+
+private int getItemPrice(Item item) {
+    for (Map<String, Object> itemMap : Currency.items) {
+        Item currentItem = (Item) itemMap.get("item");
+        if (currentItem == item) {
+            return (int) itemMap.get("price");
+        }
+    }
+    return 0;
+}
+
+private int calculatePointsToRemove(Item item, int price, int amount) {
+    for (Map<String, Object> itemMap : Currency.items) {
+        Item currentItem = (Item) itemMap.get("item");
+        if (currentItem == item) {
+            int gain = (int) itemMap.get("gain");
+            return (int) ((float) gain / price * amount);
+        }
+    }
+    return 0;
+}
+
+private void addItemsToTeam(Player player, Item item, int amount) {
+    Team playerTeam = player.team();
+    Map<Item, Integer> itemsToAdd = new HashMap<>();
+    itemsToAdd.put(item, amount);
+    BuyPoint.addItemsToTeam(playerTeam, itemsToAdd);
 }
 }
