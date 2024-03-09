@@ -31,7 +31,7 @@ public class TowerDefensePlugin extends Plugin {
 
   public void registerClientCommands(CommandHandler handler) {
     handler.register("menu", "Opens a menu", (String[] args, Player player) -> Menu.execute(player));
-    handler.register("sell", "<item>, <amount>", "Sells items based on the price", (String[] args, Player player) -> {
+    handler.register("sell", "[item] [amount]", "Sells items based on the price", (String[] args, Player player) -> {
         if (args.length > 1) {
             String itemName = args[0];
             int amount;
@@ -46,7 +46,7 @@ public class TowerDefensePlugin extends Plugin {
             player.sendMessage("Please specify the item and amount to sell.");
         }
     });
-    handler.register("buy", "<item>, <amount>", "Buys items based on the price", (String[] args, Player player) -> {
+    handler.register("buy", "[item] [amount]", "Buys items based on the price", (String[] args, Player player) -> {
         if (args.length > 1) {
             String itemName = args[0];
             int amount;
