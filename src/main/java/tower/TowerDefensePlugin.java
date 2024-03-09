@@ -109,12 +109,22 @@ public class TowerDefensePlugin extends Plugin {
     int totalPrice = price * amount;
     PlayerData playerData = Players.getPlayer(player);
     if (playerData != null) {
-        playerData.addPoints(totalPrice, player);
+        // Calculate points based on the gain and price of the item
+        int pointsGained = 0;
+        for (Map<String, Object> itemMap : Currency.items) {
+            Item item = (Item) itemMap.get("item");
+            if (item == itemToSell) {
+                int gain = (int) itemMap.get("gain");
+                pointsGained = (int) ((float) gain / price * amount);
+                break;
+            }
+        }
+
+        playerData.addPoints(pointsGained, player);
         Team playerTeam = player.team(); 
-        playerData.addPoints(amount, player);
-        Map<Item, Integer> itemsToremove = new HashMap<>();
-        itemsToremove.put(itemToSell, amount);
-        BuyPoint.removeItemsFromTeam(playerTeam, itemsToremove);
+        Map<Item, Integer> itemsToRemove = new HashMap<>();
+        itemsToRemove.put(itemToSell, amount);
+        BuyPoint.removeItemsFromTeam(playerTeam, itemsToRemove);
     }
     player.sendMessage("Sold " + amount + " " + itemToSell.toString() + " for " + totalPrice + " points.");
 }
@@ -146,8 +156,19 @@ private void buyItems(Player player, String itemName, int amount) {
     PlayerData playerData = Players.getPlayer(player);
     if (playerData != null) {
         if (playerData.getPoints() >= totalPrice) {
+            // Calculate points based on the gain and price of the item
+            int pointsToRemove = 0;
+            for (Map<String, Object> itemMap : Currency.items) {
+                Item item = (Item) itemMap.get("item");
+                if (item == itemToBuy) {
+                    int gain = (int) itemMap.get("gain");
+                    pointsToRemove = (int) ((float) gain / price * amount);
+                    break;
+                }
+            }
+
+            playerData.subtractPoints(pointsToRemove, player);
             Team playerTeam = player.team(); 
-            playerData.subtractPoints(totalPrice, player);
             Map<Item, Integer> itemsToAdd = new HashMap<>();
             itemsToAdd.put(itemToBuy, amount);
             BuyPoint.addItemsToTeam(playerTeam, itemsToAdd);

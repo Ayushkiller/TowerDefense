@@ -48,7 +48,7 @@ public class PlayerData {
     }
     public float calculateReductionPercentage(float points) {
 
-        return points *   0.1f;
+        return points *   0.9f;
     }
     public void subtractPoints(float amount, Player player) {
         this.points -= amount;
