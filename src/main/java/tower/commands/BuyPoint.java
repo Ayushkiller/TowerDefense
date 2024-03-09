@@ -142,7 +142,7 @@ public class BuyPoint {
         }
         return  0; // Return  0 if the item is not found in the items list
     }
-    private static void removeItemsFromTeam(Team team, Map<Item, Integer> selectedItems) {
+    public static void removeItemsFromTeam(Team team, Map<Item, Integer> selectedItems) {
         for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
             int quantity = entry.getValue();
@@ -155,10 +155,15 @@ public class BuyPoint {
             }
         }
     }
-
+    public static void addItemsToTeam(Team team, Map<Item, Integer> selectedItems) {
+        for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
+            Item item = entry.getKey();
+            int quantity = entry.getValue();
+            team.items().add(item, quantity);
+        }
+    }
     public static void createAndDisplayMenu(Player player, String title, String description, String[][] buttons) {
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-            // Implement menu logic here
         }), title, description, buttons);
     }
 
