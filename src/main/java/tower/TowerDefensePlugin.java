@@ -83,9 +83,11 @@ public class TowerDefensePlugin extends Plugin {
       });
   }
   private void sellItems(Player player, String itemName, int amount) {
+    System.out.println("Attempting to sell " + amount + " " + itemName + " for player " + player.name());
     Item itemToSell = findItemByName(itemName);
     if (itemToSell == null) {
         player.sendMessage("Item not found.");
+        System.out.println("Item not found: " + itemName);
         return;
     }
 
@@ -94,13 +96,15 @@ public class TowerDefensePlugin extends Plugin {
     PlayerData playerData = Players.getPlayer(player);
     if (playerData == null || playerData.getPoints() < totalPrice) {
         player.sendMessage("Not enough points to sell " + amount + " " + itemToSell.toString() + ".");
+        System.out.println("Not enough points to sell " + amount + " " + itemToSell.toString());
         return;
     }
 
     int pointsGained = calculatePointsGained(itemToSell, price, amount);
     playerData.addPoints(pointsGained, player);
     removeItemsFromTeam(player.team(), itemToSell, amount);
-    player.sendMessage("Sold " + amount + " " + itemToSell.toString() + " for " + totalPrice + " points.");
+    player.sendMessage("Sold " + amount + " " + itemToSell.toString() + " for " + totalPrice + " points. You gained " + pointsGained + " points.");
+    System.out.println("Successfully sold " + amount + " " + itemToSell.toString() + " for " + totalPrice + " points. Gained " + pointsGained + " points.");
 }
 
 private int calculatePointsGained(Item item, int price, int amount) {
@@ -120,9 +124,11 @@ private void removeItemsFromTeam(Team playerTeam, Item item, int amount) {
     BuyPoint.removeItemsFromTeam(playerTeam, itemsToRemove);
 }
 private void buyItems(Player player, String itemName, int amount) {
+    System.out.println("Attempting to buy " + amount + " " + itemName + " for player " + player.name());
     Item itemToBuy = findItemByName(itemName);
     if (itemToBuy == null) {
         player.sendMessage("Item not found.");
+        System.out.println("Item not found: " + itemName);
         return;
     }
 
@@ -131,6 +137,7 @@ private void buyItems(Player player, String itemName, int amount) {
     PlayerData playerData = Players.getPlayer(player);
     if (playerData == null || playerData.getPoints() < totalPrice) {
         player.sendMessage("Not enough points to buy " + amount + " " + itemToBuy.toString() + ".");
+        System.out.println("Not enough points to buy " + amount + " " + itemToBuy.toString());
         return;
     }
 
@@ -138,6 +145,7 @@ private void buyItems(Player player, String itemName, int amount) {
     playerData.subtractPoints(pointsToRemove, player);
     addItemsToTeam(player, itemToBuy, amount);
     player.sendMessage("Bought " + amount + " " + itemToBuy.toString() + " for " + totalPrice + " points.");
+    System.out.println("Successfully bought " + amount + " " + itemToBuy.toString() + " for " + totalPrice + " points.");
 }
 
 private Item findItemByName(String itemName) {
