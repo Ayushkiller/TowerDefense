@@ -138,10 +138,22 @@ private void buyItems(Player player, String itemName, int amount) {
         return;
     }
 
+    // Calculate points to remove based on the item's gain and price
     int pointsToRemove = calculatePointsToRemove(itemToBuy, price, amount);
     playerData.subtractPoints(pointsToRemove, player);
     addItemsToTeam(player, itemToBuy, amount);
     player.sendMessage("Bought " + amount + " " + itemToBuy.toString() + " for " + totalPrice + " points.");
+}
+
+private int calculatePointsToRemove(Item item, int price, int amount) {
+    for (Map<String, Object> itemMap : Currency.items) {
+        Item currentItem = (Item) itemMap.get("item");
+        if (currentItem == item) {
+            int gain = (int) itemMap.get("gain");
+            return (int) ((float) gain / price * amount);
+        }
+    }
+    return 0;
 }
 
 private Item findItemByName(String itemName) {
@@ -159,17 +171,6 @@ private int getItemPrice(Item item) {
         Item currentItem = (Item) itemMap.get("item");
         if (currentItem == item) {
             return (int) itemMap.get("price");
-        }
-    }
-    return 0;
-}
-
-private int calculatePointsToRemove(Item item, int price, int amount) {
-    for (Map<String, Object> itemMap : Currency.items) {
-        Item currentItem = (Item) itemMap.get("item");
-        if (currentItem == item) {
-            int gain = (int) itemMap.get("gain");
-            return (int) ((float) gain / price * amount);
         }
     }
     return 0;
