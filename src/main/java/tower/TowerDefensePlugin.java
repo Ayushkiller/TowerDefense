@@ -150,7 +150,9 @@ private int calculatePointsToRemove(Item item, int price, int amount) {
         Item currentItem = (Item) itemMap.get("item");
         if (currentItem == item) {
             int gain = (int) itemMap.get("gain");
-            return (int) ((float) gain / price * amount);
+            int itemPrice = (int) itemMap.get("price");
+            // Calculate points to remove based on the item's gain and price ratio
+            return (int) ((float) gain / itemPrice * amount);
         }
     }
     return 0;
