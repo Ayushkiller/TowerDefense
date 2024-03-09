@@ -94,13 +94,15 @@ public class TowerDefensePlugin extends Plugin {
     int price = getItemPrice(itemToSell);
     int totalPrice = price * amount;
     PlayerData playerData = Players.getPlayer(player);
-    if (playerData == null || playerData.getPoints() < totalPrice) {
-        player.sendMessage("Not enough points to sell " + amount + " " + itemToSell.toString() + ".");
-        System.out.println("Not enough points to sell " + amount + " " + itemToSell.toString());
+    if (playerData == null) {
+        player.sendMessage("Player data not found.");
+        System.out.println("Player data not found for player " + player.name());
         return;
     }
 
+    // Calculate points gained based on the amount of the resource removed
     int pointsGained = calculatePointsGained(itemToSell, price, amount);
+    // Add the points to the player's account
     playerData.addPoints(pointsGained, player);
     removeItemsFromTeam(player.team(), itemToSell, amount);
     player.sendMessage("Sold " + amount + " " + itemToSell.toString() + " for " + totalPrice + " points. You gained " + pointsGained + " points.");
