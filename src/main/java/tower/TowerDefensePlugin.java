@@ -46,21 +46,6 @@ public class TowerDefensePlugin extends Plugin {
             player.sendMessage("Please specify the item and amount to sell.");
         }
     });
-    handler.register("buy", "[item] [amount]", "Buys items based on the price", (String[] args, Player player) -> {
-        if (args.length > 1) {
-            String itemName = args[0];
-            int amount;
-            try {
-                amount = Integer.parseInt(args[1]);
-            } catch (NumberFormatException e) {
-                player.sendMessage("Invalid amount provided.");
-                return;
-            }
-            buyItems(player, itemName, amount);
-        } else {
-            player.sendMessage("Please specify the item and amount to buy.");
-        }
-    });
 }
   public void registerServerCommands(CommandHandler handler) {
       handler.register("death", "<points>", "Adds points to every player", (String[] args, Player player) -> {
@@ -122,33 +107,6 @@ private void removeItemsFromTeam(Team playerTeam, Item item, int amount) {
     Map<Item, Integer> itemsToRemove = new HashMap<>();
     itemsToRemove.put(item, amount);
     BuyPoint.removeItemsFromTeam(playerTeam, itemsToRemove);
-}
-private void buyItems(Player player, String itemName, int amount) {
-    Item itemToBuy = findItemByName(itemName);
-    if (itemToBuy == null) {
-        player.sendMessage("Item not found.");
-        return;
-    }
-
-    int price = getItemPrice(itemToBuy);
-    int totalPrice = price * amount;
-    PlayerData playerData = Players.getPlayer(player);
-    if (playerData == null || playerData.getPoints() < totalPrice) {
-        player.sendMessage("Not enough points to buy " + amount + " " + itemToBuy.toString() + ".");
-        return;
-    }
-
-    // Check if the player's team has enough of the item
-    if (!hasEnoughItems(player.team(), itemToBuy, amount)) {
-        player.sendMessage("Not enough items in your team to buy " + amount + " " + itemToBuy.toString() + ".");
-        return;
-    }
-
-    // Calculate points to remove based on the item's gain and price
-    int pointsToRemove = calculatePointsToRemove(itemToBuy, price, amount);
-    playerData.subtractPoints(pointsToRemove, player);
-    addItemsToTeam(player, itemToBuy, amount);
-    player.sendMessage("Bought " + amount + " " + itemToBuy.toString() + " for " + totalPrice + " points.");
 }
 
 private boolean hasEnoughItems(Team team, Item item, int amount) {
