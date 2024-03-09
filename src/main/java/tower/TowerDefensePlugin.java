@@ -138,11 +138,22 @@ private void buyItems(Player player, String itemName, int amount) {
         return;
     }
 
+    // Check if the player's team has enough of the item
+    if (!hasEnoughItems(player.team(), itemToBuy, amount)) {
+        player.sendMessage("Not enough items in your team to buy " + amount + " " + itemToBuy.toString() + ".");
+        return;
+    }
+
     // Calculate points to remove based on the item's gain and price
     int pointsToRemove = calculatePointsToRemove(itemToBuy, price, amount);
     playerData.subtractPoints(pointsToRemove, player);
     addItemsToTeam(player, itemToBuy, amount);
     player.sendMessage("Bought " + amount + " " + itemToBuy.toString() + " for " + totalPrice + " points.");
+}
+
+private boolean hasEnoughItems(Team team, Item item, int amount) {
+    int availableAmount = team.items().get(item);
+    return availableAmount >= amount;
 }
 private int calculatePointsToRemove(Item item, int price, int amount) {
     for (Map<String, Object> itemMap : Currency.items) {
