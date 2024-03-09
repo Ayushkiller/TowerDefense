@@ -16,7 +16,7 @@ import tower.game.Loader;
 import tower.menus.Menu;
 import tower.pathing.TowerPathfinder;
 import useful.Bundle;
-
+@SuppressWarnings("unused")
 public class TowerDefensePlugin extends Plugin {
 
     @Override
