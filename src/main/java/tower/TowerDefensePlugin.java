@@ -144,7 +144,6 @@ private void buyItems(Player player, String itemName, int amount) {
     addItemsToTeam(player, itemToBuy, amount);
     player.sendMessage("Bought " + amount + " " + itemToBuy.toString() + " for " + totalPrice + " points.");
 }
-
 private int calculatePointsToRemove(Item item, int price, int amount) {
     for (Map<String, Object> itemMap : Currency.items) {
         Item currentItem = (Item) itemMap.get("item");
