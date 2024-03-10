@@ -106,19 +106,19 @@ private static void buyUnit(UnitType unitType, Player player) {
         player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
     }
 }
-    private static void openTierMenuGui(Player player) {
-        String[][] buttons = new String[6][1]; 
-        for (int i = 0; i < 7; i++) {
-            buttons[i][0] = "Tier " + i;
-        }
-        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            if (option >= 0 && option < 7) {
-                openTierUnitsMenuGui(option, player); 
-            } else {
-                player.sendMessage("Invalid selection. Please try again.");
-            }
-        }), "Select Tier", "", buttons);
+private static void openTierMenuGui(Player player) {
+    String[][] buttons = new String[6][1]; 
+    for (int i = 0; i < 6; i++) { // Adjusted to iterate up to 5
+        buttons[i][0] = "Tier " + i;
     }
+    Call.menu(player.con, Menus.registerMenu((player1, option) -> {
+        if (option >= 0 && option < 6) { // Adjusted to check up to 5
+            openTierUnitsMenuGui(option, player); 
+        } else {
+            player.sendMessage("Invalid selection. Please try again.");
+        }
+    }), "Select Tier", "", buttons);
+}
 
     private static void openTierUnitsMenuGui(int tier, Player player) {
         List<Map<String, Object>> tierUnits = UnitsTable.units.stream()
