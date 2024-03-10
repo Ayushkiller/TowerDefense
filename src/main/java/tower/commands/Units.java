@@ -107,7 +107,7 @@ private static void buyUnit(UnitType unitType, Player player) {
     }
 }
     private static void openTierMenuGui(Player player) {
-        String[][] buttons = new String[7][1]; 
+        String[][] buttons = new String[6][1]; 
         for (int i = 0; i < 7; i++) {
             buttons[i][0] = "Tier " + i;
         }

@@ -64,7 +64,7 @@ public class PluginLogic {
         Timer.schedule(()->Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
 
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
-        Events.on(EventType.WaveEvent.class, event->multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.4f), multiplier, 100f));
+        Events.on(EventType.WaveEvent.class, event->multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 100f));
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
         Events.on(EventType.UnitDestroyEvent.class, event -> {
         if (event.unit.team != state.rules.waveTeam) return;

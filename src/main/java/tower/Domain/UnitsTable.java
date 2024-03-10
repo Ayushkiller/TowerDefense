@@ -65,7 +65,5 @@ public class UnitsTable {
         units.add(Map.of("unit", UnitTypes.obviate, "price",   18, "name", "Obviate", "tier", 3));
         units.add(Map.of("unit", UnitTypes.quell, "price",   40, "name", "Quell", "tier", 4));
         units.add(Map.of("unit", UnitTypes.disrupt, "price",   65, "name", "Disrupt", "tier", 5, "Ability",10));
-        units.add(Map.of("unit", UnitTypes.renale, "price",   12, "name", "Renale", "tier", 6, "Ability",11));
-        units.add(Map.of("unit", UnitTypes.latum, "price",   60, "name", "Latum", "tier", 6, "Ability",12));
     }
 }
