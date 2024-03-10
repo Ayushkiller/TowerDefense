@@ -64,7 +64,26 @@ public class PluginLogic {
         Timer.schedule(()->Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
 
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
-        Events.on(EventType.WaveEvent.class, event->multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 100f));
+        Events.on(EventType.WaveEvent.class, event -> {
+            // Calculate the multiplier based on the wave number
+            // For waves 1 to 8, increase the multiplier slowly
+            // After wave 8, increase the multiplier rapidly
+            if (state.wave <= 10) {
+                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 1.5f);
+            } else if (state.wave > 10 && state.wave <= 30) {
+                // After wave 8 and before wave 30, increase the multiplier rapidly
+                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 3f);
+            } else if (state.wave > 30 && state.wave <= 60) {
+                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 3.5f);
+            } else if (state.wave > 60 && state.wave <= 120) {
+                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 4f);
+            } else if (state.wave > 120 && state.wave <= 150) {
+                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 6f);
+            } else {
+                // After wave 60, increase the multiplier rapidly
+                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 100f);
+            }
+        });
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
         Events.on(EventType.UnitDestroyEvent.class, event -> {
         if (event.unit.team != state.rules.waveTeam) return;
