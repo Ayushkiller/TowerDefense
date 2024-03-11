@@ -14,7 +14,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.liquid.Conduit;
-import mindustry.world.blocks.liquid.PulseConduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
 
