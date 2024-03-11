@@ -13,6 +13,8 @@ import mindustry.net.Administration;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.ShockMine;
+import mindustry.world.blocks.liquid.Conduit;
+import mindustry.world.blocks.liquid.PulseConduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
 
@@ -44,7 +46,7 @@ public class PluginLogic {
         netServer.admins.addActionFilter(action->{
             if(action.tile == null) return true;
             if(action.type == Administration.ActionType.placeBlock || action.type == Administration.ActionType.breakBlock){
-                if(!(canBePlaced(action.tile, action.block)|| action.block instanceof ShockMine || action.block instanceof CoreBlock)){
+                if(!(canBePlaced(action.tile, action.block)|| action.block instanceof ShockMine|| action.block instanceof Conduit || action.block instanceof CoreBlock)){
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                     return false; // Explicitly return false here
                 }
@@ -55,7 +57,7 @@ public class PluginLogic {
         Timer.schedule(()->state.rules.waveTeam.data().units.each(unit->{
             var core = unit.closestEnemyCore();
             if(core == null || unit.dst(core) > 60f) return;
-            core.damage(unit.health / Mathf.sqrt(multiplier), true);
+            core.damage(unit.health+unit.shield / Mathf.sqrt(multiplier), true);
             unit.kill();
 
         }), 0f, 1f);
@@ -79,9 +81,13 @@ public class PluginLogic {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 4f);
             } else if (state.wave > 120 && state.wave <= 150) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 6f);
+            } else if (state.wave > 150 && state.wave <= 250) {
+                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 12f);
+            } else if (state.wave > 250 && state.wave <= 350) {
+                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 18f);
             } else {
-                // After wave 60, increase the multiplier rapidly
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 100f);
+                // After wave 350, increase the multiplier rapidly
+                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 2f) * 2, multiplier, 100f);
             }
         });
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
@@ -123,13 +129,20 @@ public class PluginLogic {
             event.unit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
-            event.unit.apply(StatusEffects.slow, Float.POSITIVE_INFINITY);
+            if (state.wave <= 250) {
+                event.unit.apply(StatusEffects.slow, Float.POSITIVE_INFINITY);
+            }
+            if (state.wave >= 350) {
+                event.unit.apply(StatusEffects.fast, Float.POSITIVE_INFINITY);
+            }
             event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
             event.unit.type.speed = 1.5f;
             event.unit.type.range = -1f;
             event.unit.type.hovering = true;
             event.unit.type.abilities.clear();
             event.unit.type.crashDamageMultiplier = 0f;
+            event.unit.type.crushDamage = 0f;
+            event.unit.type.deathExplosionEffect= Fx.healWave;
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
 
