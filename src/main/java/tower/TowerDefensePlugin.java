@@ -30,7 +30,7 @@ public class TowerDefensePlugin extends Plugin {
 
 
   public void registerClientCommands(CommandHandler handler) {
-    handler.register("menu", "Opens a menu", (String[] args, Player player) -> Menu.execute(player));
+    handler.register("menu", "Opens the Special store", (String[] args, Player player) -> Menu.execute(player));
     handler.register("sell", "[item] [amount]", "Sells items based on the price", (String[] args, Player player) -> {
         if (args.length > 1) {
             String itemName = args[0];
@@ -38,12 +38,12 @@ public class TowerDefensePlugin extends Plugin {
             try {
                 amount = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
-                player.sendMessage("Invalid amount provided.");
+                player.sendMessage("[#f]⚠[] [#f]Invalid amount provided.");
                 return;
             }
             sellItems(player, itemName, amount);
         } else {
-            player.sendMessage("Please specify the item and amount to sell.");
+            player.sendMessage("[#f]⚠[] [#f]Please specify the item and amount to sell.");
         }
     });
 }

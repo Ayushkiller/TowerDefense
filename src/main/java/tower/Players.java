@@ -43,7 +43,7 @@ public class Players {
                     float currentPoints = playerData.getPoints();
                     if (currentPoints != playerData.getLastUpdatedPoints()) {
                         StringBuilder hud = new StringBuilder();
-                        hud.append("[green]Points [red]" + playerData.getName()+ "= [lime]" + (int) playerData.getPoints() + "\n  ");
+                        hud.append("[green]Points for[white] " + playerData.getName() + " - [lime]" + (int) playerData.getPoints() + "\n ");
                         
                         Call.setHudText(player.con, hud.toString());
                         playerData.setLastUpdatedPoints(currentPoints);

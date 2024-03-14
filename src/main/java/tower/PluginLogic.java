@@ -56,12 +56,16 @@ public class PluginLogic {
         Timer.schedule(()->state.rules.waveTeam.data().units.each(unit->{
             var core = unit.closestEnemyCore();
             if(core == null || unit.dst(core) > 60f) return;
-            core.damage(unit.health+unit.shield / Mathf.sqrt(multiplier), true);
+            float damage = unit.health + unit.shield / Mathf.sqrt(multiplier);
+            core.damage(damage, true);
             unit.kill();
-
-        }), 0f, 1f);
+            
+            // Check if the core's health is 0 or less and set to 1
         
-
+            if(core.health <= 0) {
+                core.health = 1;
+            }
+        }), 0f, 1f);
         Timer.schedule(()->Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
 
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
