@@ -16,7 +16,7 @@ import tower.game.Loader;
 import tower.menus.Menu;
 import tower.pathing.TowerPathfinder;
 import useful.Bundle;
-@SuppressWarnings("unused")
+
 public class TowerDefensePlugin extends Plugin {
 
     @Override
@@ -109,23 +109,6 @@ private void removeItemsFromTeam(Team playerTeam, Item item, int amount) {
     BuyPoint.removeItemsFromTeam(playerTeam, itemsToRemove);
 }
 
-private boolean hasEnoughItems(Team team, Item item, int amount) {
-    int availableAmount = team.items().get(item);
-    return availableAmount >= amount;
-}
-private int calculatePointsToRemove(Item item, int price, int amount) {
-    for (Map<String, Object> itemMap : Currency.items) {
-        Item currentItem = (Item) itemMap.get("item");
-        if (currentItem == item) {
-            int gain = (int) itemMap.get("gain");
-            int itemPrice = (int) itemMap.get("price");
-            // Calculate points to remove based on the item's gain and price ratio
-            return (int) ((float) gain / itemPrice * amount);
-        }
-    }
-    return 0;
-}
-
 private Item findItemByName(String itemName) {
     for (Map<String, Object> itemMap : Currency.items) {
         Item item = (Item) itemMap.get("item");
@@ -144,12 +127,5 @@ private int getItemPrice(Item item) {
         }
     }
     return 0;
-}
-
-private void addItemsToTeam(Player player, Item item, int amount) {
-    Team playerTeam = player.team();
-    Map<Item, Integer> itemsToAdd = new HashMap<>();
-    itemsToAdd.put(item, amount);
-    BuyPoint.addItemsToTeam(playerTeam, itemsToAdd);
 }
 }
