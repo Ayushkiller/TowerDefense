@@ -23,7 +23,7 @@ public class Menu {
 
     private static final String[][] buttons = {
         {"[lime]Units", "[red]Info","[purple]Super[lime]Pow"},
-        {"[cyan]BuyPoints","[blue]Powerups", "[lightgray]Close"}
+        {"[cyan]BuyCash","[blue]Powerups", "[lightgray]Close"}
     };
 
     public static void execute(Player player) {

@@ -113,11 +113,11 @@ public class PluginLogic {
 
         Call.label(builder.toString(),   1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
 
-        // Distribute points to all players
+        // Distribute Cash to all players
         Players.forEach(playerData -> {
          if (playerData != null) {
-            float reductionPercentage = playerData.calculateReductionPercentage(playerData.getPoints());
-            playerData.addPointsWithReduction(reductionPercentage);
+            float reductionPercentage = playerData.calculateReductionPercentage(playerData.getCash());
+            playerData.addCashWithReduction(reductionPercentage);
           }
          });
       });

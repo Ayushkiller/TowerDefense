@@ -36,8 +36,8 @@ public class Units {
 private static void buyUnit(UnitType unitType, Player player) {
     PlayerData playerData = Players.getPlayer(player);
     int price = unitPrices.get(unitType);
-    if (playerData.getPoints() >= price) {
-        playerData.subtractPoints((float) price, player);
+    if (playerData.getCash() >= price) {
+        playerData.subtractCash((float) price, player);
 
         Unit oldUnit = player.unit();
         Unit spawned = unitType.spawn(player.x, player.y);
@@ -91,7 +91,7 @@ private static void buyUnit(UnitType unitType, Player player) {
             ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
             executor.schedule(() -> {
                 if (spawned.dead()) {
-                    playerData.addPoints((float) price, player);
+                    playerData.addCash((float) price, player);
                     player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
                     player.sendMessage(Bundle.get("unit.died", player.locale));
                 }
@@ -99,7 +99,7 @@ private static void buyUnit(UnitType unitType, Player player) {
 
             player.sendMessage(Bundle.get("unit.brought", player.locale));
         } else {
-            playerData.addPoints((float) price, player);
+            playerData.addCash((float) price, player);
             player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
         }
     } else {

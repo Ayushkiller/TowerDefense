@@ -103,9 +103,9 @@ public class Statuseffects {
         // Add the calculated amount to the status effect's price
         int totalPrice = effectPrice + additionalPrice;
     
-        if (playerData.getPoints() >= totalPrice) {
+        if (playerData.getCash() >= totalPrice) {
             if (effect != null) { // Ensure the effect is not null before applying it
-                playerData.subtractPoints(totalPrice, player);
+                playerData.subtractCash(totalPrice, player);
                 player.unit().apply(effect, Float.POSITIVE_INFINITY);
                 // Modify the message to include the emoji, base effect price, and the additional price
                 player.sendMessage(effect.emoji() + " " + Bundle.get("effect.bought.with.additional", player.locale) + effectPrice + " + " + additionalPrice + " = " + totalPrice);

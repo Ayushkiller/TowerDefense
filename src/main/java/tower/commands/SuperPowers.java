@@ -64,8 +64,8 @@ public class SuperPowers {
     
     private static void spawnUnitWithType(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
-        if (playerData.getPoints() >= 100) { // Ensure the player has enough points
-            playerData.subtractPoints(100, player); // Subtract points as soon as the player confirms the purchase
+        if (playerData.getCash() >= 100) { // Ensure the player has enough Cash
+            playerData.subtractCash(100, player); // Subtract Cash as soon as the player confirms the purchase
             float angleStep = 360f / 6;
             float radius = 100f; // Calculate the angle step for evenly spaced spawns
             for (int i = 0; i < 6; i++) {
@@ -100,7 +100,7 @@ public class SuperPowers {
                             unitType.weapons.get(0).cooldownTime = 10f;
                         }
                     } else {
-                        playerData.addPoints(100, player);
+                        playerData.addCash(100, player);
                         player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
                     }
                 } else {
@@ -108,7 +108,7 @@ public class SuperPowers {
                 }
             }
         } else {
-            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
+            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-Cash", player.locale()));
         }
     }
     
@@ -117,7 +117,7 @@ public class SuperPowers {
         int unitCost =   100; // Cost per unit
         int totalCost = unitCost; // Total cost remains   40 for all units
 
-        if (playerData.getPoints() >= totalCost) {
+        if (playerData.getCash() >= totalCost) {
             float radius =   140f;
             float arcAngle =   180f;
             float angleStep = arcAngle /   20; // Divide the arc by the number of units
@@ -155,15 +155,15 @@ public class SuperPowers {
             }
 
             if (allUnitsSpawned) {
-                playerData.subtractPoints(totalCost, player); // Subtract the total cost
+                playerData.subtractCash(totalCost, player); // Subtract the total cost
                 player.sendMessage(Bundle.get("spawn.arc-of-units.success", player.locale()));
             } else {
-                // If any unit was not successfully spawned, give back the points
-                playerData.addPoints(totalCost, player);
+                // If any unit was not successfully spawned, give back the Cash
+                playerData.addCash(totalCost, player);
                 player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
             }
         } else {
-            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
+            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-Cash", player.locale()));
         }
     }
 private static void spawnDisruptUnit(Player player, World world, float playerX, float playerY) {
@@ -171,7 +171,7 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
     int unitCost =   40; // Cost per unit
     int totalCost = unitCost; // Total cost for   4 unit types
 
-    if (playerData.getPoints() >= totalCost) {
+    if (playerData.getCash() >= totalCost) {
         float radius =   140f;
         float arcAngle =   180f;
         float angleStep = arcAngle /   20; // Divide the arc by the number of units
@@ -216,11 +216,11 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
             }
 
             if (allUnitsSpawned[0]) {
-                playerData.subtractPoints(totalCost, player); // Subtract the total cost
+                playerData.subtractCash(totalCost, player); // Subtract the total cost
                 player.sendMessage(Bundle.get("spawn.arc-of-units.success", player.locale()));
             } else {
-                // If any unit was not successfully spawned, give back the points
-                playerData.addPoints(totalCost, player);
+                // If any unit was not successfully spawned, give back the Cash
+                playerData.addCash(totalCost, player);
                 player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
             }
         }, spawnDuration, TimeUnit.SECONDS);
@@ -232,7 +232,7 @@ private static void spawnDisruptUnit(Player player, World world, float playerX, 
             }
         });
     } else {
-        player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-points", player.locale()));
+        player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-Cash", player.locale()));
     }
 }
 

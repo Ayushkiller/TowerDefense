@@ -38,7 +38,7 @@ public class Info {
 
         messages = new String[]{
             Bundle.get("settings.message", locale),
-            Bundle.get("info.points", locale),
+            Bundle.get("info.Cash", locale),
             Bundle.get("info.Buypoint", locale),
             Bundle.get("info.powerup", locale),
             Bundle.get("info.superpower", locale),

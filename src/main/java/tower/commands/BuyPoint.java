@@ -66,9 +66,9 @@ public class BuyPoint {
             } else if (opt ==   6) { // Buy button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
                 if (hasEnoughItems(player.team(), option, player)) {
-                    int totalPoints = calculateTotalPoints(selectedItems);
+                    int totalCash = calculateTotalCash(selectedItems);
                     PlayerData playerData = Players.getPlayer(player);
-                    playerData.addPoints(totalPoints, player);
+                    playerData.addCash(totalCash, player);
                     removeItemsFromTeam(player.team(), selectedItems);
                     selectedItemsQuantities.remove(player);
                     player.sendMessage(Bundle.get("menu.buypoint.success"));
@@ -97,26 +97,26 @@ public class BuyPoint {
         return true;
     }
 
-    private static int calculateTotalPoints(Map<Item, Integer> selectedItems) {
-        int totalPoints =   0;
+    private static int calculateTotalCash(Map<Item, Integer> selectedItems) {
+        int totalCash =   0;
         for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
-            int quantity = Math.abs(entry.getValue()); // Use absolute value to calculate points
+            int quantity = Math.abs(entry.getValue()); // Use absolute value to calculate Cash
             int minQuantity = getMinQuantityForItem(item);
             int actualQuantity = Math.min(quantity, minQuantity);
             int excessQuantity = Math.max(0, quantity - minQuantity);
     
-            // Calculate points for actualQuantity
+            // Calculate Cash for actualQuantity
             for (int row =   0; row < Currency.items.size(); row++) {
                 Map<String, Object> itemMap = Currency.items.get(row);
                 if (itemMap.get("item") == item) {
                     int pointGain = (int) itemMap.get("gain");
                     int itemPrice = (int) itemMap.get("price");
-                    totalPoints += (float) pointGain / itemPrice * actualQuantity;
+                    totalCash += (float) pointGain / itemPrice * actualQuantity;
                     break;
                 }
             }
-  // If there's excess quantity, calculate points for it
+  // If there's excess quantity, calculate Cash for it
         if (excessQuantity >  0) {
     int itemIndex = -1;
     for (int i =  0; i < Currency.items.size(); i++) {
@@ -126,11 +126,11 @@ public class BuyPoint {
         }
     }
      if (itemIndex != -1) { 
-        totalPoints += (float) ((int) Currency.items.get(itemIndex).get("gain")) / ((int) Currency.items.get(itemIndex).get("price")) * excessQuantity;
+        totalCash += (float) ((int) Currency.items.get(itemIndex).get("gain")) / ((int) Currency.items.get(itemIndex).get("price")) * excessQuantity;
     }
                                     }
                                 }
-        return totalPoints;
+        return totalCash;
     }
 
     private static int getMinQuantityForItem(Item item) {

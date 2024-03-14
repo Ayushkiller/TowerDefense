@@ -41,6 +41,18 @@ public class TowerDefensePlugin extends Plugin {
                 player.sendMessage("[#f]⚠[] [#f]Invalid amount provided.");
                 return;
             }
+    
+            // Check if the player has enough of the item to sell
+            Item itemToSell = findItemByName(itemName);
+            if (itemToSell == null) {
+                player.sendMessage("[#f]⚠[] [#f]Item not found.");
+                return;
+            }
+            if (player.team().items().get(itemToSell) < amount) {
+                player.sendMessage("[#f]⚠[] [#f]You do not have enough of this item to sell.");
+                return;
+            }
+    
             sellItems(player, itemName, amount);
         } else {
             player.sendMessage("[#f]⚠[] [#f]Please specify the item and amount to sell.");
@@ -48,22 +60,22 @@ public class TowerDefensePlugin extends Plugin {
     });
 }
   public void registerServerCommands(CommandHandler handler) {
-      handler.register("death", "<points>", "Adds points to every player", (String[] args, Player player) -> {
+      handler.register("death", "<Cash>", "Adds Cash to every player", (String[] args, Player player) -> {
           if (args.length > 0) {
               try {
-                  int pointsToAdd = Integer.parseInt(args[0]);
+                  int CashToAdd = Integer.parseInt(args[0]);
                   Groups.player.each(p -> {
                       PlayerData playerData = Players.getPlayer(p);
                       if (playerData != null) {
-                          playerData.addPoints(pointsToAdd, p);
+                          playerData.addCash(CashToAdd, p);
                       }
                   });
               } catch (NumberFormatException e) {
                   // Handle the case where the argument is not a valid integer
-                  System.out.println("Invalid number of points provided.");
+                  System.out.println("Invalid number of Cash provided.");
               }
           } else {
-              System.out.println("No points specified.");
+              System.out.println("No Cash specified.");
           }
       });
   }
@@ -84,15 +96,15 @@ public class TowerDefensePlugin extends Plugin {
     }
 
   
-    int pointsGained = calculatePointsGained(itemToSell, price, amount);
+    int CashGained = calculateCashGained(itemToSell, price, amount);
     
-    playerData.addPoints(pointsGained, player);
+    playerData.addCash(CashGained, player);
     removeItemsFromTeam(player.team(), itemToSell, amount);
-    player.sendMessage("Sold " + amount + " " + itemToSell.toString() + ". You gained " + pointsGained + " points.");
+    player.sendMessage("Sold " + amount + " " + itemToSell.toString() + ". You gained " + CashGained + " Cash.");
    
 }
 
-private int calculatePointsGained(Item item, int price, int amount) {
+private int calculateCashGained(Item item, int price, int amount) {
     for (Map<String, Object> itemMap : Currency.items) {
         Item currentItem = (Item) itemMap.get("item");
         if (currentItem == item) {

@@ -40,13 +40,13 @@ public class Players {
                 }
 
                 if (!player.dead() && player.name().equals(playerData.getName()) && player.uuid().equals(playerData.getUuid())) {
-                    float currentPoints = playerData.getPoints();
-                    if (currentPoints != playerData.getLastUpdatedPoints()) {
+                    float currentCash = playerData.getCash();
+                    if (currentCash != playerData.getLastUpdatedCash()) {
                         StringBuilder hud = new StringBuilder();
-                        hud.append("[green]Points for[white] " + playerData.getName() + " - [lime]" + (int) playerData.getPoints() + "\n ");
+                        hud.append("[green]Cash for[white] " + playerData.getName() + " - [lime]" + (int) playerData.getCash() + "\n ");
                         
                         Call.setHudText(player.con, hud.toString());
-                        playerData.setLastUpdatedPoints(currentPoints);
+                        playerData.setLastUpdatedCash(currentCash);
                     }
                 }
                 
