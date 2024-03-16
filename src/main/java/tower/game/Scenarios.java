@@ -1,15 +1,15 @@
 package tower.game;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.ui.Menus;
 import tower.Bundle;
 import tower.PluginLogic;
 import tower.Domain.PlayerData;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class Scenarios {
 
@@ -24,13 +24,16 @@ public class Scenarios {
     };
     private static int globalYesVotes = 0;
     private static int globalNoVotes = 0;
-    private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+      private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     public static void requestDeployment(Player player) {
         if (player == null) {
             System.out.println("Warning: Attempted to request deployment for a null player.");
             return;
         }
         Call.menu(player.con, DeploymentMenu, Bundle.get("deployment.title", player.locale), Bundle.get("deployment.message", player.locale), DeploymentButtons);
+
+        
+        scheduler.schedule(() -> handleDeploymentOption1(player), 30, TimeUnit.SECONDS);
     }
 
     private static void handleDeploymentOption(Player player, int option) {
@@ -44,14 +47,8 @@ public class Scenarios {
                 System.out.println("Yes vote added. Current Yes votes: " + globalYesVotes);
                 break;
         }
-    
-        executor.schedule(() -> {
-            for (Player p : PlayerData.getAllPlayers()) {
-                handleDeploymentOption1(p);
-            }
-        }, 30, TimeUnit.SECONDS);
     }
-    
+
     private static void handleDeploymentOption1(Player player) {
         System.out.println("Handling deployment option for player: " + player.name);
         String message = globalYesVotes > globalNoVotes ? Bundle.get("deployment.success", player.locale) : Bundle.get("deployment.failure", player.locale);
