@@ -46,7 +46,6 @@ public class Players {
                         
                         Call.setHudText(player.con, hud.toString());
                         playerData.setLastUpdatedCash(currentCash);
-                        Scenarios.requestDeployment(player);
                     }
                 }
                 
