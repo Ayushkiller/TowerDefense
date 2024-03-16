@@ -1,8 +1,9 @@
 package tower.game;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import mindustry.gen.Call;
 import mindustry.gen.Player;
@@ -24,16 +25,23 @@ public class Scenarios {
     };
     private static int globalYesVotes = 0;
     private static int globalNoVotes = 0;
-      private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+   
     public static void requestDeployment(Player player) {
         if (player == null) {
             System.out.println("Warning: Attempted to request deployment for a null player.");
             return;
         }
-        Call.menu(player.con, DeploymentMenu, Bundle.get("deployment.title", player.locale), Bundle.get("deployment.message", player.locale), DeploymentButtons);
 
-        
-        scheduler.schedule(() -> handleDeploymentOption1(player), 30, TimeUnit.SECONDS);
+        Call.menu(player.con, DeploymentMenu, Bundle.get("deployment.title", player.locale), Bundle.get("deployment.message", player.locale), DeploymentButtons);
+        Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handleDeploymentOption1(player);
+            }
+        }, 30000); // = 30 seconds
+    
+    
     }
 
     private static void handleDeploymentOption(Player player, int option) {
