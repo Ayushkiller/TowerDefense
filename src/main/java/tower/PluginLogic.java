@@ -26,7 +26,8 @@ import static mindustry.Vars.*;
 import java.util.Map;
 
 public class PluginLogic {
-    private static int initialWave = -1; // Store the initial wave number
+    private static int initialWave = 0; 
+    private static int previousWave = -1; 
     public static float multiplier = 1f;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
     public static void init() {
@@ -174,37 +175,67 @@ public class PluginLogic {
     public static void Help(int globalYesVotes) {
         System.out.println("Help method called with globalYesVotes: " + globalYesVotes);
         if (globalYesVotes > 0) {
-            // Set the initial wave number if it hasn't been set yet
-            if (initialWave == -1) {
-                initialWave = state.wave;
-                System.out.println("Initial wave set to: " + initialWave);
-            }
-    
-            // Check if 30 waves have passed from the initial wave
-            if (state.wave <= initialWave + 30) {
-                Events.on(EventType.UnitSpawnEvent.class, event -> {
-                    // Check if the unit's team is not equal to state.rules.waveTeam
-                    if (!event.unit.team.equals(state.rules.waveTeam)) {
-                        // Kill the unit
-                        event.unit.kill();
-                        System.out.println("Unit killed for not being part of waveTeam. Current wave: " + state.wave);
-                        Call.sendMessage("[lime]Thanks for providing support to Sector 31. Unit has been deployed there.[red] " + (30 - initialWave) + "[lime] waves remaining to Transfer Units.");
-                    }
-                });
-            }
-            // Check if the current wave is 30 and add cash of 350 to all players
-            if (state.wave == initialWave + 30) {
-                System.out.println("Adding cash to all players for wave: " + state.wave);
-                Groups.player.each(p -> {
-                    PlayerData playerData = Players.getPlayer(p);
-                    if (playerData != null) {
-                        playerData.addCash(350, p);
-                        System.out.println("Cash added to player: " + p.name);
-                        Call.sendMessage("[lime]Sector 31 Gave us cash for helping them.\nWe Got 200 Cash each.");
-                    }
-                });
-            }
+            setInitialWaveIfNotSet();
+            handleUnitSpawnEvent();
+            addCashToAllPlayersIfWaveIs30();
+            initialWave=30;
         }
     }
-
+    private static void setInitialWaveIfNotSet() {
+        if (initialWave == 30) {
+            // Check if the current wave is different from the previous wave
+            if (state.wave != previousWave) {
+                initialWave--;
+                System.out.println("Wave changed. Reduced initialWave to: " + initialWave);
+                // Update the previous wave number to the current wave number
+                previousWave = state.wave;
+            }
+        }
+        // Stop the action if initialWave is 0
+        if (initialWave == 0) {
+            System.out.println("Initial wave reached zero. Stopping actions.");
+            return; // Stop the method execution
+        }
+    }
+    
+    private static void handleUnitSpawnEvent() {
+        // Stop the action if initialWave is 0
+        if (initialWave == 0) {
+            System.out.println("Initial wave reached zero. Stopping actions.");
+            return; // Stop the method execution
+        }
+    
+        if (initialWave > 0) {
+            Events.on(EventType.UnitSpawnEvent.class, event -> {
+                if (!event.unit.team.equals(state.rules.waveTeam)) {
+                    event.unit.kill();
+                    System.out.println("Unit killed for not being part of waveTeam. Current wave: " + initialWave);
+                    Call.sendMessage("[lime]Thanks for providing support to Sector 31. Unit has been deployed there.[red] " + (initialWave) + "[lime] waves remaining to Transfer Remaning Units.");
+                }
+            });
+        }
+    }
+    
+    private static void addCashToAllPlayersIfWaveIs30() {
+        // Stop the action if initialWave is 0
+        if (initialWave == 0) {
+            System.out.println("Initial wave reached zero. Stopping actions.");
+            return; // Stop the method execution
+        }
+    
+        if (initialWave == 0) {
+            System.out.println("Adding cash to all players for wave: " + state.wave);
+            Groups.player.each(p -> {
+                PlayerData playerData = Players.getPlayer(p);
+                if (playerData != null) {
+                    playerData.addCash(350, p);
+                    System.out.println("Cash added to player: " + p.name);
+                    Call.sendMessage("[lime]Sector 31 Gave us cash for helping them.\nWe Got 200 Cash each.");
+                }
+            });
+            // Reset initialWave and previousWave to their default values
+            initialWave = 0;
+            previousWave = -1;
+        }
+    }
 }
