@@ -77,6 +77,30 @@ public class PluginLogic {
             if (state.wave == 10) {
                 Scenarios.requestDeploymentForAllPlayers();
             }
+            if (state.wave == 50) {
+                Scenarios.requestDeploymentForAllPlayers();
+            }
+            if (state.wave == 100) {
+                Scenarios.requestDeploymentForAllPlayers();
+            }
+            if (state.wave == 150) {
+                Scenarios.requestDeploymentForAllPlayers();
+            }
+            if (state.wave == 200) {
+                Scenarios.requestDeploymentForAllPlayers();
+            }
+            if (state.wave == 250) {
+                Scenarios.requestDeploymentForAllPlayers();
+            }
+            if (state.wave == 300) {
+                Scenarios.requestDeploymentForAllPlayers();
+            }
+            if (state.wave == 350) {
+                Scenarios.requestDeploymentForAllPlayers();
+            }
+            if (state.wave == 400) {
+                Scenarios.requestDeploymentForAllPlayers();
+            }
             if (state.wave <= 10) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 1.5f);
             } else if (state.wave > 10 && state.wave <= 30) {
