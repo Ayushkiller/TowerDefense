@@ -26,6 +26,10 @@ public class Scenarios {
     private static int globalNoVotes = 0;
     private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     public static void requestDeployment(Player player) {
+        if (player == null) {
+            System.out.println("Warning: Attempted to request deployment for a null player.");
+            return;
+        }
         Call.menu(player.con, DeploymentMenu, Bundle.get("deployment.title", player.locale), Bundle.get("deployment.message", player.locale), DeploymentButtons);
     }
 
