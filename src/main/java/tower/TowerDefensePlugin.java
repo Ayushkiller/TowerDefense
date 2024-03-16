@@ -13,6 +13,7 @@ import tower.Domain.CustomStatusEffects;
 import tower.Domain.PlayerData;
 import tower.commands.BuyPoint;
 import tower.game.Loader;
+import tower.game.Scenarios;
 import tower.menus.Menu;
 import tower.pathing.TowerPathfinder;
 import useful.Bundle;
@@ -78,6 +79,10 @@ public class TowerDefensePlugin extends Plugin {
               System.out.println("No Cash specified.");
           }
       });
+      handler.register("deployall", "Requests deployment for all players", (String[] args, Player player) -> {
+        requestDeploymentForAll();
+        player.sendMessage("Deployment requested for all players.");
+    });
   }
   
   private void sellItems(Player player, String itemName, int amount) {
@@ -140,5 +145,8 @@ private int getItemPrice(Item item) {
         }
     }
     return 0;
+}
+private void requestDeploymentForAll() {
+    Scenarios.requestDeploymentForAllPlayers();
 }
 }

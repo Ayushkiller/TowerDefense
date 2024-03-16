@@ -21,7 +21,6 @@ import mindustry.world.meta.BlockFlag;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
 import useful.Bundle;
-import tower.game.Scenarios;
 import static mindustry.Vars.*;
 
 import java.util.Map;
@@ -30,7 +29,6 @@ public class PluginLogic {
     private static int initialWave = -1; // Store the initial wave number
     public static float multiplier = 1f;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
-    private static boolean deploymentRequested = false;
     public static void init() {
         drops = new ObjectMap<>();
         for (Map<String, Object> dropEntry : Unitsdrops.drops) {
@@ -74,50 +72,6 @@ public class PluginLogic {
 
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
         Events.on(EventType.WaveEvent.class, event -> {
-            if (state.wave == 10 && !deploymentRequested) {
-                Scenarios.requestDeploymentForAllPlayers();
-                deploymentRequested = true; 
-            }
-            if (state.wave == 50) {
-                deploymentRequested = false; 
-                Scenarios.requestDeploymentForAllPlayers();
-                deploymentRequested = true; 
-            }
-            if (state.wave == 100) {
-                deploymentRequested = false; 
-                Scenarios.requestDeploymentForAllPlayers();
-                deploymentRequested = true; 
-            }
-            if (state.wave == 150) {
-                deploymentRequested = false; 
-                Scenarios.requestDeploymentForAllPlayers();
-                deploymentRequested = true; 
-            }
-            if (state.wave == 200) {
-                deploymentRequested = false; 
-                Scenarios.requestDeploymentForAllPlayers();
-                deploymentRequested = true; 
-            }
-            if (state.wave == 250) {
-                deploymentRequested = false; 
-                Scenarios.requestDeploymentForAllPlayers();
-                deploymentRequested = true; 
-            }
-            if (state.wave == 300) {
-                deploymentRequested = false; 
-                Scenarios.requestDeploymentForAllPlayers();
-                deploymentRequested = true; 
-            }
-            if (state.wave == 350) {
-                deploymentRequested = false; 
-                Scenarios.requestDeploymentForAllPlayers();
-                deploymentRequested = true; 
-            }
-            if (state.wave == 400) {
-                deploymentRequested = false; 
-                Scenarios.requestDeploymentForAllPlayers();
-                deploymentRequested = true; 
-            }
             if (state.wave <= 10) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 1.5f);
             } else if (state.wave > 10 && state.wave <= 30) {

@@ -37,9 +37,11 @@ public class Scenarios {
         switch (option) {
             case 0:
                 globalNoVotes++;
+                System.out.println("No vote added. Current No votes: " + globalNoVotes);
                 break;
             case 1:
                 globalYesVotes++;
+                System.out.println("Yes vote added. Current Yes votes: " + globalYesVotes);
                 break;
         }
     
@@ -48,9 +50,8 @@ public class Scenarios {
                 handleDeploymentOption1(p);
             }
         }, 30, TimeUnit.SECONDS);
-        
     }
-
+    
     private static void handleDeploymentOption1(Player player) {
         System.out.println("Handling deployment option for player: " + player.name);
         String message = globalYesVotes > globalNoVotes ? Bundle.get("deployment.success", player.locale) : Bundle.get("deployment.failure", player.locale);
@@ -67,7 +68,9 @@ public class Scenarios {
         globalYesVotes = 0;
         globalNoVotes = 0;
         System.out.println("Resetting votes for player: " + player.name);
+        System.out.println("Current Yes votes: " + globalYesVotes + ", Current No votes: " + globalNoVotes);
     }
+
 
     public static void requestDeploymentForAllPlayers() {
         for (Player player : PlayerData.getAllPlayers()) {
