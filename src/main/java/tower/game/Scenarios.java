@@ -71,7 +71,11 @@ public class Scenarios {
 
     public static void requestDeploymentForAllPlayers() {
         for (Player player : PlayerData.getAllPlayers()) {
-            requestDeployment(player);
+            if (player != null) {
+                requestDeployment(player);
+            } else {
+                System.out.println("Warning: Skipping null player.");
+            }
         }
     }
 }
