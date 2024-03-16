@@ -182,7 +182,6 @@ public class PluginLogic {
     
             // Check if 30 waves have passed from the initial wave
             if (state.wave <= initialWave + 30) {
-                System.out.println("Registering UnitSpawnEvent listener for wave: " + state.wave);
                 Events.on(EventType.UnitSpawnEvent.class, event -> {
                     // Check if the unit's team is not equal to state.rules.waveTeam
                     if (!event.unit.team.equals(state.rules.waveTeam)) {
