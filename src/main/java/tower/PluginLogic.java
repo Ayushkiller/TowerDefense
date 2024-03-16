@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.game.EventType;
+import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.net.Administration;
@@ -60,12 +61,13 @@ public class PluginLogic {
             float damage = (unit.health + unit.shield)/ Mathf.sqrt(multiplier);
             // Ensure damage does not exceed the core's health
             damage = Math.min(damage, core.health);
-            core.damage(damage, true);
+            core.damage(Team.crux,damage);
+            core.damage(1,true);
             unit.kill();
             
             // Check if the core's health is 0 or less and set to 1
-            if(core.health <= 0) {
-                core.health = 1;
+            if(core.block.health <= 0) {
+                core.block.health = 1;
             }
         }), 0f, 1f);
         Timer.schedule(()->Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
