@@ -178,7 +178,8 @@ public class PluginLogic {
             setInitialWaveIfNotSet();
             handleUnitSpawnEvent();
             addCashToAllPlayersIfWaveIs30();
-            initialWave=30;
+            initialWave = 30;
+            System.out.println("Initial wave set to 30."); // Added logging
         }
     }
     private static void setInitialWaveIfNotSet() {
@@ -192,7 +193,7 @@ public class PluginLogic {
             }
         }
         // Stop the action if initialWave is 0
-        if (initialWave == 0) {
+        if (initialWave == 1) {
             System.out.println("Initial wave reached zero. Stopping actions.");
             return; // Stop the method execution
         }
@@ -200,7 +201,7 @@ public class PluginLogic {
     
     private static void handleUnitSpawnEvent() {
         // Stop the action if initialWave is 0
-        if (initialWave == 0) {
+        if (initialWave == 1) {
             System.out.println("Initial wave reached zero. Stopping actions.");
             return; // Stop the method execution
         }
@@ -217,13 +218,8 @@ public class PluginLogic {
     }
     
     private static void addCashToAllPlayersIfWaveIs30() {
-        // Stop the action if initialWave is 0
-        if (initialWave == 0) {
-            System.out.println("Initial wave reached zero. Stopping actions.");
-            return; // Stop the method execution
-        }
-    
-        if (initialWave == 0) {
+        // Only proceed if initialWave is 1
+        if (initialWave == 1) {
             System.out.println("Adding cash to all players for wave: " + state.wave);
             Groups.player.each(p -> {
                 PlayerData playerData = Players.getPlayer(p);
