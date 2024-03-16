@@ -5,9 +5,11 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.Vars;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.game.EventType;
+import mindustry.game.Rules;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -20,15 +22,15 @@ import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
+import tower.game.Scenarios;
 import useful.Bundle;
 import static mindustry.Vars.*;
 
 import java.util.Map;
 
 public class PluginLogic {
-    private static int initialWave = 0; 
-    private static int previousWave = -1; 
     public static float multiplier = 1f;
+    public static boolean multiplierAdjusted = false;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
     public static void init() {
         drops = new ObjectMap<>();
@@ -73,6 +75,37 @@ public class PluginLogic {
 
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
         Events.on(EventType.WaveEvent.class, event -> {
+            if (state.wave == 10) {
+                Scenarios.requestDeploymentForAllPlayers(); 
+            }
+            if (state.wave == 50) {
+                Scenarios.requestDeploymentForAllPlayers(); 
+            }
+            if (state.wave == 100) {
+                Scenarios.requestDeploymentForAllPlayers(); 
+            }
+            if (state.wave == 150) {
+                Scenarios.requestDeploymentForAllPlayers(); 
+            }
+            if (state.wave == 200) {
+                Scenarios.requestDeploymentForAllPlayers(); 
+            }
+            if (state.wave == 250) {
+                Scenarios.requestDeploymentForAllPlayers(); 
+            }
+            if (state.wave == 300) {
+                Scenarios.requestDeploymentForAllPlayers(); 
+            }
+            if (state.wave == 350) {
+                Scenarios.requestDeploymentForAllPlayers(); 
+            }
+            if (state.wave == 400) {
+                Scenarios.requestDeploymentForAllPlayers(); 
+            }
+            if (state.wave == 450) {
+                Scenarios.requestDeploymentForAllPlayers(); 
+            }
+
             if (state.wave <= 10) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 1.5f);
             } else if (state.wave > 10 && state.wave <= 30) {
@@ -94,24 +127,27 @@ public class PluginLogic {
         });
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
         Events.on(EventType.UnitDestroyEvent.class, event -> {
-          if (event.unit.team != state.rules.waveTeam) return;
-
-          var core = event.unit.closestEnemyCore();
-          var drop = drops.get(event.unit.type);
-
-          if (core == null || drop == null) return;
-
-          var builder = new StringBuilder();
-
-          drop.each(stack -> {
-          int amount = Mathf.random(stack.amount - stack.amount /   2, stack.amount + stack.amount /   2);
-
-          builder.append("[accent]+").append(amount).append(stack.item.emoji()).append("  ");
-          Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
-        });
-
-        Call.label(builder.toString(),   1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
-
+            if (event.unit.team != state.rules.waveTeam) return;
+        
+            var core = event.unit.closestEnemyCore();
+            var drop = drops.get(event.unit.type);
+        
+            if (core == null || drop == null) return;
+        
+            var builder = new StringBuilder();
+        
+            drop.each(stack -> {
+                // Adjust the amount based on the multiplierAdjusted flag
+                int amount = multiplierAdjusted ? (int) (stack.amount * 0.75f) : Mathf.random(stack.amount - stack.amount / 2, stack.amount + stack.amount / 2);
+        
+                builder.append("[accent]+").append(amount).append(stack.item.emoji()).append(" ");
+                Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
+            });
+        
+            Call.label(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
+        
+            Timer.schedule(() -> multiplierAdjusted = false, 180f);
+        
         // Distribute Cash to all players
           Players.forEach(playerData -> {
           if (playerData != null) {
@@ -166,72 +202,30 @@ public class PluginLogic {
     }
     public static void adjustMultiplierBasedOnNoVotes(int globalNoVotes) {
         if (globalNoVotes > 0) {
-            float increaseAmount = Mathf.random(0.15f, 2f);
+            float increaseAmount = Mathf.random(0.0f, state.wave * 0.02f);
             multiplier += increaseAmount;
-            System.out.println("Enemy got a buff. Increase amount: " + increaseAmount + ", New multiplier: " + multiplier);
-            Call.sendMessage("[red]Enemy got a buff! They are now stronger.");
+            Call.sendMessage("[red]Enemy got a buff!After capturing The sector. They are now stronger.");
+            multiplierAdjusted = true;
         }
     }
     public static void Help(int globalYesVotes) {
-        System.out.println("Help method called with globalYesVotes: " + globalYesVotes);
         if (globalYesVotes > 0) {
-            setInitialWaveIfNotSet();
-            handleUnitSpawnEvent();
-            addCashToAllPlayersIfWaveIs30();
-            initialWave = 30;
-            System.out.println("Initial wave set to 30."); // Added logging
-        }
-    }
-    private static void setInitialWaveIfNotSet() {
-        if (initialWave == 30) {
-            // Check if the current wave is different from the previous wave
-            if (state.wave != previousWave) {
-                initialWave--;
-                System.out.println("Wave changed. Reduced initialWave to: " + initialWave);
-                // Update the previous wave number to the current wave number
-                previousWave = state.wave;
-            }
-        }
-        // Stop the action if initialWave is 0
-        if (initialWave == 1) {
-            System.out.println("Initial wave reached zero. Stopping actions.");
-            return; // Stop the method execution
-        }
-    }
-    
-    private static void handleUnitSpawnEvent() {
-        // Stop the action if initialWave is 0
-        if (initialWave == 1) {
-            System.out.println("Initial wave reached zero. Stopping actions.");
-            return; // Stop the method execution
-        }
-    
-        if (initialWave > 0) {
-            Events.on(EventType.UnitSpawnEvent.class, event -> {
-                if (!event.unit.team.equals(state.rules.waveTeam)) {
-                    event.unit.kill();
-                    System.out.println("Unit killed for not being part of waveTeam. Current wave: " + initialWave);
-                    Call.sendMessage("[lime]Thanks for providing support to Sector 31. Unit has been deployed there.[red] " + (initialWave) + "[lime] waves remaining to Transfer Remaning Units.");
-                }
-            });
-        }
-    }
-    
-    private static void addCashToAllPlayersIfWaveIs30() {
-        // Only proceed if initialWave is 1
-        if (initialWave == 1) {
-            System.out.println("Adding cash to all players for wave: " + state.wave);
-            Groups.player.each(p -> {
-                PlayerData playerData = Players.getPlayer(p);
-                if (playerData != null) {
-                    playerData.addCash(350, p);
-                    System.out.println("Cash added to player: " + p.name);
-                    Call.sendMessage("[lime]Sector 31 Gave us cash for helping them.\nWe Got 200 Cash each.");
-                }
-            });
-            // Reset initialWave and previousWave to their default values
-            initialWave = 0;
-            previousWave = -1;
+            Timer.schedule(() -> {
+                Groups.player.each(p -> {
+                    PlayerData playerData = Players.getPlayer(p);
+                    if (playerData != null) {
+                        playerData.addCash(300, p);
+                        Team team = Team.sharded;
+                        Rules.TeamRule teamRule = Vars.state.rules.teams.get(team);
+                        teamRule.blockDamageMultiplier = 1f;
+                    }
+                });
+            }, 120f); 
+            Team team = Team.sharded;
+            Rules.TeamRule teamRule = Vars.state.rules.teams.get(team);
+            teamRule.blockDamageMultiplier = 0.5f;
+            Call.sendMessage("[red]Due to deployment of team of specialised engineers.Our current Turrets damage is reduced to 50%");
+            Call.sendMessage("[lime]New Team of engineers will arrive soon.");
         }
     }
 }
