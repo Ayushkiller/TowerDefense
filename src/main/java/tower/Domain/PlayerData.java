@@ -2,13 +2,8 @@ package tower.Domain;
 
 
 
-import static mindustry.Vars.player;
-
-import java.util.Collection;
-
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
-import java.util.Map;
 import tower.Players;
 
 
@@ -112,23 +107,10 @@ public class PlayerData {
         this.name = player.name();
         this.Cash= 10;
     }
-    public static Player[] getAllPlayers() {    
-            Collection<PlayerData> allPlayerData = Players.players.values();
-        Player[] allPlayers = new Player[allPlayerData.size()];
-        int index = 0;
-        for (PlayerData playerData : allPlayerData) {
-
-            for (Map.Entry<String, PlayerData> entry : Players.players.entrySet()) {
-                if (entry.getValue().getUuid().equals(playerData.getUuid())) {
-
-                    allPlayers[index++] = entry.getValue().getPlayer();
-                }
-            }
-        }
-        
-        return allPlayers;
+    public static Player[] getAllPlayers() {
+        // Convert the values of the players map (which are PlayerData objects) to Player objects
+        return Players.players.values().stream()
+                       .map(PlayerData::getUnit) // Assuming getUnit() returns the Player object
+                       .toArray(Player[]::new);
     }
-    public Player getPlayer() {
-    return player;
-}
 }

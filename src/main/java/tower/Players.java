@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+
 public class Players {
     public static final Map<String, PlayerData> players = new HashMap<>();
 
@@ -23,7 +24,7 @@ public class Players {
     public static void clearMap() {
         players.clear();
     }
-        public static void forEach(Consumer<PlayerData> action) {
+    public static void forEach(Consumer<PlayerData> action) {
         players.values().forEach(action);
     }
 
@@ -41,7 +42,6 @@ public class Players {
                     if (currentCash != playerData.getLastUpdatedCash()) {
                         StringBuilder hud = new StringBuilder();
                         hud.append("[green]Cash for[white] " + playerData.getName() + " - [lime]" + (int) playerData.getCash() + "\n ");
-                        
                         Call.setHudText(player.con, hud.toString());
                         playerData.setLastUpdatedCash(currentCash);
                     }

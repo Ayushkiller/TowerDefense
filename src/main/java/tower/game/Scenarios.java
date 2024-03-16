@@ -25,13 +25,6 @@ public class Scenarios {
     private static int globalYesVotes = 0;
     private static int globalNoVotes = 0;
     private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    public static void requestDeploymentForAllPlayers() {
-        Player[] allPlayers = PlayerData.getAllPlayers();
-        for (Player player : allPlayers) {
-            Scenarios.requestDeployment(player);
-        }
-    }
-
     public static void requestDeployment(Player player) {
         Call.menu(player.con, DeploymentMenu, Bundle.get("deployment.title", player.locale), Bundle.get("deployment.message", player.locale), DeploymentButtons);
     }
@@ -46,28 +39,35 @@ public class Scenarios {
                 break;
         }
     
-        // Check if all players have voted globally
-        if (globalYesVotes + globalNoVotes == PlayerData.getTotalPlayers()) {
-            // Schedule handleDeploymentOption1 to be called 30 seconds later for all players
-            executor.schedule(() -> {
-                Player[] allPlayers = PlayerData.getAllPlayers();
-                for (Player p : allPlayers) {
-                    handleDeploymentOption1(p);
-                }
-            }, 30, TimeUnit.SECONDS);
-        }
+        executor.schedule(() -> {
+            for (Player p : PlayerData.getAllPlayers()) {
+                handleDeploymentOption1(p);
+            }
+        }, 30, TimeUnit.SECONDS);
+        
     }
 
     private static void handleDeploymentOption1(Player player) {
+        System.out.println("Handling deployment option for player: " + player.name);
         String message = globalYesVotes > globalNoVotes ? Bundle.get("deployment.success", player.locale) : Bundle.get("deployment.failure", player.locale);
+        System.out.println("Message for player: " + message);
         Call.menu(player.con, DeploymentMenuClose, Bundle.get("deployment.title", player.locale), message, DeploymentButtonsClose);
         if (globalYesVotes > globalNoVotes) {
+            System.out.println("Deployment successful with " + globalYesVotes + " votes.");
             PluginLogic.Help(globalYesVotes);
         }
         if (globalNoVotes > globalYesVotes) {
+            System.out.println("Deployment failed with " + globalNoVotes + " votes.");
             PluginLogic.adjustMultiplierBasedOnNoVotes(globalNoVotes);
         }
         globalYesVotes = 0;
         globalNoVotes = 0;
+        System.out.println("Resetting votes for player: " + player.name);
+    }
+
+    public static void requestDeploymentForAllPlayers() {
+        for (Player player : PlayerData.getAllPlayers()) {
+            requestDeployment(player);
+        }
     }
 }

@@ -193,41 +193,48 @@ public class PluginLogic {
         return !tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
     }
     public static void adjustMultiplierBasedOnNoVotes(int globalNoVotes) {
-     if (globalNoVotes > 0) {
-        float increaseAmount = Mathf.random(0.15f, 2f);
-        multiplier += increaseAmount;
-     }
+        if (globalNoVotes > 0) {
+            float increaseAmount = Mathf.random(0.15f, 2f);
+            multiplier += increaseAmount;
+            System.out.println("Enemy got a buff. Increase amount: " + increaseAmount + ", New multiplier: " + multiplier);
+            Call.sendMessage("[red]Enemy got a buff! They are now stronger.");
+        }
+    }
+    public static void Help(int globalYesVotes) {
+        System.out.println("Help method called with globalYesVotes: " + globalYesVotes);
+        if (globalYesVotes > 0) {
+            // Set the initial wave number if it hasn't been set yet
+            if (initialWave == -1) {
+                initialWave = state.wave;
+                System.out.println("Initial wave set to: " + initialWave);
+            }
+    
+            // Check if 30 waves have passed from the initial wave
+            if (state.wave <= initialWave + 30) {
+                System.out.println("Registering UnitSpawnEvent listener for wave: " + state.wave);
+                Events.on(EventType.UnitSpawnEvent.class, event -> {
+                    // Check if the unit's team is not equal to state.rules.waveTeam
+                    if (!event.unit.team.equals(state.rules.waveTeam)) {
+                        // Kill the unit
+                        event.unit.kill();
+                        System.out.println("Unit killed for not being part of waveTeam. Current wave: " + state.wave);
+                        Call.sendMessage("[lime]Thanks for providing support to Sector 31. Unit has been deployed there.[red] " + (30 - initialWave) + "[lime] waves remaining to Transfer Units.");
+                    }
+                });
+            }
+            // Check if the current wave is 30 and add cash of 350 to all players
+            if (state.wave == initialWave + 30) {
+                System.out.println("Adding cash to all players for wave: " + state.wave);
+                Groups.player.each(p -> {
+                    PlayerData playerData = Players.getPlayer(p);
+                    if (playerData != null) {
+                        playerData.addCash(350, p);
+                        System.out.println("Cash added to player: " + p.name);
+                        Call.sendMessage("[lime]Sector 31 Gave us cash for helping them.\nWe Got 200 Cash each.");
+                    }
+                });
+            }
+        }
     }
 
-   public static void Help(int globalYesVotes) {
-    if (globalYesVotes > 0) {
-        // Set the initial wave number if it hasn't been set yet
-        if (initialWave == -1) {
-            initialWave = state.wave;
-        }
-
-        // Check if 30 waves have passed from the initial wave
-        if (state.wave <= initialWave + 30) {
-            Events.on(EventType.UnitSpawnEvent.class, event -> {
-                // Check if the unit's team is not equal to state.rules.waveTeam
-                if (!event.unit.team.equals(state.rules.waveTeam)) {
-                    // Kill the unit
-                    event.unit.kill();
-                    Call.sendMessage("[lime]Thanks for providing support to Sector 31. Unit has been deployed there.[red] " + ( 30 - initialWave) + "[lime] waves remaining to Transfer Units.");
-                }
-            });
-        }
-                // Check if the current wave is 30 and add cash of 350 to all players
-                if (state.wave == initialWave + 30) {
-                  Groups.player.each(p -> {
-                      PlayerData playerData = Players.getPlayer(p);
-                      if (playerData != null) {
-                          playerData.addCash(350, p);
-                          Call.sendMessage("[lime]Sector 31 Gave us cash for helping them.\nWe Got 200 Cash each.");
-                      }
-                  });
-                }
-            
-    }
-   }
 }
