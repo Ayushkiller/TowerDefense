@@ -4,14 +4,12 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import tower.Domain.PlayerData;
-import tower.game.Scenarios;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class Players {
-    private static final Map<String, PlayerData> players = new HashMap<>();
+    public static final Map<String, PlayerData> players = new HashMap<>();
 
     public static PlayerData getPlayer(Player player) {
         if (!players.containsKey(player.uuid())) {
@@ -47,18 +45,6 @@ public class Players {
                         Call.setHudText(player.con, hud.toString());
                         playerData.setLastUpdatedCash(currentCash);
                     }
-                }
-                
-            }
-        });
-    }
-    public static void forAll() {
-        Groups.player.each(player -> {
-            PlayerData playerData = Players.getPlayer(player);
-            // Ensure playerData is not null before proceeding
-            if (playerData != null) {
-                if (!player.dead() && player.name().equals(playerData.getName()) && player.uuid().equals(playerData.getUuid())) {
-                    Scenarios.requestDeployment(player);
                 }
                 
             }

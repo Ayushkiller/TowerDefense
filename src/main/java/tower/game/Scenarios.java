@@ -25,6 +25,12 @@ public class Scenarios {
     private static int globalYesVotes = 0;
     private static int globalNoVotes = 0;
     private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    public static void requestDeploymentForAllPlayers() {
+        Player[] allPlayers = PlayerData.getAllPlayers();
+        for (Player player : allPlayers) {
+            Scenarios.requestDeployment(player);
+        }
+    }
 
     public static void requestDeployment(Player player) {
         Call.menu(player.con, DeploymentMenu, Bundle.get("deployment.title", player.locale), Bundle.get("deployment.message", player.locale), DeploymentButtons);
@@ -39,11 +45,16 @@ public class Scenarios {
                 globalYesVotes++;
                 break;
         }
-
+    
         // Check if all players have voted globally
         if (globalYesVotes + globalNoVotes == PlayerData.getTotalPlayers()) {
-            // Schedule handleDeploymentOption1 to be called 30 seconds later
-            executor.schedule(() -> handleDeploymentOption1(player), 30, TimeUnit.SECONDS);
+            // Schedule handleDeploymentOption1 to be called 30 seconds later for all players
+            executor.schedule(() -> {
+                Player[] allPlayers = PlayerData.getAllPlayers();
+                for (Player p : allPlayers) {
+                    handleDeploymentOption1(p);
+                }
+            }, 30, TimeUnit.SECONDS);
         }
     }
 

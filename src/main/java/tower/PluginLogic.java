@@ -20,7 +20,7 @@ import mindustry.world.meta.BlockFlag;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
 import useful.Bundle;
-
+import tower.game.Scenarios;
 import static mindustry.Vars.*;
 
 import java.util.Map;
@@ -73,7 +73,7 @@ public class PluginLogic {
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
         Events.on(EventType.WaveEvent.class, event -> {
             if (state.wave == 10) {
-                Players.forAll();
+                Scenarios.requestDeploymentForAllPlayers();
             }
             if (state.wave <= 10) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 1.5f);

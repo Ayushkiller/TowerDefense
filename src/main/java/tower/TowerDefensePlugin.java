@@ -13,7 +13,6 @@ import tower.Domain.CustomStatusEffects;
 import tower.Domain.PlayerData;
 import tower.commands.BuyPoint;
 import tower.game.Loader;
-import tower.game.Scenarios;
 import tower.menus.Menu;
 import tower.pathing.TowerPathfinder;
 import useful.Bundle;
@@ -79,15 +78,6 @@ public class TowerDefensePlugin extends Plugin {
               System.out.println("No Cash specified.");
           }
       });
-      handler.register("deploy", "Initiates a deployment request for all players", (String[] args, Player player) -> {
-    // Iterate over all players and call the requestDeployment method for each
-    Players.forEach(playerData -> {
-        if (playerData != null) {
-            Scenarios.requestDeployment(player);
-        }
-    });
-    System.out.println("Deployment request has been initiated for all players.");
-});
   }
   
   private void sellItems(Player player, String itemName, int amount) {
