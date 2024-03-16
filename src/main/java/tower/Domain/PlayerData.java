@@ -13,7 +13,7 @@ import mindustry.gen.Unit;
  * the unit they are controlling, Cash accumulated, and other game-related data.
  */
 public class PlayerData {
-
+    private static int totalPlayers = 0;
     private Unit unit;
     private float hp;
     private String uuid;
@@ -36,12 +36,10 @@ public class PlayerData {
         // If Cash to add is positive, add them to the player's Cash
         this.Cash += CashToAdd;
     }
-    public void addKills (int amount) {
-    }
 
-    public void setKills (int amount) {
+    public static int getTotalPlayers() {
+        return totalPlayers;
     }
-
     public void addCash(float amount, Player player) {
         this.Cash += amount;
    
@@ -102,6 +100,7 @@ public class PlayerData {
 
     public PlayerData(Player player) {
         this.uuid = player.uuid();
+        totalPlayers++; 
         player.ip();
         this.hp = player.unit().health();
         this.name = player.name();

@@ -4,8 +4,7 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import tower.Domain.PlayerData;
-
-
+import tower.game.Scenarios;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,13 +46,25 @@ public class Players {
                         
                         Call.setHudText(player.con, hud.toString());
                         playerData.setLastUpdatedCash(currentCash);
+                        Scenarios.requestDeployment(player);
                     }
                 }
                 
             }
         });
     }
-    
+    public static void forAll() {
+        Groups.player.each(player -> {
+            PlayerData playerData = Players.getPlayer(player);
+            // Ensure playerData is not null before proceeding
+            if (playerData != null) {
+                if (!player.dead() && player.name().equals(playerData.getName()) && player.uuid().equals(playerData.getUuid())) {
+                    Scenarios.requestDeployment(player);
+                }
+                
+            }
+        });
+    }
 
 
 }

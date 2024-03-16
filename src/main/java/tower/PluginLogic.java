@@ -9,6 +9,7 @@ import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
+import mindustry.gen.Groups;
 import mindustry.net.Administration;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -16,7 +17,7 @@ import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
-
+import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
 import useful.Bundle;
 
@@ -25,7 +26,7 @@ import static mindustry.Vars.*;
 import java.util.Map;
 
 public class PluginLogic {
-
+    private static int initialWave = -1; // Store the initial wave number
     public static float multiplier = 1f;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
     
@@ -55,13 +56,14 @@ public class PluginLogic {
 
         Timer.schedule(()->state.rules.waveTeam.data().units.each(unit->{
             var core = unit.closestEnemyCore();
-            if(core == null || unit.dst(core) > 60f) return;
-            float damage = unit.health + unit.shield / Mathf.sqrt(multiplier);
+            if(core == null || unit.dst(core) > 80f || core.health <= 0) return; // Check if core is null, out of range, or already dead
+            float damage = (unit.health + unit.shield)/ Mathf.sqrt(multiplier);
+            // Ensure damage does not exceed the core's health
+            damage = Math.min(damage, core.health);
             core.damage(damage, true);
             unit.kill();
             
             // Check if the core's health is 0 or less and set to 1
-        
             if(core.health <= 0) {
                 core.health = 1;
             }
@@ -70,13 +72,12 @@ public class PluginLogic {
 
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
         Events.on(EventType.WaveEvent.class, event -> {
-            // Calculate the multiplier based on the wave number
-            // For waves 1 to 8, increase the multiplier slowly
-            // After wave 8, increase the multiplier rapidly
+            if (state.wave == 10) {
+                Players.forAll();
+            }
             if (state.wave <= 10) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 1.5f);
             } else if (state.wave > 10 && state.wave <= 30) {
-                // After wave 8 and before wave 30, increase the multiplier rapidly
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 3f);
             } else if (state.wave > 30 && state.wave <= 60) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 3.5f);
@@ -95,32 +96,32 @@ public class PluginLogic {
         });
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
         Events.on(EventType.UnitDestroyEvent.class, event -> {
-        if (event.unit.team != state.rules.waveTeam) return;
+          if (event.unit.team != state.rules.waveTeam) return;
 
-        var core = event.unit.closestEnemyCore();
-        var drop = drops.get(event.unit.type);
+          var core = event.unit.closestEnemyCore();
+          var drop = drops.get(event.unit.type);
 
-        if (core == null || drop == null) return;
+          if (core == null || drop == null) return;
 
-        var builder = new StringBuilder();
+          var builder = new StringBuilder();
 
-        drop.each(stack -> {
-        int amount = Mathf.random(stack.amount - stack.amount /   2, stack.amount + stack.amount /   2);
+          drop.each(stack -> {
+          int amount = Mathf.random(stack.amount - stack.amount /   2, stack.amount + stack.amount /   2);
 
-        builder.append("[accent]+").append(amount).append(stack.item.emoji()).append("  ");
-        Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
+          builder.append("[accent]+").append(amount).append(stack.item.emoji()).append("  ");
+          Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x, event.unit.y, core);
         });
 
         Call.label(builder.toString(),   1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
 
         // Distribute Cash to all players
-        Players.forEach(playerData -> {
-         if (playerData != null) {
+          Players.forEach(playerData -> {
+          if (playerData != null) {
             float reductionPercentage = playerData.calculateReductionPercentage(playerData.getCash());
             playerData.addCashWithReduction(reductionPercentage);
-          }
+           }
+           });
          });
-      });
         Events.on(EventType.UnitSpawnEvent.class, event->{
 
             if(event.unit.team != state.rules.waveTeam) 
@@ -142,6 +143,7 @@ public class PluginLogic {
             event.unit.type.speed = 1.5f;
             event.unit.type.range = -1f;
             event.unit.type.hovering = true;
+            event.unit.disarmed = true;
             event.unit.type.abilities.clear();
             event.unit.type.crashDamageMultiplier = 0f;
             event.unit.type.crushDamage = 0f;
@@ -164,4 +166,42 @@ public class PluginLogic {
     public static boolean canBePlaced(Tile tile, Block block) {
         return !tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
     }
+    public static void adjustMultiplierBasedOnNoVotes(int globalNoVotes) {
+     if (globalNoVotes > 0) {
+        float increaseAmount = Mathf.random(0.15f, 2f);
+        multiplier += increaseAmount;
+     }
+    }
+
+   public static void Help(int globalYesVotes) {
+    if (globalYesVotes > 0) {
+        // Set the initial wave number if it hasn't been set yet
+        if (initialWave == -1) {
+            initialWave = state.wave;
+        }
+
+        // Check if 30 waves have passed from the initial wave
+        if (state.wave <= initialWave + 30) {
+            Events.on(EventType.UnitSpawnEvent.class, event -> {
+                // Check if the unit's team is not equal to state.rules.waveTeam
+                if (!event.unit.team.equals(state.rules.waveTeam)) {
+                    // Kill the unit
+                    event.unit.kill();
+                    Call.sendMessage("[lime]Thanks for providing support to Sector 31. Unit has been deployed there.[red] " + ( 30 - initialWave) + "[lime] waves remaining to Transfer Units.");
+                }
+            });
+        }
+                // Check if the current wave is 30 and add cash of 350 to all players
+                if (state.wave == initialWave + 30) {
+                  Groups.player.each(p -> {
+                      PlayerData playerData = Players.getPlayer(p);
+                      if (playerData != null) {
+                          playerData.addCash(350, p);
+                          Call.sendMessage("[lime]Sector 31 Gave us cash for helping them.\nWe Got 200 Cash each.");
+                      }
+                  });
+                }
+            
+    }
+   }
 }
