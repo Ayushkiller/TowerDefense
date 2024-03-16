@@ -129,7 +129,6 @@ public class PlayerData {
         return allPlayers;
     }
     public Player getPlayer() {
-    // Assuming 'player' is a field in PlayerData that holds the Player instance
     return player;
 }
 }
