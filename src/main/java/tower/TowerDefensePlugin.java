@@ -81,7 +81,7 @@ public class TowerDefensePlugin extends Plugin {
       });
       handler.register("deployall", "Requests deployment for all players", (String[] args, Player player) -> {
         requestDeploymentForAll();
-        player.sendMessage("Deployment requested for all players.");
+
     });
   }
   
