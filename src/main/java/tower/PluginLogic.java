@@ -173,14 +173,14 @@ public class PluginLogic {
         
             Timer.schedule(() -> multiplierAdjusted = false, 180f);
         
-        // Distribute Cash to all players
-          Players.forEach(playerData -> {
-          if (playerData != null) {
+            // Distribute Cash to all players
+            Players.forEach(playerData -> {
+            if (playerData != null) {
             float reductionPercentage = playerData.calculateReductionPercentage(playerData.getCash());
-            playerData.addCashWithReduction(reductionPercentage);
-           }
+              playerData.addCashWithReduction(reductionPercentage);
+             }
+             });
            });
-         });
         Events.on(EventType.UnitSpawnEvent.class, event->{
 
             if(event.unit.team != state.rules.waveTeam) 
@@ -221,10 +221,10 @@ public class PluginLogic {
              event.unit.type.targetFlags = new BlockFlag[]{BlockFlag.core};
             return;
         });
-        Events.on(EventType.Trigger.class, event -> {
-            System.out.println("EventType.Trigger event fired. Checking units within radius...");
+        Events.run(EventType.Trigger.update, () -> {
+            System.out.println("Running checkUnitsWithinRadius...");
             checkUnitsWithinRadius();
-            System.out.println("Finished checking units within radius.");
+            System.out.println("Finished running checkUnitsWithinRadius.");
         });
     }
     public static boolean isPath(Tile tile) {
