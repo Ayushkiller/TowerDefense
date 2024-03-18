@@ -197,22 +197,7 @@ public class PluginLogic {
         });
     }
     public static boolean isPath(Tile tile) {
-        Block floorBlock = tile.floor();
-        boolean isPath = floorBlock == Blocks.darkPanel5 || floorBlock == Blocks.sandWater;
-    
-    
-        // Check additional blocks at specified coordinates
-        for (int x = 0; x <= 2; x++) {
-            for (int y = 0; y <= 2; y++) {
-                Block additionalBlock = Vars.world.tile(x, y).floor();
-                if (additionalBlock == floorBlock) {
-                    isPath = true;
-                    break;
-                }
-            }
-        }
-    
-        return isPath;
+        return tile.floor() == Vars.world.tile(0, 0).floor();
     }
     public static boolean canBePlaced(Tile tile, Block block) {
         return !tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
