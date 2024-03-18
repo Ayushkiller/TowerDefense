@@ -26,6 +26,7 @@ import tower.Domain.Unitsdrops;
 import tower.game.Scenarios;
 import tower.pathing.FlyingAIForAss;
 import useful.Bundle;
+
 import static mindustry.Vars.*;
 
 import java.util.Map;
@@ -141,13 +142,13 @@ public class PluginLogic {
                 // If the tile is not already in the map, add it
                 if (!forceProjectorTiles.containsKey(changedTile)) {
                     forceProjectorTiles.put(changedTile, (ForceProjector) block);
-                    System.out.println("Added ForceProjector tile: " + changedTile);
+                   
                 }
             } else {
                 // If the tile is in the map but no longer contains a ForceProjector, remove it
                 if (forceProjectorTiles.containsKey(changedTile)) {
                     forceProjectorTiles.remove(changedTile);
-                    System.out.println("Removed ForceProjector tile: " + changedTile);
+
                 }
             }
         });
@@ -272,9 +273,10 @@ public class PluginLogic {
         forceProjectorTiles.each((tile, forceProjector) -> {
             Groups.unit.each(unit -> {
                 float distance = unit.dst(tile.worldx(), tile.worldy());
-                if (distance <= 100 && unit.team != state.rules.waveTeam ) {
-                    unit.apply(StatusEffects.unmoving, 10f);
-                
+                if (distance <= 100f && unit.team == state.rules.waveTeam ) {
+                    unit.type.speed = 0.9f;
+                    unit.healthMultiplier(0.75f);
+                    Bundle.label(player,100f, tile.drawx(), tile.drawy(), "shieldProjector.label");
                 }
             });
         });
