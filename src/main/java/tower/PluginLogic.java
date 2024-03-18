@@ -13,6 +13,7 @@ import mindustry.game.Rules;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
+import mindustry.gen.Player;
 import mindustry.net.Administration;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -273,10 +274,17 @@ public class PluginLogic {
         forceProjectorTiles.each((tile, forceProjector) -> {
             Groups.unit.each(unit -> {
                 float distance = unit.dst(tile.worldx(), tile.worldy());
-                if (distance <= 100f && unit.team == state.rules.waveTeam ) {
+                if (distance <= 100f && unit.team == state.rules.waveTeam) {
                     unit.type.speed = 0.9f;
                     unit.healthMultiplier(0.75f);
-                    Bundle.label(player,100f, tile.drawx(), tile.drawy(), "shieldProjector.label");
+                    // Iterate over all players stored in the Players map
+                    Players.forEach(playerData -> {
+                        // Find the Player object that matches the UUID stored in PlayerData
+                        Player player = Groups.player.find(p -> p.uuid().equals(playerData.getUuid()));
+                        if (player != null) {
+                            Bundle.label(player, 100f, tile.drawx(), tile.drawy(), "shieldProjector.label");
+                        }
+                    });
                 }
             });
         });
