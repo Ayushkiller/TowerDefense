@@ -21,7 +21,6 @@ import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
-import tower.Domain.CustomStatusEffects;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
 import tower.game.Scenarios;
@@ -197,14 +196,11 @@ public class PluginLogic {
             event.unit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
-            if (state.wave <= 250) {
-                event.unit.apply(StatusEffects.slow, Float.POSITIVE_INFINITY);
-            }
             if (state.wave >= 350) {
                 event.unit.apply(StatusEffects.fast, Float.POSITIVE_INFINITY);
             }
             event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
-            event.unit.type.speed = 1.5f;
+            event.unit.type.speed = 0.8f;
             event.unit.type.range = -1f;
             event.unit.type.hovering = true;
             event.unit.disarmed = true;
@@ -280,12 +276,9 @@ public class PluginLogic {
                 if (distance <= 105f && unit.team == state.rules.waveTeam) {
                     unit.type.speed = 0.9f;
                     unit.healthMultiplier(0.75f);
-                    if (!unit.hasEffect(CustomStatusEffects.slowAsShit)) {
-                        System.out.println("Applying slowAsShit effect to unit: " + unit.id + unit.type.name +unit.type.emoji());
-                        unit.apply(CustomStatusEffects.slowAsShit, 120f);
-                    } else {
-                        System.out.println("Unit already has slowAsShit effect: " + unit.id + unit.type.name +unit.type.emoji());
-                    }
+                    unit.apply(StatusEffects.electrified,200f);
+                    unit.apply(StatusEffects.slow, 200f);
+                    unit.apply(StatusEffects.sporeSlowed, 200f);
                     }  
                 });
            });
