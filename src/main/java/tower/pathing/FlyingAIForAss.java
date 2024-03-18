@@ -29,7 +29,7 @@ public class FlyingAIForAss extends AIController{
 
             if(state.rules.waves && unit.team == state.rules.defaultTeam){
                 Tile spawner = getClosestSpawner();
-                if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) 
+                if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 1200000f)) 
                 moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 800f);;
                 if(spawner == null && core == null) move = false;
             }
