@@ -17,6 +17,7 @@ import mindustry.net.Administration;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.ShockMine;
+import mindustry.world.blocks.environment.StaticWall;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
@@ -197,7 +198,17 @@ public class PluginLogic {
         });
     }
     public static boolean isPath(Tile tile) {
-        return tile.floor() == Vars.world.tile(0, 0).floor();
+        return 
+           tile.floor() == Vars.world.tile(0, 0).floor() 
+        || tile.floor() == Vars.world.tile(0, 1).floor()
+        || tile.floor() == Vars.world.tile(1, 0).floor()
+        || tile.floor() == Vars.world.tile(1, 1).floor()
+        || tile.floor() == Vars.world.tile(2, 0).floor()
+        || tile.floor() == Vars.world.tile(0, 2).floor()
+        || tile.floor() == Vars.world.tile(2, 1).floor()
+        || tile.floor() == Vars.world.tile(1, 2).floor()
+        || tile.floor() == Vars.world.tile(2, 2).floor()
+        || tile.block() instanceof StaticWall;
     }
     public static boolean canBePlaced(Tile tile, Block block) {
         return !tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
