@@ -47,7 +47,7 @@ public class PluginLogic {
         }
         netServer.admins.addActionFilter(action->{
             if(action.tile == null) return true;
-            if(action.type == Administration.ActionType.placeBlock || action.type == Administration.ActionType.breakBlock){
+            if(action.type == Administration.ActionType.placeBlock || action.type == Administration.ActionType.breakBlock || action.type == Administration.ActionType.dropPayload){
                 if(!(canBePlaced(action.tile, action.block)|| action.block instanceof ShockMine|| action.block instanceof Conduit || action.block instanceof CoreBlock)){
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                     return false; // Explicitly return false here
@@ -196,7 +196,15 @@ public class PluginLogic {
         });
     }
     public static boolean isPath(Tile tile) {
-        return tile.floor() == Blocks.darkPanel5 || tile.floor() == Blocks.sandWater;
+        Block floorBlock = tile.floor();
+        Block worldBlock = Vars.world.tile(0,0).floor();
+        boolean isPath = floorBlock == Blocks.darkPanel5 || floorBlock == Blocks.sandWater || floorBlock == worldBlock;
+    
+        if (isPath && floorBlock == worldBlock) {
+            System.out.println("Block at (0,0) is: " + worldBlock.toString());
+        }
+    
+        return isPath;
     }
     public static boolean canBePlaced(Tile tile, Block block) {
         return !tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
