@@ -1,7 +1,6 @@
 package tower.pathing;
 
 import arc.math.*;
-import mindustry.ai.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -24,22 +23,20 @@ public class FlyingAIForAss extends AIController{
             }
         }
 
-        if((core == null || !unit.within(core, unit.type.range * 0.5f))){
+        if(core == null){
             boolean move = true;
 
             if(state.rules.waves && unit.team == state.rules.defaultTeam){
                 Tile spawner = getClosestSpawner();
-                if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 1200000f)) 
-                moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 80000000000000f);;
-                if(spawner == null && core == null) move = false;
+                if(spawner != null) {
+                    moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 10f);
+                } else {
+                    move = false;
+                }
             }
 
-            //no reason to move if there's nothing there
-            if(core == null && (!state.rules.waves || getClosestSpawner() == null)){
-             move = false;
-            }
-
-            if(move) pathfind(Pathfinder.fieldCore);
+            // Move to the nearest spawner if no core is found, regardless of distance
+            if(move) pathfind(TowerPathfinder.fieldCore);
         }
 
         if(unit.type.canBoost && unit.elevation > 0.001f && !unit.onSolid()){
