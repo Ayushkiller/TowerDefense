@@ -8,7 +8,6 @@ import arc.util.*;
 import mindustry.Vars;
 import mindustry.ai.types.GroundAI;
 import mindustry.content.*;
-import mindustry.entities.Units;
 import mindustry.game.EventType;
 import mindustry.game.Rules;
 import mindustry.game.Team;
@@ -134,9 +133,6 @@ public class PluginLogic {
         });
         
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
-        Events.on(EventType.Trigger.class, event ->{
-            getUnitsWithinRadius();
-        });
         Events.on(EventType.TileChangeEvent.class, event -> {
             Tile changedTile = event.tile;
             Block block = changedTile.block();
@@ -225,6 +221,11 @@ public class PluginLogic {
              event.unit.type.targetFlags = new BlockFlag[]{BlockFlag.core};
             return;
         });
+        Events.on(EventType.Trigger.class, event -> {
+            System.out.println("EventType.Trigger event fired. Checking units within radius...");
+            checkUnitsWithinRadius();
+            System.out.println("Finished checking units within radius.");
+        });
     }
     public static boolean isPath(Tile tile) {
         return 
@@ -269,14 +270,18 @@ public class PluginLogic {
             Call.sendMessage("[lime]New Team of engineers will arrive soon.Due to more enginners after their arrival Turrets damage will be esclated to 120%");
         }
     }
-    static float radius = 100f;
-    public static void getUnitsWithinRadius() {
-        for (Tile tile : forceProjectorTiles.keys()) {
-            // Get all units of Team.crux within the specified radius around the tile
-            Units.nearby(Team.crux, tile.x, tile.y,radius, unit -> {
-                unit.apply(StatusEffects.unmoving,Float.POSITIVE_INFINITY);
-                System.out.println("Unit ID: " + unit.id + unit.getControllerName() +unit.x + unit.y );
+    public static void checkUnitsWithinRadius() {
+        System.out.println("Starting check for units within 100 radius of force projector tiles...");
+        forceProjectorTiles.each((tile, forceProjector) -> {
+            System.out.println("Checking units around tile: " + tile.pos());
+            Groups.unit.each(unit -> {
+                float distance = unit.dst(tile.worldx(), tile.worldy());
+                if (distance <= 100) {
+                    // Unit is within 100 radius of the tile
+                    System.out.println("Unit " + unit.id + unit.getControllerName() + " is within 100 radius of tile " + tile.pos());
+                }
             });
-        }
+        });
+        System.out.println("Finished checking units within 100 radius of force projector tiles.");
     }
 }
