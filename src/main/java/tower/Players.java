@@ -15,7 +15,6 @@ public class Players {
     public static PlayerData getPlayer(Player player) {
         if (!players.containsKey(player.uuid())) {
             PlayerData playerData = new PlayerData(player);
-            // Set the player's name in the PlayerData object
             playerData.setName(player.name());
             players.put(player.uuid(), playerData);
         }
