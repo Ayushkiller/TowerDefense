@@ -39,12 +39,10 @@ private static void buyUnit(UnitType unitType, Player player) {
     if (playerData.getCash() >= price) {
         playerData.subtractCash((float) price, player);
 
-        Unit oldUnit = player.unit();
         Unit spawned = unitType.spawn(player.x, player.y);
 
         if (spawned != null && !spawned.dead()) {
             Call.unitControl(player, spawned);
-            oldUnit.kill();
 
             // Check if the unit has an ability defined in UnitsTable.java
             Map<String, Object> unitMap = UnitsTable.units.stream()
