@@ -269,17 +269,14 @@ public class PluginLogic {
         }
     }
     public static void checkUnitsWithinRadius() {
-        System.out.println("Starting check for units within 100 radius of force projector tiles...");
         forceProjectorTiles.each((tile, forceProjector) -> {
-            System.out.println("Checking units around tile: " + tile.pos());
             Groups.unit.each(unit -> {
                 float distance = unit.dst(tile.worldx(), tile.worldy());
-                if (distance <= 100) {
-                    // Unit is within 100 radius of the tile
-                    System.out.println("Unit " + unit.id + unit.getControllerName() + " is within 100 radius of tile " + tile.pos());
+                if (distance <= 100 && unit.team != state.rules.waveTeam ) {
+                    unit.apply(StatusEffects.unmoving, 10f);
+                
                 }
             });
         });
-        System.out.println("Finished checking units within 100 radius of force projector tiles.");
     }
 }
