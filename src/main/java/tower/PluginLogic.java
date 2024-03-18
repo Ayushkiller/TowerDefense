@@ -15,7 +15,6 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.net.Administration;
 import mindustry.type.*;
-import mindustry.ui.Menus;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.ForceProjector;
 import mindustry.world.blocks.defense.ShockMine;
@@ -67,7 +66,7 @@ public class PluginLogic {
         });
         Timer.schedule(() -> {
             forceProjectorTiles.each((tile, forceProjector) -> {   String labelText = tower.Bundle.get("shieldProjector.label");
-             Menus.label(labelText, 1f, tile.drawx(), tile.drawy());
+             Call.label(labelText, 1f, tile.drawx(), tile.drawy());
             });
         }, 0f, 2f);
         Timer.schedule(()->state.rules.waveTeam.data().units.each(unit->{
@@ -197,13 +196,13 @@ public class PluginLogic {
             event.unit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
-            event.unit.apply(StatusEffects.sporeSlowed, 200f);
+            event.unit.apply(StatusEffects.sporeSlowed, Float.POSITIVE_INFINITY);
             event.unit.apply(StatusEffects.muddy, Float.POSITIVE_INFINITY);
             if (state.wave >= 350) {
                 event.unit.apply(StatusEffects.fast, Float.POSITIVE_INFINITY);
             }
             event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
-            event.unit.type.speed = 0.2f;
+            event.unit.type.speed = 0.8f;
             event.unit.type.range = -1f;
             event.unit.type.hovering = true;
             event.unit.disarmed = true;
