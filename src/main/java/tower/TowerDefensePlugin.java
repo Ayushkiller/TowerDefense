@@ -23,9 +23,9 @@ public class TowerDefensePlugin extends Plugin {
     @Override
     public void init() {
         Bundle.load(TowerDefensePlugin.class);
-        TowerPathfinder.init();
-        PluginLogic.init();
         Loader.load();
+           TowerPathfinder.init();
+        PluginLogic.init();
         CustomStatusEffects.load();
     }
 

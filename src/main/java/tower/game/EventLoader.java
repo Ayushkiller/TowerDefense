@@ -26,5 +26,6 @@ public class EventLoader {
             Players.clearMap();
         });
         Events.run(EventType.Trigger.update, Players::forEach);
+        
     }
 }

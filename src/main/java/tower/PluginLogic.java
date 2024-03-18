@@ -75,9 +75,6 @@ public class PluginLogic {
 
         Events.on(EventType.WorldLoadEvent.class, event->multiplier = 0.5f);
         Events.on(EventType.WaveEvent.class, event -> {
-            if (state.wave == 10) {
-                Scenarios.requestDeploymentForAllPlayers(); 
-            }
             if (state.wave == 50) {
                 Scenarios.requestDeploymentForAllPlayers(); 
             }
@@ -125,6 +122,7 @@ public class PluginLogic {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 2f) * 2, multiplier, 100f);
             }
         });
+        
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam) return;
@@ -179,16 +177,20 @@ public class PluginLogic {
             event.unit.type.hovering = true;
             event.unit.disarmed = true;
             event.unit.type.abilities.clear();
+            event.unit.type.abilities.clear();
+            event.unit.type.abilities.clear();
+            event.unit.type.abilities.clear();
+            event.unit.type.abilities.clear();
             event.unit.type.crashDamageMultiplier = 0f;
             event.unit.type.crushDamage = 0f;
-            event.unit.type.deathExplosionEffect= Fx.healWave;
+            event.unit.type.deathExplosionEffect= Fx.shockwave;
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
 
              // Apply AI settings after the unit has spawned
              event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
              event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange =  0f;
-             event.unit.type.aiController = event.unit.type.flying ? FlyingAI::new : GroundAI::new;
+             event.unit.type.aiController = GroundAI::new;
              event.unit.type.targetFlags = new BlockFlag[]{BlockFlag.core};
             return;
         });
@@ -196,7 +198,6 @@ public class PluginLogic {
     public static boolean isPath(Tile tile) {
         return tile.floor() == Blocks.darkPanel5 || tile.floor() == Blocks.sandWater;
     }
-
     public static boolean canBePlaced(Tile tile, Block block) {
         return !tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
     }
