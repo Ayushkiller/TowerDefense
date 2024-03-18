@@ -177,6 +177,7 @@ public class PluginLogic {
             event.unit.type.range = -1f;
             event.unit.type.hovering = true;
             event.unit.disarmed = true;
+            event.unit.type.lowAltitude=true;
             event.unit.type.abilities.clear();
             event.unit.type.abilities.clear();
             event.unit.type.abilities.clear();
