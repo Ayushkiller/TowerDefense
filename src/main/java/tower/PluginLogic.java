@@ -134,6 +134,9 @@ public class PluginLogic {
         });
         
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
+        Events.on(EventType.Trigger.class, event ->{
+            getUnitsWithinRadius();
+        });
         Events.on(EventType.TileChangeEvent.class, event -> {
             Tile changedTile = event.tile;
             Block block = changedTile.block();
@@ -271,8 +274,7 @@ public class PluginLogic {
         for (Tile tile : forceProjectorTiles.keys()) {
             // Get all units of Team.crux within the specified radius around the tile
             Units.nearby(Team.crux, tile.x, tile.y,radius, unit -> {
-                // Perform actions with the unit
-                // For example, print the unit's ID
+                unit.apply(StatusEffects.unmoving,Float.POSITIVE_INFINITY);
                 System.out.println("Unit ID: " + unit.id + unit.getControllerName() +unit.x + unit.y );
             });
         }
