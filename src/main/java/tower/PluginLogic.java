@@ -6,7 +6,6 @@ import arc.math.Mathf;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.Vars;
-import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.game.EventType;
 import mindustry.game.Rules;
@@ -23,6 +22,7 @@ import mindustry.world.meta.BlockFlag;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
 import tower.game.Scenarios;
+import tower.pathing.FlyingAIForAss;
 import useful.Bundle;
 import static mindustry.Vars.*;
 
@@ -190,7 +190,7 @@ public class PluginLogic {
              // Apply AI settings after the unit has spawned
              event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
              event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange =  0f;
-             event.unit.type.aiController = GroundAI::new;
+             event.unit.type.aiController = FlyingAIForAss::new;
              event.unit.type.targetFlags = new BlockFlag[]{BlockFlag.core};
             return;
         });
