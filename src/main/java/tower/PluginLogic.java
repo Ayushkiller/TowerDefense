@@ -177,7 +177,6 @@ public class PluginLogic {
             event.unit.type.range = -1f;
             event.unit.type.hovering = true;
             event.unit.disarmed = true;
-            event.unit.type.lowAltitude=true;
             event.unit.type.abilities.clear();
             event.unit.type.abilities.clear();
             event.unit.type.abilities.clear();
@@ -199,7 +198,8 @@ public class PluginLogic {
     }
     public static boolean isPath(Tile tile) {
         Block floorBlock = tile.floor();
-        boolean isPath = true;
+        boolean isPath = floorBlock == Blocks.darkPanel5 || floorBlock == Blocks.sandWater;
+    
     
         // Check additional blocks at specified coordinates
         for (int x = 0; x <= 2; x++) {
