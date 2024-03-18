@@ -14,7 +14,6 @@ import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.net.Administration;
-import mindustry.ui.Menus;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.ForceProjector;
@@ -68,7 +67,7 @@ public class PluginLogic {
         });
         Timer.schedule(() -> {
             forceProjectorTiles.each((tile, forceProjector) -> {
-                Menus.label("shieldProjector.label", 60f, tile.drawx(), tile.drawy());
+              Call.label("shieldProjector.label", 60f, tile.drawx(), tile.drawy());
             });
         }, 0f, 2f);
         Timer.schedule(()->state.rules.waveTeam.data().units.each(unit->{
@@ -282,7 +281,10 @@ public class PluginLogic {
                     unit.type.speed = 0.9f;
                     unit.healthMultiplier(0.75f);
                     if (!unit.hasEffect(CustomStatusEffects.slowAsShit)) {
+                        System.out.println("Applying slowAsShit effect to unit: " + unit.id + unit.type.name +unit.type.emoji());
                         unit.apply(CustomStatusEffects.slowAsShit, 120f);
+                    } else {
+                        System.out.println("Unit already has slowAsShit effect: " + unit.id + unit.type.name +unit.type.emoji());
                     }
                     }  
                 });
