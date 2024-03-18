@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.Vars;
 import mindustry.ai.types.GroundAI;
 import mindustry.content.*;
+import mindustry.entities.Units;
 import mindustry.game.EventType;
 import mindustry.game.Rules;
 import mindustry.game.Team;
@@ -34,6 +35,7 @@ public class PluginLogic {
     public static float multiplier = 1f;
     public static boolean multiplierAdjusted = false;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
+    public static ObjectMap<Tile, ForceProjector> forceProjectorTiles = new ObjectMap<>();
     public static void init() {
         drops = new ObjectMap<>();
         for (Map<String, Object> dropEntry : Unitsdrops.drops) {
@@ -133,12 +135,22 @@ public class PluginLogic {
         
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
         Events.on(EventType.TileChangeEvent.class, event -> {
-        Tile changedTile = event.tile;
-         System.out.println("Tile changed at position: " + changedTile.x + ", " + changedTile.y);
-         Block block = changedTile.block();
-        if (block instanceof ForceProjector) {
-        System.out.println("A ForceProjector block was placed or changed.");
-        }
+            Tile changedTile = event.tile;
+            Block block = changedTile.block();
+
+            if (block instanceof ForceProjector) {
+                // If the tile is not already in the map, add it
+                if (!forceProjectorTiles.containsKey(changedTile)) {
+                    forceProjectorTiles.put(changedTile, (ForceProjector) block);
+                    System.out.println("Added ForceProjector tile: " + changedTile);
+                }
+            } else {
+                // If the tile is in the map but no longer contains a ForceProjector, remove it
+                if (forceProjectorTiles.containsKey(changedTile)) {
+                    forceProjectorTiles.remove(changedTile);
+                    System.out.println("Removed ForceProjector tile: " + changedTile);
+                }
+            }
         });
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam) return;
@@ -254,5 +266,15 @@ public class PluginLogic {
             Call.sendMessage("[lime]New Team of engineers will arrive soon.Due to more enginners after their arrival Turrets damage will be esclated to 120%");
         }
     }
-    
+    static float radius = 100f;
+    public static void getUnitsWithinRadius() {
+        for (Tile tile : forceProjectorTiles.keys()) {
+            // Get all units of Team.crux within the specified radius around the tile
+            Units.nearby(Team.crux, tile.x, tile.y,radius, unit -> {
+                // Perform actions with the unit
+                // For example, print the unit's ID
+                System.out.println("Unit ID: " + unit.id + unit.getControllerName() +unit.x + unit.y );
+            });
+        }
+    }
 }
