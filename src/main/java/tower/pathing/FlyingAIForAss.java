@@ -1,64 +1,58 @@
 package tower.pathing;
 
 import arc.math.*;
+import mindustry.ai.Pathfinder;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.world.*;
+import mindustry.world.meta.*;
+
 import static mindustry.Vars.*;
-
-public class FlyingAIForAss extends AIController {
-
+public class FlyingAIForAss extends AIController{
 
     @Override
-    public void updateMovement() {
+    public void updateMovement(){
         unloadPayloads();
 
-        Building core = unit.closestEnemyCore();
-
-        if (core != null && unit.within(core, unit.range() / 1.3f + core.block.size * tilesize / 2f)) {
-            target = core;
-            for (var mount : unit.mounts) {
-                if (mount.weapon.controllable && mount.weapon.bullet.collidesGround) {
-                    mount.target = core;
-                }
+        if(target != null && unit.hasWeapons()){
+            if(unit.type.circleTarget){
+                pathfind(Pathfinder.fieldCore);
+            }else{
+                pathfind(Pathfinder.fieldCore);
+                unit.lookAt(target);
             }
         }
 
-        boolean move = true;
+        if(target == null && state.rules.waves && unit.team == state.rules.defaultTeam){
+            pathfind(Pathfinder.fieldCore);
+        }
+    }
 
-        if ((core == null || !unit.within(core, unit.type.range * 0.5f))) {
-            if (state.rules.waves && unit.team == state.rules.defaultTeam) {
-                Tile spawner = getClosestSpawner();
-                if (spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 12f)) {
-                    moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 10f);
-                }
-                if (spawner == null && core == null) move = false;
-            }
+    @Override
+    public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
+        var result = findMainTarget(x, y, range, air, ground);
 
-            if (core == null && (!state.rules.waves || getClosestSpawner() == null)) {
-                move = false;
-            }
+        //if the main target is in range, use it, otherwise target whatever is closest
+        return checkTarget(result, x, y, range) ? target(x, y, range, air, ground) : result;
+    }
 
-            if (move) pathfind(TowerPathfinder.fieldCore);
+    @Override
+    public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
+        var core = targetFlag(x, y, BlockFlag.core, true);
+
+        if(core != null && Mathf.within(x, y, core.getX(), core.getY(), range)){
+            return core;
         }
 
-        if (unit.type.canBoost && unit.elevation > 0.001f && !unit.onSolid()) {
-            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, unit.type.riseSpeed);
-        }
-        faceTarget();
-        if (!move) {
-            if (target != null && unit.hasWeapons()) {
-                if (unit.type.circleTarget) {
-                    circleAttack(120f);
-                } else {
-                    moveTo(target, unit.type.range * 0.8f);
-                    unit.lookAt(target);
-                }
+        for(var flag : unit.type.targetFlags){
+            if(flag == null){
+                Teamc result = target(x, y, range, air, ground);
+                if(result != null) return result;
+            }else if(ground){
+                Teamc result = targetFlag(x, y, flag, true);
+                if(result != null) return result;
             }
+        }
 
-            if (target == null && state.rules.waves && unit.team == state.rules.defaultTeam) {
-                moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 130f);
-            }
-        }
+        return core;
     }
 }
