@@ -136,7 +136,10 @@ public class PluginLogic {
             }
         });
         
-        Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
+        Events.on(EventType.GameOverEvent.class, event -> {
+            Players.clearMap();
+            forceProjectorTiles.clear();
+        });
         Events.on(EventType.TileChangeEvent.class, event -> {
             Tile changedTile = event.tile;
             Block block = changedTile.block();

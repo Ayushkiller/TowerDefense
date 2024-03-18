@@ -94,10 +94,12 @@ public class SuperPowers {
                             unitType.groundLayer = Layer.flyingUnit;
                             unitType.weapons.get(0).reload = 10f;
                             unitType.weapons.get(0).cooldownTime = 10f;
+                            unit.type.playerControllable=false;
                         } else if (unitType == UnitTypes.collaris) {
                             unitType.groundLayer = Layer.flyingUnit;
                             unitType.weapons.get(0).reload = 10f;
                             unitType.weapons.get(0).cooldownTime = 10f;
+                            unit.type.playerControllable=false;
                         }
                     } else {
                         playerData.addCash(100, player);
