@@ -197,11 +197,17 @@ public class PluginLogic {
     }
     public static boolean isPath(Tile tile) {
         Block floorBlock = tile.floor();
-        Block worldBlock = Vars.world.tile(0,0).floor();
-        boolean isPath = floorBlock == Blocks.darkPanel5 || floorBlock == Blocks.sandWater || floorBlock == worldBlock;
+        boolean isPath = floorBlock == Blocks.darkPanel5 || floorBlock == Blocks.sandWater;
     
-        if (isPath && floorBlock == worldBlock) {
-            System.out.println("Block at (0,0) is: " + worldBlock.toString());
+        // Check additional blocks at specified coordinates
+        for (int x = 0; x <= 2; x++) {
+            for (int y = 0; y <= 2; y++) {
+                Block additionalBlock = Vars.world.tile(x, y).floor();
+                if (additionalBlock == floorBlock) {
+                    isPath = true;
+                    break;
+                }
+            }
         }
     
         return isPath;
