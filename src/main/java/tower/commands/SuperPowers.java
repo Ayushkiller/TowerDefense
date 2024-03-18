@@ -95,11 +95,15 @@ public class SuperPowers {
                             unitType.weapons.get(0).reload = 10f;
                             unitType.weapons.get(0).cooldownTime = 10f;
                             unit.type.playerControllable=false;
+                            unit.type.autoFindTarget = true;
+                            unit.type.allowedInPayloads = true;
                         } else if (unitType == UnitTypes.collaris) {
                             unitType.groundLayer = Layer.flyingUnit;
                             unitType.weapons.get(0).reload = 10f;
                             unitType.weapons.get(0).cooldownTime = 10f;
                             unit.type.playerControllable=false;
+                            unit.type.autoFindTarget = true;
+                            unit.type.allowedInPayloads = true;
                         }
                     } else {
                         playerData.addCash(100, player);

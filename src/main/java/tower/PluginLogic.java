@@ -46,7 +46,6 @@ public class PluginLogic {
                 Seq<ItemStack> itemStacks = (Seq<ItemStack>) dropsObject;
                 drops.put(unit, itemStacks);
             } else {
-                System.err.println("Unexpected type for drops: " + dropsObject.getClass().getName());
             }
         }
         netServer.admins.addActionFilter(action->{
@@ -68,7 +67,7 @@ public class PluginLogic {
             forceProjectorTiles.each((tile, forceProjector) -> {   String labelText = tower.Bundle.get("shieldProjector.label");
              Call.label(labelText, 1f, tile.drawx(), tile.drawy());
             });
-        }, 0f, 2f);
+        }, 0f, 5f);
         Timer.schedule(()->state.rules.waveTeam.data().units.each(unit->{
             var core = unit.closestEnemyCore();
             if(core == null || unit.dst(core) > 80f || core.health <= 0) return; // Check if core is null, out of range, or already dead
@@ -190,8 +189,7 @@ public class PluginLogic {
            });
         Events.on(EventType.UnitSpawnEvent.class, event->{
 
-            if(event.unit.team != state.rules.waveTeam) 
-
+            if(event.unit.team == state.rules.waveTeam){
             event.unit.health(event.unit.health * multiplier);
             event.unit.maxHealth(event.unit.maxHealth * multiplier);
             event.unit.damageMultiplier(0f);
@@ -219,13 +217,11 @@ public class PluginLogic {
             event.unit.type.deathExplosionEffect= Fx.shockwave;
             event.unit.shield(event.unit.shield * multiplier);
             event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
-
-             // Apply AI settings after the unit has spawned
-             event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
-             event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange =  0f;
+            event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
+            event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange =  0f;
             event.unit.type.aiController = event.unit.type.flying ? FlyingAIForAss::new : GroundAI::new;
-             event.unit.type.targetFlags = new BlockFlag[]{BlockFlag.core};
-            return;
+            event.unit.type.targetFlags = new BlockFlag[]{BlockFlag.core};
+            }
         });
         Events.run(EventType.Trigger.update, () -> {
             checkUnitsWithinRadius();
@@ -250,7 +246,7 @@ public class PluginLogic {
         if (globalNoVotes > 0) {
             float increaseAmount = Mathf.random(0.0f, state.wave * 0.02f);
             multiplier += increaseAmount;
-            Call.sendMessage("[red]Enemy got a buff!After capturing The sector. They are now stronger.");
+            Call.sendMessage(tower.Bundle.get("enemyBuffMessage"));
             multiplierAdjusted = true;
         }
     }
@@ -270,8 +266,8 @@ public class PluginLogic {
             Team team = Team.sharded;
             Rules.TeamRule teamRule = Vars.state.rules.teams.get(team);
             teamRule.blockDamageMultiplier = 0.5f;
-            Call.sendMessage("[red]Due to deployment of team of specialised engineers.Our current Turrets damage is reduced to 50%");
-            Call.sendMessage("[lime]New Team of engineers will arrive soon.Due to more enginners after their arrival Turrets damage will be esclated to 120%");
+            Call.sendMessage(tower.Bundle.get("turretsDamageReducedMessage"));
+            Call.sendMessage(tower.Bundle.get("newEngineersArrivalMessage"));
         }
     }
     public static void checkUnitsWithinRadius() {

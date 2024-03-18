@@ -33,7 +33,7 @@ public class TowerDefensePlugin extends Plugin {
 
   public void registerClientCommands(CommandHandler handler) {
     handler.register("menu", "Opens the Special store", (String[] args, Player player) -> Menu.execute(player));
-    handler.register("sell", "[item] [amount]", "Sells items based on the price", (String[] args, Player player) -> {
+    handler.register("cash", "[item] [amount]", "Buy/sell cash.To sell cash add - to amount ", (String[] args, Player player) -> {
         if (args.length > 1) {
             String itemName = args[0];
             int amount;
@@ -50,8 +50,21 @@ public class TowerDefensePlugin extends Plugin {
                 player.sendMessage("[#f]⚠[] [#f]Item not found.");
                 return;
             }
-            if (player.team().items().get(itemToSell) < amount) {
-                player.sendMessage("[#f]⚠[] [#f]You do not have enough of this item to sell.");
+            if (player.team().items().get(itemToSell) < amount + 2000) {
+                player.sendMessage("[#f]⚠[] [#f]You do not have enough of this item to sell.Ensure 2000 of resources left in core.");
+                return;
+            }
+    
+            // Check if the player has enough cash to sell the items
+            int price = getItemPrice(itemToSell);
+            int totalPrice = price * amount;
+            PlayerData playerData = Players.getPlayer(player);
+            if (playerData == null) {
+                player.sendMessage("[#f]⚠[] [#f]Player data not found.");
+                return;
+            }
+            if (playerData.getCash() < totalPrice) {
+                player.sendMessage("[#f]⚠[] [#f]You do not have enough cash to Buy this amount.");
                 return;
             }
     
@@ -73,11 +86,10 @@ public class TowerDefensePlugin extends Plugin {
                       }
                   });
               } catch (NumberFormatException e) {
-                  // Handle the case where the argument is not a valid integer
-                  System.out.println("Invalid number of Cash provided.");
+
               }
           } else {
-              System.out.println("No Cash specified.");
+
           }
       });
       handler.register("deployall", "Requests deployment for all players", (String[] args, Player player) -> {

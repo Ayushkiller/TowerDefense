@@ -4,11 +4,12 @@ import arc.math.*;
 import mindustry.ai.Pathfinder;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.world.Tile;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 public class FlyingAIForAss extends AIController{
-
+    private boolean pathingSuccess;
     @Override
     public void updateMovement(){
         unloadPayloads();
@@ -16,9 +17,16 @@ public class FlyingAIForAss extends AIController{
         if(target != null && unit.hasWeapons()){
             if(unit.type.circleTarget){
                 pathfind(Pathfinder.fieldCore);
+                if(!wasPathingSuccessful()){
+                    circleAttack(60f);
+                }
+
             }else{
                 pathfind(Pathfinder.fieldCore);
                 unit.lookAt(target);
+                if(!wasPathingSuccessful()){
+                    moveTo(target, unit.type.range * 0.8f);
+                }
             }
         }
 
@@ -55,4 +63,29 @@ public class FlyingAIForAss extends AIController{
 
         return core;
     }
+    @Override
+    public void pathfind(int pathTarget){
+        pathingSuccess = false; // Reset the flag at the start of pathfinding
+        int costType = unit.pathType();
+
+        Tile tile = unit.tileOn();
+        if(tile == null) return;
+        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
+
+        if(tile == targetTile || (costType == Pathfinder.costNaval && !targetTile.floor().isLiquid)) return;
+
+        unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), prefSpeed()));
+        pathingSuccess = true; // Pathing was successful
+    }
+
+    // Method to check if the last pathfinding attempt was successful
+    public boolean wasPathingSuccessful() {
+        return pathingSuccess;
+    }
+    
+    public float prefSpeed(){
+        return unit.speed();
+    }
+
+    
 }

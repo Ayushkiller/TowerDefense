@@ -30,7 +30,6 @@ public class Players {
     public static void forEach() {
         Groups.player.each(player -> {
             PlayerData playerData = Players.getPlayer(player);
-            // Ensure playerData is not null before proceeding
             if (playerData != null) {
                 if(Players.getPlayer(player).getUnit() != null && player.unit() != Players.getPlayer(player).getUnit()) {
                     player.unit(Players.getPlayer(player).getUnit());

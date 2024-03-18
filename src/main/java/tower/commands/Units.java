@@ -42,6 +42,8 @@ private static void buyUnit(UnitType unitType, Player player) {
         Unit spawned = unitType.spawn(player.x, player.y);
 
         if (spawned != null && !spawned.dead()) {
+            spawned.type.autoFindTarget = true;
+            spawned.type.alwaysUnlocked = true;
             Call.unitControl(player, spawned);
 
             // Check if the unit has an ability defined in UnitsTable.java
