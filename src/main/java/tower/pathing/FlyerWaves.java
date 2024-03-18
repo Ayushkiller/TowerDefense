@@ -19,7 +19,6 @@ public class FlyerWaves extends WaveSpawner {
     @Override
     public void spawnEnemies() {
         System.out.println("Spawning enemies for wave: " + state.wave); // Log the wave number
-        super.spawnEnemies();
     
         for(mindustry.game.SpawnGroup group : state.rules.spawns){
             if(group.type == null) continue;

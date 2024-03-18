@@ -2,6 +2,7 @@ package tower;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import mindustry.game.Team;
 import arc.util.CommandHandler;
 import mindustry.gen.Groups;
@@ -27,7 +28,6 @@ public class TowerDefensePlugin extends Plugin {
         TowerPathfinder.init();
         PluginLogic.init();
         CustomStatusEffects.load();
-        
     }
 
 
