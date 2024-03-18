@@ -222,9 +222,7 @@ public class PluginLogic {
             return;
         });
         Events.run(EventType.Trigger.update, () -> {
-            System.out.println("Running checkUnitsWithinRadius...");
             checkUnitsWithinRadius();
-            System.out.println("Finished running checkUnitsWithinRadius.");
         });
     }
     public static boolean isPath(Tile tile) {
