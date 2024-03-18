@@ -17,10 +17,11 @@ public class TowerPathfinder extends Pathfinder {
             if (team != state.rules.waveTeam.id) {
                 return  1; // Default cost for non-waveTeam units
             }
-            return ( ((PathTile.team(tile) ==  0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable :  1 +
+            return ( ((PathTile.team(tile) ==  0 || PathTile.team(tile) == team) )) ? impassable :  1 +
                 (PathTile.deep(tile) ? 300 :  0) +
                 (PathTile.damages(tile) ?  50 :  0) +
                 (PathTile.nearSolid(tile) ?  50 :  0) +
+                (PathTile.solid(tile) ? 450 : 0) +
                 (PathTile.nearLiquid(tile) ?  10 :  0);
         });
 
@@ -28,10 +29,11 @@ public class TowerPathfinder extends Pathfinder {
             if (team != state.rules.waveTeam.id) {
                 return  1; // Default cost for non-waveTeam units
             }
-            return ( ((PathTile.team(tile) ==  0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable :  1 +
+            return ( ((PathTile.team(tile) ==  0 || PathTile.team(tile) == team) )) ? impassable :  1 +
                 (PathTile.deep(tile) ? 200 :  0) +
                 (PathTile.damages(tile) ?  50 :  0) +
                 (PathTile.nearSolid(tile) ?  50 :  0) +
+                (PathTile.solid(tile) ? 450 : 0) +
                 (PathTile.nearLiquid(tile) ?  10 :  0);
         });
 
@@ -39,8 +41,9 @@ public class TowerPathfinder extends Pathfinder {
             if (team != state.rules.waveTeam.id) {
                 return  1; // Default cost for non-waveTeam units
             }
-            return ( ((PathTile.team(tile) ==  0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable :  1 +
+            return ( ((PathTile.team(tile) ==  0 || PathTile.team(tile) == team) )) ? impassable :  1 +
                 (PathTile.deep(tile) ? 300 :  0) +
+                (PathTile.solid(tile) ? 450 : 0) +
                 (PathTile.damages(tile) ?  50 :  0) +
                 (PathTile.nearSolid(tile) ?  50 :  0);
         });

@@ -199,7 +199,7 @@ public class PluginLogic {
     }
     public static boolean isPath(Tile tile) {
         Block floorBlock = tile.floor();
-        boolean isPath = floorBlock == Blocks.darkPanel5 || floorBlock == Blocks.sandWater;
+        boolean isPath = true;
     
         // Check additional blocks at specified coordinates
         for (int x = 0; x <= 2; x++) {
