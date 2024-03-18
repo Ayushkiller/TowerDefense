@@ -16,8 +16,8 @@ import mindustry.gen.Groups;
 import mindustry.net.Administration;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.ForceProjector;
 import mindustry.world.blocks.defense.ShockMine;
-import mindustry.world.blocks.environment.StaticWall;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
@@ -49,14 +49,20 @@ public class PluginLogic {
         }
         netServer.admins.addActionFilter(action->{
             if(action.tile == null) return true;
-            if(action.type == Administration.ActionType.placeBlock || action.type == Administration.ActionType.breakBlock || action.type == Administration.ActionType.dropPayload){
+            if(action.type == Administration.ActionType.placeBlock || action.type == Administration.ActionType.breakBlock){
                 if(!(canBePlaced(action.tile, action.block)|| action.block instanceof ShockMine|| action.block instanceof Conduit || action.block instanceof CoreBlock)){
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                     return false; // Explicitly return false here
                 }
             }
+            if((action.type == Administration.ActionType.dropPayload || action.type == Administration.ActionType.pickupBlock)){
+                Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
+                return false;
+            }
             return true; 
+
         });
+        
 
         Timer.schedule(()->state.rules.waveTeam.data().units.each(unit->{
             var core = unit.closestEnemyCore();
@@ -126,6 +132,14 @@ public class PluginLogic {
         });
         
         Events.on(EventType.GameOverEvent.class, event -> Players.clearMap());
+        Events.on(EventType.TileChangeEvent.class, event -> {
+        Tile changedTile = event.tile;
+         System.out.println("Tile changed at position: " + changedTile.x + ", " + changedTile.y);
+         Block block = changedTile.block();
+        if (block instanceof ForceProjector) {
+        System.out.println("A ForceProjector block was placed or changed.");
+        }
+        });
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam) return;
         
@@ -207,8 +221,7 @@ public class PluginLogic {
         || tile.floor() == Vars.world.tile(0, 2).floor()
         || tile.floor() == Vars.world.tile(2, 1).floor()
         || tile.floor() == Vars.world.tile(1, 2).floor()
-        || tile.floor() == Vars.world.tile(2, 2).floor()
-        || tile.block() instanceof StaticWall;
+        || tile.floor() == Vars.world.tile(2, 2).floor();
     }
     public static boolean canBePlaced(Tile tile, Block block) {
         return !tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
@@ -230,7 +243,7 @@ public class PluginLogic {
                         playerData.addCash(300, p);
                         Team team = Team.sharded;
                         Rules.TeamRule teamRule = Vars.state.rules.teams.get(team);
-                        teamRule.blockDamageMultiplier = 1f;
+                        teamRule.blockDamageMultiplier = 1.2f;
                     }
                 });
             }, 120f); 
@@ -238,7 +251,8 @@ public class PluginLogic {
             Rules.TeamRule teamRule = Vars.state.rules.teams.get(team);
             teamRule.blockDamageMultiplier = 0.5f;
             Call.sendMessage("[red]Due to deployment of team of specialised engineers.Our current Turrets damage is reduced to 50%");
-            Call.sendMessage("[lime]New Team of engineers will arrive soon.");
+            Call.sendMessage("[lime]New Team of engineers will arrive soon.Due to more enginners after their arrival Turrets damage will be esclated to 120%");
         }
     }
+    
 }
