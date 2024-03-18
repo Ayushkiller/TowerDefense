@@ -13,8 +13,8 @@ import mindustry.game.Rules;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
-import mindustry.gen.Player;
 import mindustry.net.Administration;
+import mindustry.ui.Menus;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.ForceProjector;
@@ -22,6 +22,7 @@ import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockFlag;
+import tower.Domain.CustomStatusEffects;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
 import tower.game.Scenarios;
@@ -65,8 +66,11 @@ public class PluginLogic {
             return true; 
 
         });
-        
-
+        Timer.schedule(() -> {
+            forceProjectorTiles.each((tile, forceProjector) -> {
+                Menus.label("shieldProjector.label", 60f, tile.drawx(), tile.drawy());
+            });
+        }, 0f, 2f);
         Timer.schedule(()->state.rules.waveTeam.data().units.each(unit->{
             var core = unit.closestEnemyCore();
             if(core == null || unit.dst(core) > 80f || core.health <= 0) return; // Check if core is null, out of range, or already dead
@@ -274,19 +278,15 @@ public class PluginLogic {
         forceProjectorTiles.each((tile, forceProjector) -> {
             Groups.unit.each(unit -> {
                 float distance = unit.dst(tile.worldx(), tile.worldy());
-                if (distance <= 100f && unit.team == state.rules.waveTeam) {
+                if (distance <= 105f && unit.team == state.rules.waveTeam) {
                     unit.type.speed = 0.9f;
                     unit.healthMultiplier(0.75f);
-                    // Iterate over all players stored in the Players map
-                    Players.forEach(playerData -> {
-                        // Find the Player object that matches the UUID stored in PlayerData
-                        Player player = Groups.player.find(p -> p.uuid().equals(playerData.getUuid()));
-                        if (player != null) {
-                            Bundle.label(player, 100f, tile.drawx(), tile.drawy(), "shieldProjector.label");
-                        }
-                    });
-                }
-            });
-        });
-    }
+                    if (!unit.hasEffect(CustomStatusEffects.slowAsShit)) {
+                        unit.apply(CustomStatusEffects.slowAsShit, 120f);
+                    }
+                    }  
+                });
+           });
+       }
 }
+
