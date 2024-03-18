@@ -23,19 +23,21 @@ public class FlyingAIForAss extends AIController{
             }
         }
 
-        if(core == null){
+        if((core == null || !unit.within(core, unit.type.range * 0.5f))){
             boolean move = true;
 
             if(state.rules.waves && unit.team == state.rules.defaultTeam){
                 Tile spawner = getClosestSpawner();
-                if(spawner != null) {
-                    moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 10f);
-                } else {
-                    move = false;
-                }
+                if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 12f)) 
+                moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 10f);;
+                if(spawner == null && core == null) move = false;
             }
 
-            // Move to the nearest spawner if no core is found, regardless of distance
+            //no reason to move if there's nothing there
+            if(core == null && (!state.rules.waves || getClosestSpawner() == null)){
+             move = false;
+            }
+
             if(move) pathfind(TowerPathfinder.fieldCore);
         }
 
