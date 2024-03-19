@@ -164,23 +164,16 @@ public class BuyPoint {
                 openQuantityAdjustmentMenu(player, option);
             } else if (opt == 6) { // Buy button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
-
-                int totalQuantity = selectedItems.values().stream().mapToInt(Integer::intValue).sum();
-                if (totalQuantity <= 0) {
-                    sendMessageToPlayer(player, "menu.buypoint.error.invalidQuantity");
-                    return;
-                }
                 if (hasEnoughItems(player.team(), option, player)) {
-                    int totalCash = calculateTotalCash(selectedItems);
+                    int totalCash = calculateTotalCash(selectedItems); 
                     PlayerData playerData = Players.getPlayer(player);
-                    playerData.subtractCash(totalCash, player);
-                    addItemsToTeam(player.team(), selectedItems);
+                    playerData.addCash(totalCash, player);
+                    removeItemsFromTeam(player.team(), selectedItems);
                     selectedItemsQuantities.remove(player);
                     player.sendMessage(Bundle.get("menu.buypoint.success"));
                 } else {
                     // Inform the player about insufficient team resources
                     player.sendMessage(Bundle.get("critical.resource"));
-                    selectedItemsQuantities.put(player, new HashMap<>());
                 }
             } else if (opt == 7) { // Close button
                 player.sendMessage(Bundle.get("menu.buypoint.close"));

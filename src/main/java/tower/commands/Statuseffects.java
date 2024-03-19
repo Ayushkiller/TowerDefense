@@ -112,7 +112,7 @@ public class Statuseffects {
                 player.sendMessage(effect.emoji() + " " + Bundle.get("effect.bought.with.additional", player.locale)
                         + effectPrice + " + " + additionalPrice + " = " + totalPrice);
             } else {
-                player.sendMessage("Error: The effect could not be applied. Please try again.");
+                player.sendMessage("[red]Apache helicopter en route to destroy you for messign with server.");
             }
         } else {
             player.sendMessage(Bundle.get("menu.effects.not-enough", player.locale()));

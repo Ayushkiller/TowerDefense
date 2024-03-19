@@ -78,15 +78,22 @@ public class PluginLogic {
                 Call.label(labelText, 1f, tile.drawx(), tile.drawy());
             });
         }, 0f, 5f);
+        // Schedule cash generation every 8 seconds
         Timer.schedule(() -> {
             repairPointTiles.each((tile, forceProjector) -> {
-                float cashGenerated = 1f;
+                float cashGenerated = 0f;
                 repairPointCash.put(tile, repairPointCash.get(tile, 0f) + cashGenerated);
+            });
+        }, 0f, 12f);
+
+        // Schedule label display every 5 seconds
+        Timer.schedule(() -> {
+            repairPointTiles.each((tile, forceProjector) -> {
                 String labelText = tower.Bundle.get("RepairPoint.label") + " Cash generated: "
                         + repairPointCash.get(tile, 0f);
                 Call.label(labelText, 1f, tile.drawx(), tile.drawy());
             });
-        }, 0f, 8f);
+        }, 0f, 5f);
         Timer.schedule(() -> {
             Groups.player.each(player -> {
                 repairPointTiles.each((tile, forceProjector) -> {
@@ -134,23 +141,23 @@ public class PluginLogic {
         Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier",
                 Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
 
-                Events.on(EventType.WorldLoadEvent.class, event -> {
-                    // Set the multiplier to 0.5f
-                    multiplier = 0.5f;
+        Events.on(EventType.WorldLoadEvent.class, event -> {
+            // Set the multiplier to 0.5f
+            multiplier = 0.5f;
 
-                    Groups.player.each(player -> {
-                        PlayerData playerData = Players.getPlayer(player);
-                        if (playerData != null) {
-                            float currentCash = playerData.getCash();
-                            StringBuilder hud = new StringBuilder();
-                            hud.append("[green]Cash for[white] " + playerData.getName() + " - [lime]"
-                                    + (int) playerData.getCash() + "\n ");
-                            Call.setHudText(player.con, hud.toString());
-                            playerData.setLastUpdatedCash(currentCash);
-            
-                        }
-                    });
-                });
+            Groups.player.each(player -> {
+                PlayerData playerData = Players.getPlayer(player);
+                if (playerData != null) {
+                    float currentCash = playerData.getCash();
+                    StringBuilder hud = new StringBuilder();
+                    hud.append("[green]Cash for[white] " + playerData.getName() + " - [lime]"
+                            + (int) playerData.getCash() + "\n ");
+                    Call.setHudText(player.con, hud.toString());
+                    playerData.setLastUpdatedCash(currentCash);
+
+                }
+            });
+        });
         Events.on(EventType.WaveEvent.class, event -> {
             if (state.wave == 50) {
                 Scenarios.requestDeploymentForAllPlayers();

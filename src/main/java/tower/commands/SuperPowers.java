@@ -148,21 +148,20 @@ public class SuperPowers {
                     Unit unit = unitType.spawn(worldX, worldY);
                     if (unit == null || !unit.isValid()) {
                         allUnitsSpawned = false;
-                    
-                        break;
+                        break; // Exit the loop if a unit fails to spawn
                     }
                     unit.type.allowedInPayloads = false;
+                    unit.type.playerControllable = false;
+                    unit.type.autoFindTarget = true;
                     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                     executor.schedule(() -> {
                         if (unit != null && unit.isValid()) {
                             unit.kill();
-                            
-
                         }
                     }, 10, TimeUnit.SECONDS); // Adjusted to 5 seconds
                 } else {
                     allUnitsSpawned = false;
-                    break;
+                    break; // Exit the loop if the tile is null
                 }
             }
 
@@ -178,6 +177,8 @@ public class SuperPowers {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-Cash", player.locale()));
         }
     }
+
+    boolean[] allUnitsSpawned = new boolean[] { true };
 
     private static void spawnDisruptUnit(Player player, World world, float playerX, float playerY) {
         PlayerData playerData = Players.getPlayer(player);
@@ -213,6 +214,8 @@ public class SuperPowers {
                         for (UnitType unitType : new UnitType[] { UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert,
                                 UnitTypes.flare }) {
                             Unit unit = unitType.spawn(worldX, worldY);
+                            unit.type.playerControllable = false;
+                            unit.type.autoFindTarget = true;
                             unit.type.allowedInPayloads = false;
                             if (unit == null || !unit.isValid()) {
                                 allUnitsSpawned[0] = false;
