@@ -151,7 +151,7 @@ public class TowerDefensePlugin extends Plugin {
         player.team().core().items.add(itemToBuy, amount);
 
         // Deduct cash from the player
-        playerData.addCash(-requiredCash, player);
+        playerData.subtractCash(requiredCash, player);
 
         player.sendMessage("Bought " + amount + " " + itemToBuy.toString() + " for " + requiredCash + " Cash.");
     }

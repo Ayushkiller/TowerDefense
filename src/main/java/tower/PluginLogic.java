@@ -17,16 +17,17 @@ import mindustry.net.Administration;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.ForceProjector;
+import mindustry.world.blocks.defense.RegenProjector;
 import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
+import mindustry.world.blocks.units.RepairTurret;
 import mindustry.world.meta.BlockFlag;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
 import tower.game.Scenarios;
 import tower.pathing.FlyingAIForAss;
 import useful.Bundle;
-
 import static mindustry.Vars.*;
 
 import java.util.Map;
@@ -36,7 +37,7 @@ public class PluginLogic {
     public static boolean multiplierAdjusted = false;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
     public static ObjectMap<Tile, ForceProjector> forceProjectorTiles = new ObjectMap<>();
-
+    public static ObjectMap<Tile, RepairTurret> repairPointTiles = new ObjectMap<>();
     public static void init() {
         drops = new ObjectMap<>();
         for (Map<String, Object> dropEntry : Unitsdrops.drops) {
@@ -71,6 +72,12 @@ public class PluginLogic {
         Timer.schedule(() -> {
             forceProjectorTiles.each((tile, forceProjector) -> {
                 String labelText = tower.Bundle.get("shieldProjector.label");
+                Call.label(labelText, 1f, tile.drawx(), tile.drawy());
+            });
+        }, 0f, 5f);
+        Timer.schedule(() -> {
+            repairPointTiles.each((tile, forceProjector) -> {
+                String labelText = tower.Bundle.get("RepairPoint.label");
                 Call.label(labelText, 1f, tile.drawx(), tile.drawy());
             });
         }, 0f, 5f);
@@ -151,7 +158,7 @@ public class PluginLogic {
             Tile changedTile = event.tile;
             Block block = changedTile.block();
 
-            if (block instanceof ForceProjector) {
+            if (block instanceof ForceProjector && block instanceof RegenProjector) {
                 // If the tile is not already in the map, add it
                 if (!forceProjectorTiles.containsKey(changedTile)) {
                     forceProjectorTiles.put(changedTile, (ForceProjector) block);
@@ -163,6 +170,13 @@ public class PluginLogic {
                     forceProjectorTiles.remove(changedTile);
 
                 }
+            }
+            if (block instanceof RepairTurret) {
+                if (!repairPointTiles.containsKey(changedTile)) {
+                    repairPointTiles.put(changedTile, (RepairTurret) block);
+                }
+            } else {
+                repairPointTiles.remove(changedTile);
             }
         });
         Events.on(EventType.UnitDestroyEvent.class, event -> {
@@ -190,14 +204,6 @@ public class PluginLogic {
             Call.label(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
 
             Timer.schedule(() -> multiplierAdjusted = false, 180f);
-
-            // Distribute Cash to all players
-            Players.forEach(playerData -> {
-                if (playerData != null) {
-                    float reductionPercentage = playerData.calculateReductionPercentage(playerData.getCash());
-                    playerData.addCashWithReduction(reductionPercentage);
-                }
-            });
         });
         Events.on(EventType.UnitSpawnEvent.class, event -> {
 
@@ -295,6 +301,16 @@ public class PluginLogic {
                     unit.healthMultiplier(0.75f);
                     unit.apply(StatusEffects.electrified, 200f);
                     unit.apply(StatusEffects.slow, 200f);
+                }
+            });
+        });
+        repairPointTiles.each((tile, repairPoint) -> {
+            Groups.player.each(player -> {
+                if (player.dst(tile.worldx(), tile.worldy()) <= 40f) {
+                    Timer.schedule(() -> {
+                        PlayerData playerData = Players.getPlayer(player);
+                        playerData.addCash(3, player);
+                    }, 0f, 3f); 
                 }
             });
         });

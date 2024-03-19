@@ -22,23 +22,7 @@ public class PlayerData {
     private String name;
     private boolean showStats;
     private float Cash;
-
-    public void addCashWithReduction(float reductionPercentage) {
-        float baseCash = 1f; // Base Cash to be added
-        float reduction = this.Cash * reductionPercentage / 100; // Calculate reduction
-        float CashToAdd = baseCash - reduction; // Calculate Cash to add after reduction
-
-        // Check if Cash to add is negative
-        if (CashToAdd <= 0) {
-            // If Cash to add is negative, do not add any Cash
-            return;
-        }
-
-        // If Cash to add is positive, add them to the player's Cash
-        this.Cash += CashToAdd;
-    }
-
-    public static int getTotalPlayers() {
+   public static int getTotalPlayers() {
         return totalPlayers;
     }
 
@@ -47,10 +31,6 @@ public class PlayerData {
 
     }
 
-    public float calculateReductionPercentage(float Cash) {
-
-        return Cash * 0.9f;
-    }
 
     public void subtractCash(float amount, Player player) {
         this.Cash -= amount;
