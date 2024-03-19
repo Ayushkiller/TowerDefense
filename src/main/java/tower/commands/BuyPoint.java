@@ -161,8 +161,7 @@ public class BuyPoint {
             if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
                 quantities.put(selectedItem, currentQuantity + adjustment);
-                openQuantityAdjustmentMenu(player, option); // Open menu again after adjustment
-            } else if (opt == 6) { // Buy button
+                openQuantityAdjustmentMenu(player, option);
             } else if (opt == 6) { // Buy button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
 

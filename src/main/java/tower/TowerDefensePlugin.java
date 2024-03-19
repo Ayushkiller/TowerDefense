@@ -30,30 +30,27 @@ public class TowerDefensePlugin extends Plugin {
     public void registerClientCommands(CommandHandler handler) {
         handler.register("menu", "Opens the Special store", (String[] args, Player player) -> Menu.execute(player));
         handler.register("cash", "[item] [amount]", "Buy/sell cash. To sell cash, use negative amount.",
-                (String[] args, Player player) -> {
-                    if (args.length > 1) {
-                        String itemName = args[0];
-                        int amount;
-                        try {
-                            amount = Integer.parseInt(args[1]);
-                        } catch (NumberFormatException e) {
-                            player.sendMessage("[#f]⚠[] [#f]Invalid amount provided.");
-                            return;
-                        }
-
-                        if (amount > 0) {
-                            // Player wants to sell items
-                            sellItems(player, itemName, amount);
-                        } else if (amount < 0) {
-                            // Player wants to buy items
-                            buyItems(player, itemName, -amount); // Convert negative amount to positive
-                        } else {
-                            player.sendMessage("[#f]⚠[] [#f]Amount should not be zero.");
-                        }
-                    } else {
-                        player.sendMessage("[#f]⚠[] [#f]Please specify the item and amount.");
-                    }
-                });
+        (String[] args, Player player) -> {
+            if (args.length > 1) {
+                String itemName = args[0];
+                int amount;
+                try {
+                    amount = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    player.sendMessage("[#f]⚠[] [#f]Invalid amount provided.");
+                    return;
+                }
+    
+                if (amount > 0) {
+                    // Player wants to sell items
+                    sellItems(player, itemName, amount);
+                } else {
+                    player.sendMessage("[#f]⚠[] [#f]Negative amounts are not allowed.");
+                }
+            } else {
+                player.sendMessage("[#f]⚠[] [#f]Please specify the item and amount.");
+            }
+        });
     }
 
 
@@ -125,35 +122,6 @@ public class TowerDefensePlugin extends Plugin {
             }
         }
         return 0;
-    }
-
-    private void buyItems(Player player, String itemName, int amount) {
-        Item itemToBuy = findItemByName(itemName);
-        if (itemToBuy == null) {
-            player.sendMessage("[#f]⚠[] [#f]Item not found.");
-            return;
-        }
-
-        int price = getItemPrice(itemToBuy);
-        PlayerData playerData = Players.getPlayer(player);
-        if (playerData == null) {
-            player.sendMessage("[#f]⚠[] [#f]Player data not found.");
-            return;
-        }
-
-        int requiredCash = price * amount;
-        if (playerData.getCash() < requiredCash) {
-            player.sendMessage("[#f]⚠[] [#f]You do not have enough cash to buy these items.You need "+ requiredCash);
-            return;
-        }
-
-        // Add items to the player's core
-        player.team().core().items.add(itemToBuy, amount);
-
-        // Deduct cash from the player
-        playerData.subtractCash(requiredCash, player);
-
-        player.sendMessage("Bought " + amount + " " + itemToBuy.toString() + " for " + requiredCash + " Cash.");
     }
 
     private Item findItemByName(String itemName) {

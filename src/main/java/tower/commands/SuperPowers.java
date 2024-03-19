@@ -99,14 +99,14 @@ public class SuperPowers {
                             unitType.weapons.get(0).cooldownTime = 10f;
                             unit.type.playerControllable = false;
                             unit.type.autoFindTarget = true;
-                            unit.type.allowedInPayloads = true;
+                            unit.type.allowedInPayloads = false;
                         } else if (unitType == UnitTypes.collaris) {
                             unitType.groundLayer = Layer.flyingUnit;
                             unitType.weapons.get(0).reload = 10f;
                             unitType.weapons.get(0).cooldownTime = 10f;
                             unit.type.playerControllable = false;
                             unit.type.autoFindTarget = true;
-                            unit.type.allowedInPayloads = true;
+                            unit.type.allowedInPayloads = false;
                         }
                     } else {
                         playerData.addCash(100, player);
@@ -148,12 +148,15 @@ public class SuperPowers {
                     Unit unit = unitType.spawn(worldX, worldY);
                     if (unit == null || !unit.isValid()) {
                         allUnitsSpawned = false;
+                    
                         break;
                     }
+                    unit.type.allowedInPayloads = false;
                     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                     executor.schedule(() -> {
                         if (unit != null && unit.isValid()) {
                             unit.kill();
+                            
 
                         }
                     }, 10, TimeUnit.SECONDS); // Adjusted to 5 seconds
@@ -210,6 +213,7 @@ public class SuperPowers {
                         for (UnitType unitType : new UnitType[] { UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert,
                                 UnitTypes.flare }) {
                             Unit unit = unitType.spawn(worldX, worldY);
+                            unit.type.allowedInPayloads = false;
                             if (unit == null || !unit.isValid()) {
                                 allUnitsSpawned[0] = false;
                                 break;

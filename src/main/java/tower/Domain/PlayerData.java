@@ -7,12 +7,6 @@ import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import tower.Players;
 
-/**
- * Represents the data associated with a player in the tower defense game.
- * This class stores information such as the player's name, UUID, IP address,
- * health Cash,
- * the unit they are controlling, Cash accumulated, and other game-related data.
- */
 public class PlayerData {
     private static int totalPlayers = 0;
     private Unit unit;
@@ -91,7 +85,7 @@ public class PlayerData {
         player.ip();
         this.hp = player.unit().health();
         this.name = player.name();
-        this.Cash = 10;
+        this.Cash = 0;
     }
 
     public static Player[] getAllPlayers() {

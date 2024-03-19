@@ -36,18 +36,12 @@ public class Players {
                         && player.unit() != Players.getPlayer(player).getUnit()) {
                     player.unit(Players.getPlayer(player).getUnit());
                 }
-
-                if (!player.dead() && player.name().equals(playerData.getName())
-                        && player.uuid().equals(playerData.getUuid())) {
-                    float currentCash = playerData.getCash();
-                    if (currentCash != playerData.getLastUpdatedCash()) {
-                        StringBuilder hud = new StringBuilder();
-                        hud.append("[green]Cash for[white] " + playerData.getName() + " - [lime]"
-                                + (int) playerData.getCash() + "\n ");
-                        Call.setHudText(player.con, hud.toString());
-                        playerData.setLastUpdatedCash(currentCash);
-                    }
-                }
+                float currentCash = playerData.getCash();
+                StringBuilder hud = new StringBuilder();
+                hud.append("[green]Cash for[white] " + playerData.getName() + " - [lime]"
+                        + (int) playerData.getCash() + "\n ");
+                Call.setHudText(player.con, hud.toString());
+                playerData.setLastUpdatedCash(currentCash);
 
             }
         });

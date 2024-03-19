@@ -168,15 +168,17 @@ public class Units {
     }
 
     private static void openQuantityAdjustmentMenu(UnitType unitType, Player player, int defaultQuantity) {
-        String title = "Adjust Quantity";
-        String[][] buttons = new String[][] { { "-1", "0", "+1" }, { "Buy", "Back", "Close" } };
-
+        String title = "[red]Adjust Quantity";
+        String[][] buttons = new String[][] { { "-1", "0", "+1" }, { "[green]Buy", "[grey]Back", "[red]Close" } };
+        int price = unitPrices.get(unitType); // Assuming unitPrices is accessible and contains the price for each unit type
+        String message = "[green]Current Quantity: " + defaultQuantity + "\n[red]Total Price: " + (defaultQuantity * price);
+    
         Call.menu(player.con, Menus.registerMenu((p, opt) -> {
             if (opt < 3) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
                 int currentQuantity = defaultQuantity + adjustment;
                 if (currentQuantity < 1) {
-                    player.sendMessage("Quantity cannot be less than 1.");
+                    player.sendMessage("[red]Quantity cannot be less than 1.");
                     return;
                 }
                 openQuantityAdjustmentMenu(unitType, player, currentQuantity);
@@ -187,7 +189,7 @@ public class Units {
             } else if (opt == 5) { // Close button
                 player.sendMessage("Purchase cancelled.");
             }
-        }), title, "Select quantity adjustment", buttons);
+        }), title, message, buttons); // Pass the dynamic message to the menu
     }
 
     private static void buyMultipleUnits(UnitType unitType, Player player, int quantity) {
@@ -199,9 +201,9 @@ public class Units {
                 buyUnit(unitType, player, false); // Pass false to prevent unit control
             }
             playerData.subtractCash(totalCost, player);
-            player.sendMessage("Units purchased successfully.");
+            player.sendMessage("[green]Units purchased successfully.");
         } else {
-            player.sendMessage("You don't have enough funds to buy " + quantity + " units.");
+            player.sendMessage("[red]You don't have enough funds to buy " + quantity + " units.");
         }
     }
     public static void execute(Player player) {
