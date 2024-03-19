@@ -13,6 +13,7 @@ import mindustry.game.Rules;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
+import mindustry.gen.Player;
 import mindustry.net.Administration;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -75,25 +76,26 @@ public class PluginLogic {
         Timer.schedule(() -> {
             forceProjectorTiles.each((tile, forceProjector) -> {
                 String labelText = tower.Bundle.get("shieldProjector.label");
-                Call.label(labelText, 1f, tile.drawx(), tile.drawy());
+                Call.labelReliable(labelText, 1f, tile.drawx(), tile.drawy());
             });
         }, 0f, 5f);
         // Schedule cash generation every 8 seconds
         Timer.schedule(() -> {
             repairPointTiles.each((tile, forceProjector) -> {
-                if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
-                float cashGenerated = 1f;
-                repairPointCash.put(tile, repairPointCash.get(tile, 0f) + cashGenerated);
-                }
+                Groups.player.each(player -> {
+                    if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
+                        float cashGenerated = 1f;
+                        repairPointCash.put(tile, repairPointCash.get(tile, 0f) + cashGenerated);
+                    }
+                });
             });
         }, 0f, 20f);
-
         // Schedule label display every 5 seconds
         Timer.schedule(() -> {
             repairPointTiles.each((tile, forceProjector) -> {
                 String labelText = tower.Bundle.get("RepairPoint.label") + " Cash generated: "
                         + repairPointCash.get(tile, 0f);
-                Call.label(labelText, 2f, tile.drawx(), tile.drawy());
+                Call.labelReliable(labelText, 2f, tile.drawx(), tile.drawy());     
             });
         }, 0f, 5f);
         Timer.schedule(() -> {
@@ -124,6 +126,24 @@ public class PluginLogic {
                 }
             }
         }, 0f, 1f);
+        Timer.schedule(() -> {
+            boolean hasNegativePoints = false;
+            for (Player player : Groups.player) {
+                PlayerData playerData = Players.getPlayer(player);
+                if (playerData != null && playerData.getCash() < 0) {
+                    hasNegativePoints = true;
+                    break;
+                }
+            }
+            if (hasNegativePoints) {
+                for (Player player : Groups.player) {
+                    PlayerData playerData = Players.getPlayer(player);
+                    if (playerData != null) {
+                        playerData.setCash(0, player);
+                    }
+                }
+            }
+        }, 0f, 2f); // Check every second
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
             if (core == null || unit.dst(core) > 80f || core.health <= 0)
@@ -261,7 +281,7 @@ public class PluginLogic {
                         event.unit.y, core);
             });
 
-            Call.label(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
+            Call.labelReliable(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
 
             Timer.schedule(() -> multiplierAdjusted = false, 180f);
         });
