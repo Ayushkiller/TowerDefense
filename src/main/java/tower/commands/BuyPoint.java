@@ -148,7 +148,7 @@ public class BuyPoint {
         }
         Map<String, Object> selectedItemMap = Currency.items.get(option);
         Item selectedItem = (Item) selectedItemMap.get("item");
-
+    
         String title = "Adjust Quantity";
         Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
         int currentQuantity = quantities.getOrDefault(selectedItem, 0);
@@ -156,7 +156,7 @@ public class BuyPoint {
                 selectedItem.emoji(), currentQuantity);
         String[][] buttons = new String[][] { { "-2000", "-1000", "-100", "+100", "+1000", "+2000" },
                 { "Buy", "Close", "Back" } };
-
+    
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
             if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
@@ -165,15 +165,15 @@ public class BuyPoint {
             } else if (opt == 6) { // Buy button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
                 if (hasEnoughItems(player.team(), option, player)) {
-                    int totalCash = calculateTotalCash(selectedItems); 
+                    int totalCash = calculateTotalCash(selectedItems);
                     PlayerData playerData = Players.getPlayer(player);
                     playerData.addCash(totalCash, player);
                     removeItemsFromTeam(player.team(), selectedItems);
                     selectedItemsQuantities.remove(player);
                     player.sendMessage(Bundle.get("menu.buypoint.success"));
                 } else {
-                    // Inform the player about insufficient team resources
                     player.sendMessage(Bundle.get("critical.resource"));
+                    selectedItemsQuantities.put(player, new HashMap<>());
                 }
             } else if (opt == 7) { // Close button
                 player.sendMessage(Bundle.get("menu.buypoint.close"));

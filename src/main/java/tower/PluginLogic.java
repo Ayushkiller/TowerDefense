@@ -81,7 +81,7 @@ public class PluginLogic {
         // Schedule cash generation every 8 seconds
         Timer.schedule(() -> {
             repairPointTiles.each((tile, forceProjector) -> {
-                float cashGenerated = 0f;
+                float cashGenerated = 1f;
                 repairPointCash.put(tile, repairPointCash.get(tile, 0f) + cashGenerated);
             });
         }, 0f, 12f);
@@ -91,7 +91,7 @@ public class PluginLogic {
             repairPointTiles.each((tile, forceProjector) -> {
                 String labelText = tower.Bundle.get("RepairPoint.label") + " Cash generated: "
                         + repairPointCash.get(tile, 0f);
-                Call.label(labelText, 1f, tile.drawx(), tile.drawy());
+                Call.label(labelText, 2f, tile.drawx(), tile.drawy());
             });
         }, 0f, 5f);
         Timer.schedule(() -> {
@@ -210,6 +210,8 @@ public class PluginLogic {
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
             forceProjectorTiles.clear();
+            repairPointTiles.clear();
+            repairPointCash.clear();
         });
         Events.on(EventType.TileChangeEvent.class, event -> {
             Tile changedTile = event.tile;
