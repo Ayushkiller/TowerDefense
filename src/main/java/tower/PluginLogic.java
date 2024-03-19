@@ -81,10 +81,12 @@ public class PluginLogic {
         // Schedule cash generation every 8 seconds
         Timer.schedule(() -> {
             repairPointTiles.each((tile, forceProjector) -> {
+                if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
                 float cashGenerated = 1f;
                 repairPointCash.put(tile, repairPointCash.get(tile, 0f) + cashGenerated);
+                }
             });
-        }, 0f, 12f);
+        }, 0f, 20f);
 
         // Schedule label display every 5 seconds
         Timer.schedule(() -> {
@@ -206,7 +208,6 @@ public class PluginLogic {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 2f) * 2, multiplier, 100f);
             }
         });
-
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
             forceProjectorTiles.clear();
@@ -231,7 +232,7 @@ public class PluginLogic {
                 }
             }
             if (block instanceof RepairTurret || block instanceof ShockwaveTower) {
-                if (!repairPointTiles.containsKey(changedTile)) {
+                if (!repairPointTiles.containsKey(changedTile) && repairPointTiles.size < 20) {
                     repairPointTiles.put(changedTile, (RepairTurret) block);
                 }
             } else {
