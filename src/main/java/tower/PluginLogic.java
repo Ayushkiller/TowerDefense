@@ -19,6 +19,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.ForceProjector;
 import mindustry.world.blocks.defense.RegenProjector;
 import mindustry.world.blocks.defense.ShockMine;
+import mindustry.world.blocks.defense.ShockwaveTower;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.RepairTurret;
@@ -38,6 +39,8 @@ public class PluginLogic {
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
     public static ObjectMap<Tile, ForceProjector> forceProjectorTiles = new ObjectMap<>();
     public static ObjectMap<Tile, RepairTurret> repairPointTiles = new ObjectMap<>();
+    public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
+
     public static void init() {
         drops = new ObjectMap<>();
         for (Map<String, Object> dropEntry : Unitsdrops.drops) {
@@ -75,12 +78,42 @@ public class PluginLogic {
                 Call.label(labelText, 1f, tile.drawx(), tile.drawy());
             });
         }, 0f, 5f);
-        Timer.schedule(() -> {
-            repairPointTiles.each((tile, forceProjector) -> {
-                String labelText = tower.Bundle.get("RepairPoint.label");
+
+        repairPointTiles.each((tile, forceProjector) -> {
+            Timer.schedule(() -> {
+                float cashGenerated = 1f;
+                repairPointCash.put(tile, repairPointCash.get(tile, 0f) + cashGenerated);
+                String labelText = tower.Bundle.get("RepairPoint.label") + " Cash generated: "
+                        + repairPointCash.get(tile, 0f);
                 Call.label(labelText, 1f, tile.drawx(), tile.drawy());
+            }, 0f, 8f);
+        });
+        Groups.player.each(player -> {
+            repairPointTiles.each((tile, forceProjector) -> {
+                if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
+                    Timer.schedule(() -> {
+                        PlayerData playerData = Players.getPlayer(player);
+                        float cashToAdd = repairPointCash.get(tile, 0f);
+                        playerData.addCash(cashToAdd, player);
+                        // Reset the cash for this tile after distribution
+                        repairPointCash.put(tile, 0f);
+                    }, 0f, 1f);
+                }
             });
-        }, 0f, 5f);
+        });
+        Timer.schedule(() -> {
+            for (int x = 0; x < Vars.world.width(); x++) {
+                for (int y = 0; y < Vars.world.height(); y++) {
+                    Tile tile = Vars.world.tile(x, y);
+                    if (isPath(tile)) {
+                        Block block = tile.block();
+                        if (block != null && !(block instanceof CoreBlock || block instanceof ShockMine || block instanceof Conduit || block instanceof CoreBlock)) {
+                            tile.setBlock(Blocks.air);
+                        }
+                    }
+                }
+            }
+        }, 0f, 1f);
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
             if (core == null || unit.dst(core) > 80f || core.health <= 0)
@@ -158,7 +191,7 @@ public class PluginLogic {
             Tile changedTile = event.tile;
             Block block = changedTile.block();
 
-            if (block instanceof ForceProjector && block instanceof RegenProjector) {
+            if (block instanceof ForceProjector || block instanceof RegenProjector) {
                 // If the tile is not already in the map, add it
                 if (!forceProjectorTiles.containsKey(changedTile)) {
                     forceProjectorTiles.put(changedTile, (ForceProjector) block);
@@ -171,7 +204,7 @@ public class PluginLogic {
 
                 }
             }
-            if (block instanceof RepairTurret) {
+            if (block instanceof RepairTurret || block instanceof ShockwaveTower) {
                 if (!repairPointTiles.containsKey(changedTile)) {
                     repairPointTiles.put(changedTile, (RepairTurret) block);
                 }
@@ -301,16 +334,6 @@ public class PluginLogic {
                     unit.healthMultiplier(0.75f);
                     unit.apply(StatusEffects.electrified, 200f);
                     unit.apply(StatusEffects.slow, 200f);
-                }
-            });
-        });
-        repairPointTiles.each((tile, repairPoint) -> {
-            Groups.player.each(player -> {
-                if (player.dst(tile.worldx(), tile.worldy()) <= 40f) {
-                    Timer.schedule(() -> {
-                        PlayerData playerData = Players.getPlayer(player);
-                        playerData.addCash(3, player);
-                    }, 0f, 3f); 
                 }
             });
         });
