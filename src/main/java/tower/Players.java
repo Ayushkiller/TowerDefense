@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-
 public class Players {
     public static final Map<String, PlayerData> players = new HashMap<>();
 
@@ -20,9 +19,11 @@ public class Players {
         }
         return players.get(player.uuid());
     }
+
     public static void clearMap() {
         players.clear();
     }
+
     public static void forEach(Consumer<PlayerData> action) {
         players.values().forEach(action);
     }
@@ -31,27 +32,25 @@ public class Players {
         Groups.player.each(player -> {
             PlayerData playerData = Players.getPlayer(player);
             if (playerData != null) {
-                if(Players.getPlayer(player).getUnit() != null && player.unit() != Players.getPlayer(player).getUnit()) {
+                if (Players.getPlayer(player).getUnit() != null
+                        && player.unit() != Players.getPlayer(player).getUnit()) {
                     player.unit(Players.getPlayer(player).getUnit());
                 }
 
-                if (!player.dead() && player.name().equals(playerData.getName()) && player.uuid().equals(playerData.getUuid())) {
+                if (!player.dead() && player.name().equals(playerData.getName())
+                        && player.uuid().equals(playerData.getUuid())) {
                     float currentCash = playerData.getCash();
                     if (currentCash != playerData.getLastUpdatedCash()) {
                         StringBuilder hud = new StringBuilder();
-                        hud.append("[green]Cash for[white] " + playerData.getName() + " - [lime]" + (int) playerData.getCash() + "\n ");
+                        hud.append("[green]Cash for[white] " + playerData.getName() + " - [lime]"
+                                + (int) playerData.getCash() + "\n ");
                         Call.setHudText(player.con, hud.toString());
                         playerData.setLastUpdatedCash(currentCash);
                     }
                 }
-                
+
             }
         });
     }
 
-
 }
-
-
-
-

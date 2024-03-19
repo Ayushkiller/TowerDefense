@@ -5,12 +5,10 @@ import arc.struct.ObjectMap;
 import arc.util.Log;
 import arc.util.Structs;
 
-
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-
 
 public class Bundle {
     private static final ObjectMap<Locale, ResourceBundle> bundles = new ObjectMap<>();
@@ -19,18 +17,20 @@ public class Bundle {
     public static final Locale defaultLocale = new Locale("en");
     public static final Locale[] supportedLocales;
 
-    private Bundle() {}
+    private Bundle() {
+    }
 
     static {
         Fi file = new Fi("src/main/resources/bundles/bundle_en.properties");
         if (file.exists()) {
             String code = file.nameWithoutExtension();
             String[] codes;
-            if ((codes = code.replace("bundle_", "").split("_")).length ==   1)
-                supportedLocales = new Locale[]{new Locale(codes[0])};
-            else supportedLocales = new Locale[]{new Locale(codes[0], codes[1])};
+            if ((codes = code.replace("bundle_", "").split("_")).length == 1)
+                supportedLocales = new Locale[] { new Locale(codes[0]) };
+            else
+                supportedLocales = new Locale[] { new Locale(codes[0], codes[1]) };
         } else {
-            supportedLocales = new Locale[]{defaultLocale};
+            supportedLocales = new Locale[] { defaultLocale };
         }
     }
 
@@ -39,17 +39,19 @@ public class Bundle {
         if (bundle == null) {
             if (Structs.contains(supportedLocales, locale))
                 bundles.put(locale, bundle = ResourceBundle.getBundle("bundles.bundle", locale));
-            else bundle = getResource(defaultLocale);
+            else
+                bundle = getResource(defaultLocale);
         }
         return bundle;
     }
 
     public static Locale findLocale(String localeString) {
-        Locale locale = Structs.find(supportedLocales, l -> localeString.equals(l.toString()) || localeString.startsWith(l.toString()));
+        Locale locale = Structs.find(supportedLocales,
+                l -> localeString.equals(l.toString()) || localeString.startsWith(l.toString()));
         return locale != null ? locale : defaultLocale;
     }
 
-    public static String format(String key, Locale locale, Object... values){
+    public static String format(String key, Locale locale, Object... values) {
         String pattern = get(key, locale);
         if (values.length == 0)
             return pattern;
@@ -72,7 +74,7 @@ public class Bundle {
             return getResource(locale).getString(key);
         } catch (MissingResourceException e) {
             Log.err("Key '@' doesn't exist in locale '@'", key, locale);
-            return (locale == defaultLocale)? "?" + key + "?" : get(key);
+            return (locale == defaultLocale) ? "?" + key + "?" : get(key);
         }
     }
 

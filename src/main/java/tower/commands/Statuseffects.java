@@ -15,7 +15,7 @@ import tower.Domain.PlayerData;
 import tower.Domain.UnitsTable;
 
 public class Statuseffects {
-   
+
     private static final java.util.Map<StatusEffect, Integer> effectPrices = new HashMap<>();
     private static String[][] buttons; // Declare the buttons variable here
 
@@ -33,7 +33,7 @@ public class Statuseffects {
 
     public static void execute(Player player) {
         if (player == null) {
-          
+
             return;
         }
 
@@ -41,7 +41,7 @@ public class Statuseffects {
     }
 
     private static void openGui(Player player) {
-        if (buttons == null || buttons.length ==  0) {
+        if (buttons == null || buttons.length == 0) {
             initEffectsTable(player);
         }
 
@@ -49,7 +49,7 @@ public class Statuseffects {
     }
 
     private static final int menu = Menus.registerMenu((player, option) -> {
-        for (int i =  0; i < Effects.effects.size(); i++) {
+        for (int i = 0; i < Effects.effects.size(); i++) {
             int index = i;
             if (index == option) {
                 StatusEffect effect = (StatusEffect) Effects.effects.get(i).get("effect");
@@ -70,11 +70,11 @@ public class Statuseffects {
             buttons[i][0] = effect.emoji() + " " + effectName + " Total Price: " + effectPrice;
         }
     }
-    
+
     private static void buyEffect(StatusEffect effect, Player player) {
         PlayerData playerData = Players.getPlayer(player);
         int effectPrice = effectPrices.get(effect);
-    
+
         // Fetch the current unit's type
         UnitType currentUnitType = player.unit().type();
         // Find the position of the current unit type within the UnitsTable.units array
@@ -88,27 +88,29 @@ public class Statuseffects {
                 break;
             }
         }
-    
+
         // Check if the unit position was found and unitMap is not null
         if (row == -1 || unitMap == null) {
             player.sendMessage("Error: Unit type not found in UnitsTable or unitMap is null.");
             return;
         }
-    
+
         // Directly access the price for the current unit type from the unitMap
         int currentUnitPrice = (int) unitMap.get("price");
-    
+
         // Calculate 75% of the current unit's price
         int additionalPrice = (int) (currentUnitPrice * 0.75);
         // Add the calculated amount to the status effect's price
         int totalPrice = effectPrice + additionalPrice;
-    
+
         if (playerData.getCash() >= totalPrice) {
             if (effect != null) { // Ensure the effect is not null before applying it
                 playerData.subtractCash(totalPrice, player);
                 player.unit().apply(effect, Float.POSITIVE_INFINITY);
-                // Modify the message to include the emoji, base effect price, and the additional price
-                player.sendMessage(effect.emoji() + " " + Bundle.get("effect.bought.with.additional", player.locale) + effectPrice + " + " + additionalPrice + " = " + totalPrice);
+                // Modify the message to include the emoji, base effect price, and the
+                // additional price
+                player.sendMessage(effect.emoji() + " " + Bundle.get("effect.bought.with.additional", player.locale)
+                        + effectPrice + " + " + additionalPrice + " = " + totalPrice);
             } else {
                 player.sendMessage("Error: The effect could not be applied. Please try again.");
             }

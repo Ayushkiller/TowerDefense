@@ -1,7 +1,7 @@
 # Ignore build and .gradle directories
 /build/
 /.gradle/
-
+*.gradle
 *.bin
 *.bin
 *.bin
@@ -12,3 +12,4 @@
 .gradle/buildOutputCleanup/buildOutputCleanup.lock
 *.lock
 *.bin
+/.gradle/

@@ -15,11 +15,11 @@ public class Scenarios {
     private static final int deploymentMenuClose = Menus.registerMenu(Scenarios::handleDeploymentOptionClose);
     private static final int deploymentMenu = Menus.registerMenu(Scenarios::handleDeploymentOption);
     private static final String[][] deploymentButtons = {
-            {"[red]No"},
-            {"[lime]Yes"}
+            { "[red]No" },
+            { "[lime]Yes" }
     };
     private static final String[][] deploymentButtonsClose = {
-            {"[gray]Close"}
+            { "[gray]Close" }
     };
     private static int globalYesVotes = 0;
     private static int globalNoVotes = 0;
@@ -30,12 +30,14 @@ public class Scenarios {
             return;
         }
 
-        Call.menu(player.con, deploymentMenu, Bundle.get("deployment.title", player.locale), Bundle.get("deployment.message", player.locale), deploymentButtons);
+        Call.menu(player.con, deploymentMenu, Bundle.get("deployment.title", player.locale),
+                Bundle.get("deployment.message", player.locale), deploymentButtons);
     }
+
     private static void handleDeploymentOptionClose(Player player, int option) {
-       
 
     }
+
     private static void handleDeploymentOption(Player player, int option) {
         switch (option) {
             case 0:
@@ -48,8 +50,10 @@ public class Scenarios {
     }
 
     private static void handleDeploymentOption1(Player player) {
-        String message = globalYesVotes > globalNoVotes ? Bundle.get("deployment.success", player.locale) : Bundle.get("deployment.failure", player.locale);
-        Call.menu(player.con, deploymentMenuClose, Bundle.get("deployment.title", player.locale), message, deploymentButtonsClose);
+        String message = globalYesVotes > globalNoVotes ? Bundle.get("deployment.success", player.locale)
+                : Bundle.get("deployment.failure", player.locale);
+        Call.menu(player.con, deploymentMenuClose, Bundle.get("deployment.title", player.locale), message,
+                deploymentButtonsClose);
         if (globalYesVotes > globalNoVotes) {
             PluginLogic.Help(globalYesVotes);
         }
@@ -61,6 +65,13 @@ public class Scenarios {
     }
 
     public static void requestDeploymentForAllPlayers() {
+        for (Player player : PlayerData.getAllPlayers()) {
+            if (player != null) {
+                requestDeployment(player);
+            } else {
+                System.out.println("Warning: Skipping null player.");
+            }
+        }
         if (!isTaskScheduled) { // Check if the task is already scheduled
             isTaskScheduled = true; // Set the flag to true to indicate the task is scheduled
             Timer timer = new Timer();
@@ -78,4 +89,5 @@ public class Scenarios {
             }, 40000); // = 40 seconds
         }
     }
+
 }

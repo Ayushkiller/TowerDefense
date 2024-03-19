@@ -46,17 +46,18 @@ public class Abilities {
                 new CustomStatusFieldAbility(StatusEffects.sporeSlowed, duration, cooldown, range),
                 new CustomStatusFieldAbility(StatusEffects.blasted, duration, cooldown, range));
     }
+
     public static List<Ability> getAbility5() {
-    
+
         return Arrays.asList(
-            new ForceFieldAbility(140f, 4f, 7000f, 60f * 8, 12, 0f),
-            new UnitSpawnAbility(UnitTypes.poly, 60*40, 80, 40),
-            new UnitSpawnAbility(UnitTypes.poly, 60*40, 40, 80),
-            new UnitSpawnAbility(UnitTypes.poly, 60*40, 30, 40),
-            new UnitSpawnAbility(UnitTypes.poly, 60*40, 40, 30),
-            new UnitSpawnAbility(UnitTypes.poly, 60*40, 50, 40),
-            new UnitSpawnAbility(UnitTypes.poly, 60*40, 40, 50));
-                
+                new ForceFieldAbility(140f, 4f, 7000f, 60f * 8, 12, 0f),
+                new UnitSpawnAbility(UnitTypes.poly, 60 * 40, 80, 40),
+                new UnitSpawnAbility(UnitTypes.poly, 60 * 40, 40, 80),
+                new UnitSpawnAbility(UnitTypes.poly, 60 * 40, 30, 40),
+                new UnitSpawnAbility(UnitTypes.poly, 60 * 40, 40, 30),
+                new UnitSpawnAbility(UnitTypes.poly, 60 * 40, 50, 40),
+                new UnitSpawnAbility(UnitTypes.poly, 60 * 40, 40, 50));
+
     }
 
     public static List<Ability> getAbility6() {

@@ -12,7 +12,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.tilesize;
 
-public class CustomStatusFieldAbility extends Ability{
+public class CustomStatusFieldAbility extends Ability {
     public StatusEffect effect;
     public float duration = 60, reload = 100, range = 20; //
     public boolean onShoot = false;
@@ -23,9 +23,10 @@ public class CustomStatusFieldAbility extends Ability{
 
     protected float timer;
 
-    CustomStatusFieldAbility(){}
+    CustomStatusFieldAbility() {
+    }
 
-    public CustomStatusFieldAbility(StatusEffect effect, float duration, float reload, float range){
+    public CustomStatusFieldAbility(StatusEffect effect, float duration, float reload, float range) {
         this.duration = duration;
         this.reload = reload;
         this.range = range;
@@ -33,30 +34,33 @@ public class CustomStatusFieldAbility extends Ability{
     }
 
     @Override
-    public void addStats(Table t){
-        t.add("[lightgray]" + Stat.reload.localized() + ": [white]" + Strings.autoFixed(60f / reload, 2) + " " + StatUnit.perSecond.localized());
+    public void addStats(Table t) {
+        t.add("[lightgray]" + Stat.reload.localized() + ": [white]" + Strings.autoFixed(60f / reload, 2) + " "
+                + StatUnit.perSecond.localized());
         t.row();
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(range / tilesize, 2) + " "
+                + StatUnit.blocks.localized());
         t.row();
         t.add(effect.emoji() + " " + effect.localizedName);
     }
 
     @Override
-    public void update(Unit unit){
+    public void update(Unit unit) {
         timer += Time.delta;
-    
-        if(timer >= reload && (!onShoot || unit.isShooting)){
+
+        if (timer >= reload && (!onShoot || unit.isShooting)) {
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
 
-                if(other.team != unit.team){
+                if (other.team != unit.team) {
                     other.apply(effect, duration);
                     applyEffect.at(other, parentizeEffects);
                 }
             });
-    
-            float x = unit.x + Angles.trnsx(unit.rotation, effectY, effectX), y = unit.y + Angles.trnsy(unit.rotation, effectY, effectX);
+
+            float x = unit.x + Angles.trnsx(unit.rotation, effectY, effectX),
+                    y = unit.y + Angles.trnsy(unit.rotation, effectY, effectX);
             activeEffect.at(x, y, effectSizeParam ? range : unit.rotation, parentizeEffects ? unit : null);
-            display=true;
+            display = true;
             timer = 0f;
         }
     }

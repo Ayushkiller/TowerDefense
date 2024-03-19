@@ -18,9 +18,15 @@ import tower.game.Scenarios;
 import tower.menus.Menu;
 import tower.pathing.TowerPathfinder;
 import useful.Bundle;
-
+/**
+ * The main plugin class for the Tower Defense game.
+ * This class handles the initialization of the game, registration of commands, and other core functionalities.
+ */
 public class TowerDefensePlugin extends Plugin {
 
+    /**
+     * Initializes the plugin by loading resources, initializing game components, and setting up custom status effects.
+     */
     @Override
     public void init() {
         Bundle.load(TowerDefensePlugin.class);
@@ -30,7 +36,10 @@ public class TowerDefensePlugin extends Plugin {
         CustomStatusEffects.load();
     }
 
-
+   /**
+     * Registers client-side commands for the game.
+     * @param handler The command handler to register commands with.
+     */
   public void registerClientCommands(CommandHandler handler) {
     handler.register("menu", "Opens the Special store", (String[] args, Player player) -> Menu.execute(player));
     handler.register("cash", "[item] [amount]", "Buy/sell cash.To sell cash add - to amount ", (String[] args, Player player) -> {
@@ -74,6 +83,10 @@ public class TowerDefensePlugin extends Plugin {
         }
     });
 }
+   /**
+     * Registers server-side commands for the game.
+     * @param handler The command handler to register commands with.
+     */
   public void registerServerCommands(CommandHandler handler) {
       handler.register("death", "<Cash>", "Adds Cash to every player", (String[] args, Player player) -> {
           if (args.length > 0) {
@@ -97,7 +110,12 @@ public class TowerDefensePlugin extends Plugin {
 
     });
   }
-  
+      /**
+     * Sells items to the player.
+     * @param player The player selling the items.
+     * @param itemName The name of the item to sell.
+     * @param amount The amount of the item to sell.
+     */
   private void sellItems(Player player, String itemName, int amount) {
   
     Item itemToSell = findItemByName(itemName);
@@ -122,7 +140,13 @@ public class TowerDefensePlugin extends Plugin {
     player.sendMessage("Sold " + amount + " " + itemToSell.toString() + ". You gained " + CashGained + " Cash.");
    
 }
-
+   /**
+     * Calculates the cash gained from selling items.
+     * @param item The item being sold.
+     * @param price The price of the item.
+     * @param amount The amount of the item being sold.
+     * @return The cash gained from selling the items.
+     */
 private int calculateCashGained(Item item, int price, int amount) {
     for (Map<String, Object> itemMap : Currency.items) {
         Item currentItem = (Item) itemMap.get("item");
@@ -133,23 +157,37 @@ private int calculateCashGained(Item item, int price, int amount) {
     }
     return 0;
 }
-
+    /**
+     * Removes items from the player's team.
+     * @param playerTeam The team of the player.
+     * @param item The item to remove.
+     * @param amount The amount of the item to remove.
+     */
 private void removeItemsFromTeam(Team playerTeam, Item item, int amount) {
     Map<Item, Integer> itemsToRemove = new HashMap<>();
     itemsToRemove.put(item, amount);
     BuyPoint.removeItemsFromTeam(playerTeam, itemsToRemove);
 }
 
-private Item findItemByName(String itemName) {
-    for (Map<String, Object> itemMap : Currency.items) {
-        Item item = (Item) itemMap.get("item");
-        if (item.toString().equalsIgnoreCase(itemName)) {
-            return item;
+    /**
+     * Finds an item by its name.
+     * @param itemName The name of the item to find.
+     * @return The item found, or null if not found.
+     */
+    private Item findItemByName(String itemName) {
+        for (Map<String, Object> itemMap : Currency.items) {
+            Item item = (Item) itemMap.get("item");
+            if (item.toString().toLowerCase().contains(itemName.toLowerCase())) {
+                return item;
+            }
         }
+        return null;
     }
-    return null;
-}
-
+    /**
+     * Gets the price of an item.
+     * @param item The item to get the price for.
+     * @return The price of the item.
+     */
 private int getItemPrice(Item item) {
     for (Map<String, Object> itemMap : Currency.items) {
         Item currentItem = (Item) itemMap.get("item");
@@ -159,6 +197,9 @@ private int getItemPrice(Item item) {
     }
     return 0;
 }
+  /**
+     * Requests deployment for all players.
+     */
 private void requestDeploymentForAll() {
     Scenarios.requestDeploymentForAllPlayers();
 }
