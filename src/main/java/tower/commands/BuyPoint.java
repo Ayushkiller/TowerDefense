@@ -205,7 +205,7 @@ public class BuyPoint {
             Map<String, Object> itemMap = Currency.items.get(i);
             Item item = (Item) itemMap.get("item");
             int requiredAmount = selectedItems.getOrDefault(item,  0); // Use the quantity the player wants to purchase
-            if (team.items().get(item) < requiredAmount + 2000) {
+            if (team.items().get(item) < requiredAmount + 2000f) {
                 return false;
             }
         }
