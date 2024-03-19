@@ -47,7 +47,6 @@ public class Info {
 
     private static void handleMenuOption(Player player, int option) {
         switch (option) {
-            case 0 -> Menuforunits.execute(player); // Back
             case 1 -> nextMessage(player); // Next
         }
     }
