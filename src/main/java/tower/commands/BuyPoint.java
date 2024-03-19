@@ -148,7 +148,7 @@ public class BuyPoint {
         }
         Map<String, Object> selectedItemMap = Currency.items.get(option);
         Item selectedItem = (Item) selectedItemMap.get("item");
-    
+
         String title = "Adjust Quantity";
         Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
         int currentQuantity = quantities.getOrDefault(selectedItem, 0);
@@ -156,44 +156,52 @@ public class BuyPoint {
                 selectedItem.emoji(), currentQuantity);
         String[][] buttons = new String[][] { { "-2000", "-1000", "-100", "+100", "+1000", "+2000" },
                 { "Buy", "Close", "Back" } };
-    
+
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
             if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
                 quantities.put(selectedItem, currentQuantity + adjustment);
                 openQuantityAdjustmentMenu(player, option);
             } else if (opt == 6) { // Buy button
+                System.out.println("Buy button clicked by player: " + player.name());
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
                 if (hasEnoughItems(player.team(), option, player)) {
                     int totalCash = calculateTotalCash(selectedItems);
+                    System.out.println("Total cash calculated for player: " + player.name() + ", Total: " + totalCash);
                     PlayerData playerData = Players.getPlayer(player);
                     playerData.addCash(totalCash, player);
                     removeItemsFromTeam(player.team(), selectedItems);
                     selectedItemsQuantities.remove(player);
+                    System.out.println("Items purchased successfully by player: " + player.name());
                     player.sendMessage(Bundle.get("menu.buypoint.success"));
                 } else {
+                    System.out.println("Player: " + player.name() + " does not have enough items.");
                     player.sendMessage(Bundle.get("critical.resource"));
                     selectedItemsQuantities.put(player, new HashMap<>());
                 }
             } else if (opt == 7) { // Close button
+                System.out.println("Close button clicked by player: " + player.name());
                 player.sendMessage(Bundle.get("menu.buypoint.close"));
                 selectedItemsQuantities.remove(player);
             } else if (opt == 8) { // Back button
+                System.out.println("Back button clicked by player: " + player.name());
                 openMenu(player);
             }
         }), title, description, buttons);
     }
 
-    private static boolean hasEnoughItems(Team team, int option, Player player) {
+    public static boolean hasEnoughItems(Team team, int option, Player player) {
         Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
         for (int i = 0; i < Currency.items.size(); i++) {
             Map<String, Object> itemMap = Currency.items.get(i);
             Item item = (Item) itemMap.get("item");
             int requiredAmount = selectedItems.getOrDefault(item, 0); // Use the quantity the player wants to purchase
             if (team.items().get(item) - requiredAmount < 2000) {
+                System.out.println("Player: " + player.name() + " does not have enough of " + item.emoji() + ".");
                 return false;
             }
         }
+        System.out.println("Player: " + player.name() + " has enough items.");
         return true;
     }
 
@@ -224,9 +232,11 @@ public class BuyPoint {
             if (quantity < 0) {
                 // Add items back to the team if the quantity is negative
                 team.items().add(item, Math.abs(quantity));
+                System.out.println("Adding " + Math.abs(quantity) + " of " + item.emoji() + " back to team.");
             } else {
                 // Remove items from the team if the quantity is positive
                 team.items().remove(item, quantity);
+                System.out.println("Removing " + quantity + " of " + item.emoji() + " from team.");
             }
         }
     }
