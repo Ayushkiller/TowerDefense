@@ -45,7 +45,6 @@ public class Units {
             if (spawned != null && !spawned.dead()) {
                 spawned.type.autoFindTarget = true;
                 spawned.type.alwaysUnlocked = true;
-                spawned.type.payloadCapacity = 0f;
                 if (shouldControlUnit) {
                     Call.unitControl(player, spawned);
                 }
