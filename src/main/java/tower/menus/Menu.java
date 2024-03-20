@@ -22,7 +22,7 @@ public class Menu {
     });
 
     private static final String[][] buttons = {
-            { "[lime]Units", "[red]Info", "[purple]Super[lime]Pow" },
+            { "[lime]Units", "[red]Info", "[lime]Power" },
             { "[cyan]Cash", "[blue]Powerups", "[lightgray]Close" }
     };
 

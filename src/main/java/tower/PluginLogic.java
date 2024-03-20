@@ -6,7 +6,6 @@ import arc.math.Mathf;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.Vars;
-import mindustry.ai.types.GroundAI;
 import mindustry.content.*;
 import mindustry.game.EventType;
 import mindustry.game.Rules;
@@ -74,13 +73,6 @@ public class PluginLogic {
 
         });
         Timer.schedule(() -> {
-            forceProjectorTiles.each((tile, forceProjector) -> {
-                String labelText = tower.Bundle.get("shieldProjector.label");
-                Call.labelReliable(labelText, 1f, tile.drawx(), tile.drawy());
-            });
-        }, 0f, 5f);
-        // Schedule cash generation every 8 seconds
-        Timer.schedule(() -> {
             repairPointTiles.each((tile, forceProjector) -> {
                 Groups.player.each(player -> {
                     if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
@@ -90,14 +82,6 @@ public class PluginLogic {
                 });
             });
         }, 0f, 20f);
-        // Schedule label display every 5 seconds
-        Timer.schedule(() -> {
-            repairPointTiles.each((tile, forceProjector) -> {
-                String labelText = tower.Bundle.get("RepairPoint.label") + " Cash generated: "
-                        + repairPointCash.get(tile, 0f);
-                Call.labelReliable(labelText, 2f, tile.drawx(), tile.drawy());     
-            });
-        }, 0f, 5f);
         Timer.schedule(() -> {
             Groups.player.each(player -> {
                 repairPointTiles.each((tile, forceProjector) -> {
@@ -111,20 +95,6 @@ public class PluginLogic {
                     }
                 });
             });
-        }, 0f, 1f);
-        Timer.schedule(() -> {
-            for (int x = 0; x < Vars.world.width(); x++) {
-                for (int y = 0; y < Vars.world.height(); y++) {
-                    Tile tile = Vars.world.tile(x, y);
-                    if (isPath(tile)) {
-                        Block block = tile.block();
-                        if (block != null && !(block instanceof ShockMine || block instanceof Conduit
-                                || block instanceof CoreBlock)) {
-                            tile.setBlock(Blocks.air);
-                        }
-                    }
-                }
-            }
         }, 0f, 1f);
         Timer.schedule(() -> {
             boolean hasNegativePoints = false;
@@ -154,8 +124,7 @@ public class PluginLogic {
             core.damage(Team.crux, damage);
             core.damage(1, true);
             unit.kill();
-
-            // Check if the core's health is 0 or less and set to 1
+            Call.effect(Fx.healWaveMend,core.x,core.y,2,Color.crimson);
             if (core.block.health <= 0) {
                 core.block.health = 1;
             }
@@ -166,7 +135,18 @@ public class PluginLogic {
         Events.on(EventType.WorldLoadEvent.class, event -> {
             // Set the multiplier to 0.5f
             multiplier = 0.5f;
-
+            for (int x = 0; x < Vars.world.width(); x++) {
+                for (int y = 0; y < Vars.world.height(); y++) {
+                    Tile tile = Vars.world.tile(x, y);
+                    if (isPath(tile)) {
+                        Block block = tile.block();
+                        if (block != null && !(block instanceof ShockMine || block instanceof Conduit
+                                || block instanceof CoreBlock)) {
+                            tile.setBlock(Blocks.air);
+                        }
+                    }
+                }
+            }
             Groups.player.each(player -> {
                 PlayerData playerData = Players.getPlayer(player);
                 if (playerData != null) {
@@ -297,11 +277,11 @@ public class PluginLogic {
                 event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
                 event.unit.apply(StatusEffects.sporeSlowed, Float.POSITIVE_INFINITY);
                 event.unit.apply(StatusEffects.muddy, Float.POSITIVE_INFINITY);
-                if (state.wave >= 350) {
+                if (state.wave >= 250) {
                     event.unit.apply(StatusEffects.fast, Float.POSITIVE_INFINITY);
                 }
                 event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
-                event.unit.type.speed = 0.75f; 
+                event.unit.type.speed = 0.9f; 
                 event.unit.type.range = -1f;
                 event.unit.type.hovering = true;
                 event.unit.disarmed = true;
@@ -311,13 +291,13 @@ public class PluginLogic {
                 event.unit.type.abilities.clear();
                 event.unit.type.abilities.clear();
                 event.unit.type.crashDamageMultiplier = 0f;
-                event.unit.type.crushDamage = 0f;
+                event.unit.type.crushDamage = 10000f;
                 event.unit.type.deathExplosionEffect = Fx.shockwave;
                 event.unit.shield(event.unit.shield * multiplier);
                 event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
                 event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
                 event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange = 0f;
-                event.unit.type.aiController = event.unit.type.flying ? FlyingAIForAss::new : GroundAI::new;
+                event.unit.type.aiController = FlyingAIForAss::new ;
                 event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
             }
         });

@@ -56,7 +56,7 @@ public class BuyPoint {
         }
         Map<String, Object> selectedItemMap = Currency.items.get(option);
         Item selectedItem = (Item) selectedItemMap.get("item");
-
+    
         String title = "Adjust Quantity";
         Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
         String updatedQuantities = "";
@@ -64,14 +64,13 @@ public class BuyPoint {
             updatedQuantities += entry.getKey().emoji() + ": " + entry.getValue() + "\n";
         }
         String description = "Select quantity to sell\n\n" + updatedQuantities;
-
+    
         // Calculate total cash required to buy selected items
         int totalCashRequired = calculateTotalCashRequired(quantities);
         description += "\n\n[orange]Total Cash Required: " + totalCashRequired;
-
-        String[][] buttons = new String[][] { { "-2000", "-1000", "-100", "+400", "+1000", "+2000" },
-                { "Sell", "Close", "Back" } };
-
+    
+        String[][] buttons = new String[][]{{"-2000", "-1000", "-100", "+400", "+1000", "+2000"}, {"Sell", "Close", "Back"}};
+    
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
             if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
@@ -80,7 +79,7 @@ public class BuyPoint {
                 openQuantityAdjustmentMenuForSell(player, option);
             } else if (opt == 6) { // Sell button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
-
+    
                 int totalQuantity = selectedItems.values().stream().mapToInt(Integer::intValue).sum();
                 if (totalQuantity < 0) {
                     sendMessageToPlayer(player, "menu.sellpoint.negativeQuantity");
@@ -91,7 +90,11 @@ public class BuyPoint {
                     sendMessageToPlayer(player, "critical.insufficientFunds");
                     return;
                 }
-
+                if (totalCashRequired == 0) {
+                    sendMessageToPlayer(player, "menu.0s");
+                    return;
+                }
+    
                 addItemsToTeam(player.team(), selectedItems);
                 playerData.subtractCash(totalCashRequired, player);
                 selectedItemsQuantities.remove(player);
@@ -142,13 +145,13 @@ public class BuyPoint {
     }
 
     private static void openQuantityAdjustmentMenu(Player player, int option) {
-        if (option <   0 || option >= Currency.items.size()) {
+        if (option < 0 || option >= Currency.items.size()) {
             player.sendMessage("Invalid selection. Please try again.");
             return;
         }
         Map<String, Object> selectedItemMap = Currency.items.get(option);
         Item selectedItem = (Item) selectedItemMap.get("item");
-    
+
         String title = "Adjust Quantity";
         Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
         String updatedQuantities = "";
@@ -156,23 +159,28 @@ public class BuyPoint {
             updatedQuantities += entry.getKey().emoji() + ": " + entry.getValue() + "\n";
         }
         String description = "Select quantity adjustment\n\n" + updatedQuantities;
-        String[][] buttons = new String[][]{{"-2000", "-1000", "-100", "+400", "+1000", "+2000"}, {"Buy", "Close", "Back"}};
-    
+        String[][] buttons = new String[][] { { "-2000", "-1000", "-100", "+400", "+1000", "+2000" },
+                { "Buy", "Close", "Back" } };
+
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-            if (opt <   6) { // Adjustment buttons
+            if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
-                int currentQuantity = quantities.getOrDefault(selectedItem,   0);
+                int currentQuantity = quantities.getOrDefault(selectedItem, 0);
                 int minQuantity = getMinQuantityForItem(selectedItem);
-                if (adjustment <   0 && currentQuantity + adjustment <  minQuantity) {
+                if (adjustment < 0 && currentQuantity + adjustment < minQuantity) {
                     sendMessageToPlayer(player, "menu.buypoint.negativeQuantity");
                     return;
                 }
                 quantities.put(selectedItem, currentQuantity + adjustment);
                 openQuantityAdjustmentMenu(player, option);
-            } else if (opt ==   6) { // Buy button
+            } else if (opt == 6) { // Buy button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
+                int totalCash = calculateTotalCash(selectedItems);
+                if (totalCash == 0) {
+                    sendMessageToPlayer(player, "menu.0b");
+                    return;
+                }
                 if (hasEnoughItems(player.team(), option, player)) {
-                    int totalCash = calculateTotalCash(selectedItems);
                     PlayerData playerData = Players.getPlayer(player);
                     playerData.addCash(totalCash, player);
                     removeItemsFromTeam(player.team(), selectedItems);
@@ -182,30 +190,32 @@ public class BuyPoint {
                     player.sendMessage(Bundle.get("critical.resource"));
                     selectedItemsQuantities.put(player, new HashMap<>());
                 }
-            } else if (opt ==   7) { // Close button
+            } else if (opt == 7) { // Close button
                 player.sendMessage(Bundle.get("menu.buypoint.close"));
                 selectedItemsQuantities.remove(player);
-            } else if (opt ==   8) { // Back button
+            } else if (opt == 8) { // Back button
                 openMenu(player);
             }
         }), title, description, buttons);
     }
+
     private static int getMinQuantityForItem(Item item) {
-        for (int i =  0; i < Currency.items.size(); i++) {
+        for (int i = 0; i < Currency.items.size(); i++) {
             Map<String, Object> itemMap = Currency.items.get(i);
             if (itemMap.get("item") == item) {
                 return (int) itemMap.get("minQuantity");
             }
         }
-        return  0; // Return  0 if the item is not found in the items list
+        return 0; // Return 0 if the item is not found in the items list
     }
+
     private static boolean hasEnoughItems(Team team, int option, Player player) {
         Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
-        for (int i =  0; i < Currency.items.size(); i++) {
+        for (int i = 0; i < Currency.items.size(); i++) {
             Map<String, Object> itemMap = Currency.items.get(i);
             Item item = (Item) itemMap.get("item");
-            int requiredAmount = selectedItems.getOrDefault(item,  0); // Use the quantity the player wants to purchase
-            if (team.items().get(item) < requiredAmount ) {
+            int requiredAmount = selectedItems.getOrDefault(item, 0); // Use the quantity the player wants to purchase
+            if (team.items().get(item) < requiredAmount) {
                 return false;
             }
         }
