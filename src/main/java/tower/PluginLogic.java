@@ -95,8 +95,7 @@ public class PluginLogic {
             repairPointTiles.each((tile, forceProjector) -> {
                 String labelText = tower.Bundle.get("RepairPoint.label") + " Cash generated: "
                         + repairPointCash.get(tile, 0f);
-                Call.labelReliable(labelText, 2f, tile.drawx(), tile.drawy());   
-                  
+                Call.labelReliable(labelText, 2f, tile.drawx(), tile.drawy());     
             });
         }, 0f, 5f);
         Timer.schedule(() -> {
@@ -121,7 +120,7 @@ public class PluginLogic {
                         Block block = tile.block();
                         if (block != null && !(block instanceof ShockMine || block instanceof Conduit
                                 || block instanceof CoreBlock)) {
-                            tile.setNet(Blocks.air);
+                            tile.setBlock(Blocks.air);
                         }
                     }
                 }
