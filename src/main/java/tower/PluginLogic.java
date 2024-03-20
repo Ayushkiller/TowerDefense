@@ -6,6 +6,7 @@ import arc.math.Mathf;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.Vars;
+import mindustry.ai.types.GroundAI;
 import mindustry.content.*;
 import mindustry.game.EventType;
 import mindustry.game.Rules;
@@ -297,7 +298,7 @@ public class PluginLogic {
                 event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
                 event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
                 event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange = 0f;
-                event.unit.type.aiController = FlyingAIForAss::new ;
+                event.unit.type.aiController = event.unit.type.naval ? GroundAI::new : FlyingAIForAss::new;
                 event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
             }
         });
