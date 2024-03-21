@@ -20,7 +20,7 @@ jobs:
           export GRADLE_USER_HOME=$HOME/.gradle
       - name: Build with Gradle
         id: build
-        run: ./gradlew clean build --offline
+        run: ./gradlew clean build 
       - name: Check build status
         id: check_status
         run: echo "::set-output name=status::${{ steps.build.outcome }}"
