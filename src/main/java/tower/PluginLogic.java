@@ -57,12 +57,11 @@ public class PluginLogic {
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null)
                 return true;
-            if (action.type == Administration.ActionType.placeBlock
-                    || action.type == Administration.ActionType.breakBlock) {
+            if (action.type == Administration.ActionType.placeBlock) {
                 if (!(canBePlaced(action.tile, action.block) || action.block instanceof ShockMine
                         || action.block instanceof Conduit || action.block instanceof CoreBlock)) {
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
-                    return false; // Explicitly return false here
+                    return false;
                 }
             }
             if ((action.type == Administration.ActionType.dropPayload
@@ -85,12 +84,20 @@ public class PluginLogic {
         }, 0f, 20f);
         Timer.schedule(() -> {
             forceProjectorTiles.each((tile, forceProjectorTiles) -> {
-                Call.effect(Fx.bigShockwave, tile.x, tile.y, 100f, Color.royal);
+                Groups.player.each(player -> {
+                    if (player.dst(tile.worldx(), tile.worldy()) <= 100f) {
+                        Call.effect(Fx.greenCloud, tile.x, tile.y, 100f, Color.royal);
+                    }
+                });
             });
             repairPointTiles.each((tile, repairPointTiles) -> {
-                Call.effect(Fx.hitEmpSpark, tile.x, tile.y, 30f, Color.royal);
+                Groups.player.each(player -> {
+                    if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
+                        Call.effect(Fx.reactorExplosion, tile.x, tile.y, 30f, Color.royal);
+                    }
+                });
             });
-        }, 0f, 5f);
+        }, 0f, 2f);
         Timer.schedule(() -> {
             Groups.player.each(player -> {
                 repairPointTiles.each((tile, repairPointTiles) -> {
@@ -131,7 +138,7 @@ public class PluginLogic {
             // Ensure damage does not exceed the core's health
             damage = Math.min(damage, core.health);
             core.damage(Team.crux, damage);
-            Call.effect(Fx.healWaveMend, unit.x, unit.y, 20f, Color.crimson);
+            Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.crimson);
             core.damage(1, true);
             unit.kill();
             if (core.block.health <= 0) {

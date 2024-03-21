@@ -1,0 +1,36 @@
+name: Java CI
+
+on: [push]
+
+jobs:
+  buildJar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+      - name: Build plugin jar
+        run: ./gradlew jar
+      #      - name: Upload built jar file
+      #        uses: actions/upload-artifact@v2
+      #        with:
+      #          name: ${{ github.event.repository.Towerdefense }}
+      #          path: build/libs/YES-3.jar
+      - name: Deploy To TowerDefense
+        uses: Itzbenz/mindustry-plugin-deploy-to-pterodactyl@016baa1e8b1210c4c61cf1235e1cdfeda469e382
+        with:
+          # The path to the plugin artifact
+          artifact: build/libs/YES-3.jar
+          # The API endpoint of the Pterodactyl server
+          endpoint: sftp://node.karlito1501.xyz:2022
+          # The ID of the Pterodactyl server
+          server: ${{secrets.b48db0d4}}
+          # The API key of the Pterodactyl server
+          token: ${{secrets.ptlc_LFxq0S9K03Ha9hywdRBjDkm5qKM6LYhLtKeW9RzGaLS}}
+          # Whether to restart the server after deploying the plugin
+          restart: true

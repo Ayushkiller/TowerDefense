@@ -1,15 +1,2 @@
-# Ignore build and .gradle directories
-/build/
-/.gradle/
-*.gradle
-*.bin
-*.bin
-*.bin
-.gradle/7.6/fileHashes/fileHashes.lock
-.gradle/7.6/executionHistory/executionHistory.lock
-.gradle/7.6/executionHistory/executionHistory.bin
-.gradle/7.6/fileHashes/fileHashes.bin
-.gradle/buildOutputCleanup/buildOutputCleanup.lock
-*.lock
-*.bin
-/.gradle/
+.gradle/
+build/
