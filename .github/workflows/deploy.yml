@@ -18,15 +18,18 @@ jobs:
         run: |
           # Set the GRADLE_USER_HOME environment variable to a specific path
           export GRADLE_USER_HOME=$HOME/.gradle
-          # Ensure the Gradle cache directory exists
-          mkdir -p $GRADLE_USER_HOME/caches
       - name: Build with Gradle
+        id: build
         run: ./gradlew clean build --offline
+      - name: Check build status
+        id: check_status
+        run: echo "::set-output name=status::${{ steps.build.outcome }}"
       - name: Deploy To TowerDefense
+        if: steps.check_status.outputs.status == 'success'
         uses: Itzbenz/mindustry-plugin-deploy-to-pterodactyl@016baa1e8b1210c4c61cf1235e1cdfeda469e382
         with:
           # The path to the plugin artifact
-          artifact: build/libs/YES-3.jar
+          artifact: build\libs\YES-3.jar
           # The API endpoint of the Pterodactyl server
           endpoint: ${{secrets.PTERODACTYL_ENDPOINT}}
           # The ID of the Pterodactyl server
