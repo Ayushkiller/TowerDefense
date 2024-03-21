@@ -74,7 +74,7 @@ public class PluginLogic {
 
         });
         Timer.schedule(() -> {
-            repairPointTiles.each((tile, forceProjector) -> {
+            repairPointTiles.each((tile, repairPointTiles) -> {
                 Groups.player.each(player -> {
                     if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
                         float cashGenerated = 1f;
@@ -84,8 +84,16 @@ public class PluginLogic {
             });
         }, 0f, 20f);
         Timer.schedule(() -> {
+            forceProjectorTiles.each((tile, forceProjectorTiles) -> {
+                Call.effect(Fx.bigShockwave, tile.x, tile.y, 100f, Color.royal);
+            });
+            repairPointTiles.each((tile, repairPointTiles) -> {
+                Call.effect(Fx.hitEmpSpark, tile.x, tile.y, 30f, Color.royal);
+            });
+        }, 0f, 5f);
+        Timer.schedule(() -> {
             Groups.player.each(player -> {
-                repairPointTiles.each((tile, forceProjector) -> {
+                repairPointTiles.each((tile, repairPointTiles) -> {
                     if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
 
                         PlayerData playerData = Players.getPlayer(player);
@@ -123,9 +131,9 @@ public class PluginLogic {
             // Ensure damage does not exceed the core's health
             damage = Math.min(damage, core.health);
             core.damage(Team.crux, damage);
+            Call.effect(Fx.healWaveMend, unit.x, unit.y, 20f, Color.crimson);
             core.damage(1, true);
             unit.kill();
-            Call.effect(Fx.healWaveMend,core.x,core.y,2,Color.crimson);
             if (core.block.health <= 0) {
                 core.block.health = 1;
             }
@@ -200,10 +208,12 @@ public class PluginLogic {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 4f);
             } else if (state.wave > 120 && state.wave <= 150) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 6f);
-            } else if (state.wave > 150 && state.wave <= 250) {
+            } else if (state.wave > 150 && state.wave <= 200) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 12f);
-            } else if (state.wave > 250 && state.wave <= 350) {
+            } else if (state.wave > 200 && state.wave <= 250) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 18f);
+            } else if (state.wave > 250 && state.wave <= 350) {
+                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 48f);
             } else {
                 // After wave 350, increase the multiplier rapidly
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 2f) * 2, multiplier, 100f);
@@ -282,15 +292,17 @@ public class PluginLogic {
                     event.unit.apply(StatusEffects.fast, Float.POSITIVE_INFINITY);
                 }
                 event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
-                event.unit.type.speed = 0.9f; 
+                event.unit.type.speed = 0.8f;
                 event.unit.type.range = -1f;
                 event.unit.type.hovering = true;
                 event.unit.disarmed = true;
-                event.unit.type.abilities.clear();
-                event.unit.type.abilities.clear();
-                event.unit.type.abilities.clear();
-                event.unit.type.abilities.clear();
-                event.unit.type.abilities.clear();
+                if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires) {
+                    event.unit.type.abilities.clear();
+                    event.unit.type.abilities.clear();
+                    event.unit.type.abilities.clear();
+                    event.unit.type.abilities.clear();
+                    event.unit.type.abilities.clear();
+                }
                 event.unit.type.crashDamageMultiplier = 0f;
                 event.unit.type.crushDamage = 10000f;
                 event.unit.type.deathExplosionEffect = Fx.shockwave;
