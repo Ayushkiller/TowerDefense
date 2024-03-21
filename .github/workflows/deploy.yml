@@ -27,10 +27,11 @@ jobs:
           # The path to the plugin artifact
           artifact: build/libs/YES-3.jar
           # The API endpoint of the Pterodactyl server
-          endpoint: sftp://node.karlito1501.xyz:2022
+          endpoint: ${{secrets.PTERODACTYL_ENDPOINT}}
           # The ID of the Pterodactyl server
-          server: ${{secrets.b48db0d4}}
+          server: ${{secrets.TOWERDEFENSE_SERVER_ID}}
           # The API key of the Pterodactyl server
-          token: ${{secrets.ptlc_LFxq0S9K03Ha9hywdRBjDkm5qKM6LYhLtKeW9RzGaLS}}
+          token: ${{secrets.PTERODACTYL_API_KEY }}
           # Whether to restart the server after deploying the plugin
           restart: true
+        
