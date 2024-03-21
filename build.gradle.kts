@@ -19,7 +19,7 @@ dependencies {
 
     compileOnly("com.github.Anuken.Arc:arc-core:v$mindustryVersion")
     compileOnly("com.github.Anuken.Mindustry:core:v$mindustryVersion")
-  implementation ("com.github.xzxADIxzx.Useful-Stuffs:bundle:2f1d9eb")
+    implementation("com.github.xzxADIxzx.useful-stuffs:bundle:$usefulHash")
 }
 
 tasks.jar {
