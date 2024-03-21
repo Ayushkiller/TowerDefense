@@ -21,7 +21,7 @@ jobs:
           # Ensure the Gradle cache directory exists
           mkdir -p $GRADLE_USER_HOME/caches
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build --offline
       - name: Deploy To TowerDefense
         uses: Itzbenz/mindustry-plugin-deploy-to-pterodactyl@016baa1e8b1210c4c61cf1235e1cdfeda469e382
         with:
