@@ -14,13 +14,14 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-      - name: Build plugin jar
+      - name: Set up Gradle cache
+        run: |
+          # Set the GRADLE_USER_HOME environment variable to a specific path
+          export GRADLE_USER_HOME=$HOME/.gradle
+          # Ensure the Gradle cache directory exists
+          mkdir -p $GRADLE_USER_HOME/caches
+      - name: Build with Gradle
         run: ./gradlew clean build
-      #      - name: Upload built jar file
-      #        uses: actions/upload-artifact@v2
-      #        with:
-      #          name: ${{ github.repository }}
-      #          path: build/libs/YES-3.jar
       - name: Deploy To TowerDefense
         uses: Itzbenz/mindustry-plugin-deploy-to-pterodactyl@016baa1e8b1210c4c61cf1235e1cdfeda469e382
         with:
