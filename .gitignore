@@ -1,2 +1,4 @@
 .gradle/
 build/
+*.lock
+.gradle/7.6/checksums/checksums.lock
