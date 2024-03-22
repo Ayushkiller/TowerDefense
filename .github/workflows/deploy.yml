@@ -14,10 +14,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-      - name: Set up Gradle cache
-        run: |
-          # Set the GRADLE_USER_HOME environment variable to a specific path
-          export GRADLE_USER_HOME=$HOME/.gradle
       - name: Build with Gradle
         id: build
         run: ./gradlew clean build 

@@ -1,15 +1,16 @@
 package tower;
 
-import arc.files.Fi;
-import arc.struct.ObjectMap;
-import arc.util.Log;
-import arc.util.Structs;
-
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import arc.files.Fi;
+import arc.struct.ObjectMap;
+import arc.util.Log;
+import arc.util.Structs;
+
+@SuppressWarnings("deprecation")
 public class Bundle {
     private static final ObjectMap<Locale, ResourceBundle> bundles = new ObjectMap<>();
     private static final ObjectMap<Locale, MessageFormat> formats = new ObjectMap<>();
