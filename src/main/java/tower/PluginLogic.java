@@ -70,7 +70,6 @@ public class PluginLogic {
                 return false;
             }
             return true;
-
         });
         Timer.schedule(() -> {
             repairPointTiles.each((tile, repairPointTiles) -> {
