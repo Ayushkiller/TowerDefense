@@ -69,19 +69,20 @@ public class PluginLogic {
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
         });
-     Events.on(EventType.UnitDestroyEvent.class, event -> {
+        Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team == state.rules.waveTeam) {
                 // Check if there are any spawned tiles
                 if (!spawnedTiles.isEmpty()) {
                     // Select a random tile from the list
                     Random random = new Random();
                     Tile randomTile = spawnedTiles.get(random.nextInt(spawnedTiles.size()));
-                    UnitType unitType = UnitTypes.oct; 
-                    Unit unit = unitType.spawn(randomTile.x, randomTile.y);
-                    unit.type.drag=0.1f;
-                    unit.type.aiController=null;
-                    event.unit.apply(StatusEffects.invincible);
-                    
+                    if (randomTile != null) { // Ensure randomTile is not null
+                        UnitType unitType = UnitTypes.oct; 
+                        Unit unit = unitType.spawn(randomTile.getX(), randomTile.getY());
+                        unit.type.drag=0.1f;
+                        unit.type.aiController=null;
+                        event.unit.apply(StatusEffects.invincible);
+                    }
                 }
             }
         });
