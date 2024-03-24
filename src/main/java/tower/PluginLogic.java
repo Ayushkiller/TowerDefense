@@ -32,7 +32,7 @@ public class PluginLogic {
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
             var core2 = unit.core();
-            if (core == null || unit.dst(core) > 80f || core.health <= 0)
+            if (core == null || unit.dst(core) > 200f || core.health <= 0)
                 return; // Check if core is null, out of range, or already dead
             float damage = (100000000);
             core.damage(Team.crux, damage);
@@ -48,7 +48,15 @@ public class PluginLogic {
            
             core2.damage(Team.sharded,10000f);
         }), 0f, 0.1f);
+        Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
 
+            var core2 = unit.core();
+
+            if (core2 == null|| core2.health <= 0)
+            return; 
+            Call.effect(Fx.forceShrink, unit.x, unit.y, 200f, Color.crimson);
+            core2.damage(Team.sharded,10000f);
+        }), 0f, 2f);
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
             spawnedTiles.clear();
@@ -63,7 +71,7 @@ public class PluginLogic {
                     if (randomTile != null) { // Ensure randomTile is not null
                         UnitType unitType = UnitTypes.oct;
                         Unit unit = unitType.spawn(state.rules.waveTeam,randomTile.getX(),randomTile.getY());
-                        event.unit.type.drag = 0.0001f;
+                        event.unit.type.drag = 0.01f;
                         unit.type.aiController = Newai::new;
                         unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
                         unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
@@ -75,7 +83,7 @@ public class PluginLogic {
         Events.on(EventType.UnitSpawnEvent.class, event -> {
 
             if (event.unit.team == state.rules.waveTeam) {
-                event.unit.type.drag = 0.0001f;
+                event.unit.type.drag = 0.01f;
                 event.unit.type.aiController = Newai::new;
                 event.unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
                 spawnedTiles.add(event.unit.tileOn());
@@ -114,7 +122,7 @@ public class PluginLogic {
 
                 // Calculate the knockback strength based on the player's velocity towards the
                 // unit
-                float knockbackStrength = 0.6f + Math.abs(velocityTowardsUnit) * 0.5f;
+                float knockbackStrength = 0.7f + Math.abs(velocityTowardsUnit) * 0.5f;
 
                 // Reverse the direction to apply the knockback away from the player
                 directionToPlayer.scl(-1);
@@ -122,7 +130,7 @@ public class PluginLogic {
                 // Apply the knockback force to the unit's velocity
                 unit.vel.add(directionToPlayer.x * knockbackStrength, directionToPlayer.y * knockbackStrength);
 
-                unit.vel.limit(unit.type.speed * 4f);
+                unit.vel.limit(unit.type.speed * 40f);
                 Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.green);
             }
         });
