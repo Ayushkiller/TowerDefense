@@ -31,6 +31,7 @@ public class PluginLogic {
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
+            var core2 = unit.core();
             if (core == null || unit.dst(core) > 80f || core.health <= 0)
                 return; // Check if core is null, out of range, or already dead
             float damage = (100000000);
@@ -41,6 +42,11 @@ public class PluginLogic {
             if (core.block.health <= 0) {
                 core.block.health = 1;
             }
+            unit.kill();
+            if (core2 == null|| core2.health <= 0)
+            return; // Check if core is null, out of range, or already dead
+           
+            core2.damage(Team.sharded,10000f);
         }), 0f, 0.1f);
 
         Events.on(EventType.GameOverEvent.class, event -> {
@@ -57,7 +63,7 @@ public class PluginLogic {
                     if (randomTile != null) { // Ensure randomTile is not null
                         UnitType unitType = UnitTypes.oct;
                         Unit unit = unitType.spawn(state.rules.waveTeam,randomTile.getX(),randomTile.getY());
-                        event.unit.type.drag = 0.000001f;
+                        event.unit.type.drag = 0.0001f;
                         unit.type.aiController = Newai::new;
                         unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
                         unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
@@ -69,7 +75,7 @@ public class PluginLogic {
         Events.on(EventType.UnitSpawnEvent.class, event -> {
 
             if (event.unit.team == state.rules.waveTeam) {
-                event.unit.type.drag = 0.000001f;
+                event.unit.type.drag = 0.0001f;
                 event.unit.type.aiController = Newai::new;
                 event.unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
                 spawnedTiles.add(event.unit.tileOn());
