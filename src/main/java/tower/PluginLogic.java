@@ -11,7 +11,6 @@ import arc.graphics.Color;
 import arc.math.geom.Vec2;
 import arc.util.Timer;
 import arc.util.Tmp;
-import mindustry.ai.types.FlyingFollowAI;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
@@ -26,6 +25,7 @@ import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 import mindustry.world.Tile;
+import tower.game.Newai;
 
 public class PluginLogic {
     private static List<Tile> spawnedTiles = new ArrayList<>();
@@ -63,10 +63,10 @@ public class PluginLogic {
                     if (randomTile != null) { // Ensure randomTile is not null
                         UnitType unitType = UnitTypes.oct;
                         Unit unit = unitType.spawn(randomTile.getX(), randomTile.getY());
-                        unit.type.drag = 0.1f;
-                        unit.type.aiController = FlyingFollowAI::new;
-                        event.unit.apply(StatusEffects.disarmed,Float.POSITIVE_INFINITY);
-                        event.unit.apply(StatusEffects.invincible,Float.POSITIVE_INFINITY);
+                        unit.type.drag = 0f;
+                        unit.type.aiController = Newai::new;
+                        unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
+                        unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
                     }
                 }
             }
@@ -75,11 +75,11 @@ public class PluginLogic {
         Events.on(EventType.UnitSpawnEvent.class, event -> {
 
             if (event.unit.team == state.rules.waveTeam) {
-                event.unit.type.drag = 0.1f;
-                event.unit.type.aiController = FlyingFollowAI::new;
-                event.unit.apply(StatusEffects.invincible,Float.POSITIVE_INFINITY);
+                event.unit.type.drag = 0f;
+                event.unit.type.aiController = Newai::new;
+                event.unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
                 spawnedTiles.add(event.unit.tileOn());
-                         event.unit.apply(StatusEffects.disarmed,Float.POSITIVE_INFINITY);
+                event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
             }
         });
         Events.run(EventType.Trigger.update, () -> {
@@ -108,9 +108,13 @@ public class PluginLogic {
                 Vec2 directionToPlayer = Tmp.v1.set(nearestPlayer[0].x, nearestPlayer[0].y).sub(unit.x, unit.y).nor();
                 Vec2 playerVelocity = nearestPlayer[0].unit().vel;
 
-                float angle = directionToPlayer.dot(playerVelocity);
+                // Calculate the dot product of the direction to the player and the player's
+                // velocity
+                float velocityTowardsUnit = directionToPlayer.dot(playerVelocity);
 
-                float knockbackStrength = 0.5f + Math.abs(angle) * 0.5f;
+                // Calculate the knockback strength based on the player's velocity towards the
+                // unit
+                float knockbackStrength = 0.6f + Math.abs(velocityTowardsUnit) * 0.5f;
 
                 // Reverse the direction to apply the knockback away from the player
                 directionToPlayer.scl(-1);
@@ -118,9 +122,7 @@ public class PluginLogic {
                 // Apply the knockback force to the unit's velocity
                 unit.vel.add(directionToPlayer.x * knockbackStrength, directionToPlayer.y * knockbackStrength);
 
-                // Optionally, limit the maximum velocity to prevent the unit from moving too
-                // fast
-                unit.vel.limit(unit.type.speed);
+                unit.vel.limit(unit.type.speed * 4f);
                 Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.green);
             }
         });
@@ -130,21 +132,24 @@ public class PluginLogic {
     public static List<Tile> getSpawnedTiles() {
         return spawnedTiles;
     }
-    private static TeamAssigner teamAssigner = (player, players) -> {
-        //find team with minimum amount of players and auto-assign player to that.
-        TeamData re = state.teams.getActive().min(data -> {
-         if((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active() || data.team == Team.derelict) return Integer.MAX_VALUE;
 
-         int count = 0;
-         for(Player other : players){
-             if(other.team() == data.team && other != player){
-                 count++;
-             }
-         }
-         return count;
-     });
-     // If no team is found, return the default team
-     return re == null ? state.rules.defaultTeam : re.team;
- };
+    private static TeamAssigner teamAssigner = (player, players) -> {
+        // find team with minimum amount of players and auto-assign player to that.
+        TeamData re = state.teams.getActive().min(data -> {
+            if ((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active()
+                    || data.team == Team.derelict)
+                return Integer.MAX_VALUE;
+
+            int count = 0;
+            for (Player other : players) {
+                if (other.team() == data.team && other != player) {
+                    count++;
+                }
+            }
+            return count;
+        });
+        // If no team is found, return the default team
+        return re == null ? state.rules.defaultTeam : re.team;
+    };
 
 }
