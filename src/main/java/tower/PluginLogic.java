@@ -11,27 +11,74 @@ import arc.graphics.Color;
 import arc.math.geom.Vec2;
 import arc.util.Timer;
 import arc.util.Tmp;
+import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.game.EventType;
 import mindustry.game.Team;
+import mindustry.game.Teams;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 import mindustry.world.Tile;
+import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
 import tower.game.Newai;
 
 public class PluginLogic {
     private static List<Tile> spawnedTiles = new ArrayList<>();
 
     public static void init() {
+        Timer.schedule(() -> {
+            Teams teams = Vars.state.teams;
+            int activeTeamsCount = 0;
+            boolean anyTeamHasCores = false;
 
+            // Check for active teams
+            for (Team team : Team.all) {
+                if (teams.isActive(team)) {
+                    activeTeamsCount++;
+                    if (teams.cores(team).size > 0) {
+                        anyTeamHasCores = true;
+                    }
+                }
+            }
+
+            // Damage core of waveTeam if the number of active teams drops
+            if (activeTeamsCount < 2) { // Assuming at least 2 teams are always active
+                CoreBuild waveTeamCore = teams.cores(state.rules.waveTeam).first();
+                if (waveTeamCore != null) {
+                    waveTeamCore.damage(10000);
+                }
+            }
+            // Kill core of waveTeam if any active team doesn't have a core
+            boolean allActiveTeamsHaveCores = true;
+            for (Team team : Team.all) {
+                if (teams.isActive(team) && teams.cores(team).size == 0) {
+                    allActiveTeamsHaveCores = false;
+                    break;
+                }
+            }
+
+            if (!allActiveTeamsHaveCores) {
+                CoreBuild waveTeamCore = teams.cores(state.rules.waveTeam).first();
+                if (waveTeamCore != null) {
+                    waveTeamCore.kill();
+                }
+            }
+            // Kill core of waveTeam if no active teams have cores
+            if (!anyTeamHasCores) {
+                CoreBuild waveTeamCore = teams.cores(state.rules.waveTeam).first();
+                if (waveTeamCore != null) {
+                    waveTeamCore.kill();
+                }
+            }
+        }, 0f, 1f);
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
-            var core2 = unit.core();
+
             if (core == null || unit.dst(core) > 200f || core.health <= 0)
                 return; // Check if core is null, out of range, or already dead
             float damage = (100000000);
@@ -43,20 +90,18 @@ public class PluginLogic {
                 core.block.health = 1;
             }
             unit.kill();
-            if (core2 == null|| core2.health <= 0)
-            return; // Check if core is null, out of range, or already dead
-           
-            core2.damage(Team.sharded,10000f);
+
         }), 0f, 0.1f);
+
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
 
             var core3 = unit.closestEnemyCore();
 
-            if (core3 == null|| core3.health <= 0)
-            return; 
+            if (core3 == null || core3.health <= 0)
+                return;
             Call.effect(Fx.healWaveMend, core3.x, core3.y, 200f, Color.crimson);
-    
-        }), 0f, 2f);
+
+        }), 0f, 1f);
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
             spawnedTiles.clear();
@@ -70,7 +115,7 @@ public class PluginLogic {
                     Tile randomTile = spawnedTiles.get(random.nextInt(spawnedTiles.size()));
                     if (randomTile != null) { // Ensure randomTile is not null
                         UnitType unitType = UnitTypes.oct;
-                        Unit unit = unitType.spawn(state.rules.waveTeam,randomTile.getX(),randomTile.getY());
+                        Unit unit = unitType.spawn(state.rules.waveTeam, randomTile.getX(), randomTile.getY());
                         event.unit.type.drag = 0.01f;
                         unit.type.aiController = Newai::new;
                         unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
@@ -122,7 +167,7 @@ public class PluginLogic {
 
                 // Calculate the knockback strength based on the player's velocity towards the
                 // unit
-                float knockbackStrength = 0.7f + Math.abs(velocityTowardsUnit) * 0.5f;
+                float knockbackStrength = Math.abs(velocityTowardsUnit);
 
                 // Reverse the direction to apply the knockback away from the player
                 directionToPlayer.scl(-1);
