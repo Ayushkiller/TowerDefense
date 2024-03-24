@@ -14,11 +14,8 @@ import arc.util.Tmp;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
-import mindustry.core.NetServer.TeamAssigner;
 import mindustry.game.EventType;
-import mindustry.game.EventType.PlayerJoin;
 import mindustry.game.Team;
-import mindustry.game.Teams.TeamData;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
@@ -29,7 +26,6 @@ import tower.game.Newai;
 
 public class PluginLogic {
     private static List<Tile> spawnedTiles = new ArrayList<>();
-
     public static void init() {
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
@@ -45,10 +41,6 @@ public class PluginLogic {
                 core.block.health = 1;
             }
         }), 0f, 0.1f);
-        Events.on(PlayerJoin.class, event -> {
-            Team assignedTeam = teamAssigner.assign(event.player, Groups.player);
-            event.player.team(assignedTeam);
-        });
 
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
@@ -63,7 +55,7 @@ public class PluginLogic {
                     if (randomTile != null) { // Ensure randomTile is not null
                         UnitType unitType = UnitTypes.oct;
                         Unit unit = unitType.spawn(randomTile.getX(), randomTile.getY());
-                        unit.type.drag = 0f;
+                        unit.type.drag = 0.4f;
                         unit.type.aiController = Newai::new;
                         unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
                         unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
@@ -75,7 +67,7 @@ public class PluginLogic {
         Events.on(EventType.UnitSpawnEvent.class, event -> {
 
             if (event.unit.team == state.rules.waveTeam) {
-                event.unit.type.drag = 0f;
+                event.unit.type.drag = 0.4f;
                 event.unit.type.aiController = Newai::new;
                 event.unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
                 spawnedTiles.add(event.unit.tileOn());
@@ -132,24 +124,5 @@ public class PluginLogic {
     public static List<Tile> getSpawnedTiles() {
         return spawnedTiles;
     }
-
-    private static TeamAssigner teamAssigner = (player, players) -> {
-        // find team with minimum amount of players and auto-assign player to that.
-        TeamData re = state.teams.getActive().min(data -> {
-            if ((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active()
-                    || data.team == Team.derelict)
-                return Integer.MAX_VALUE;
-
-            int count = 0;
-            for (Player other : players) {
-                if (other.team() == data.team && other != player) {
-                    count++;
-                }
-            }
-            return count;
-        });
-        // If no team is found, return the default team
-        return re == null ? state.rules.defaultTeam : re.team;
-    };
 
 }
