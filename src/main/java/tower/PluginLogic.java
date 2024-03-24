@@ -50,12 +50,12 @@ public class PluginLogic {
         }), 0f, 0.1f);
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
 
-            var core2 = unit.core();
+            var core3 = unit.core();
 
-            if (core2 == null|| core2.health <= 0)
+            if (core3 == null|| core3.health <= 0)
             return; 
             Call.effect(Fx.forceShrink, unit.x, unit.y, 200f, Color.crimson);
-            core2.damage(Team.sharded,10000f);
+    
         }), 0f, 2f);
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
