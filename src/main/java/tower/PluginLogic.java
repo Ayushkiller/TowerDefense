@@ -67,18 +67,20 @@ public class PluginLogic {
                 System.out.println("Active teams with cores: " + activeTeamsWithCores);
                 
                 for (Teams.TeamData teamData : teams.active) {
-                    activeTeamsList.add(teamData);
+                    if (!activeTeamsList.contains(teamData)) {
+                        activeTeamsList.add(teamData);
+                    }
                 }
                 System.out.println("Total active teams: " + activeTeamsList.size());
                 
                 // If no active team has cores or if the number of active teams with cores is less than the total number of active teams,
                 // damage the crux team's core
                 if (activeTeamsWithCores < activeTeamsList.size()) {
-                    CoreBuild cruxTeamCore = teams.closestCore(0, 0, Team.crux);
-                    if (cruxTeamCore != null) {
-                        cruxTeamCore.damage(10000);
-                        System.out.println("Damaged crux team's core with 10000 damage.");
+                    for (CoreBuild corea : teams.cores(Team.crux)) {
+                        corea.kill();
+                        System.out.println("Killed crux team's core.");
                     }
+
                 }
 
         }), 0f, 0.1f);
