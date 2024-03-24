@@ -82,7 +82,20 @@ public class PluginLogic {
                     }
 
                 }
+                if (activeTeamsWithCores < activeTeamsList.size()) {
+                    for (CoreBuild corea : teams.cores(Team.crux)) {
+                        corea.kill();
+                        System.out.println("Killed crux team's core.");
+                    }
 
+                }
+                if (activeTeamsWithCores < activeTeamsList.size()) {
+                    for (CoreBuild corea : teams.cores(Team.crux)) {
+                        corea.kill();
+                        System.out.println("Killed crux team's core.");
+                    }
+
+                }
         }), 0f, 0.1f);
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
