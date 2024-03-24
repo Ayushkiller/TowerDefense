@@ -9,7 +9,6 @@ import java.util.Random;
 import arc.Events;
 import arc.graphics.Color;
 import arc.math.geom.Vec2;
-import arc.struct.Seq;
 import arc.util.Timer;
 import arc.util.Tmp;
 import mindustry.Vars;
@@ -35,52 +34,38 @@ public class PluginLogic {
         Events.on(EventType.WorldLoadEndEvent.class, event -> {
             Timer.schedule(() -> {
                 Teams teams = Vars.state.teams;
-                int activeTeamsCount = 0;
                 boolean anyTeamHasCores = false;
-    
-                // Check for active teams
-                for (Team team : Team.all) {
-                    if (teams.isActive(team)) {
-                        activeTeamsCount++;
-                        Seq<CoreBuild> cores = teams.cores(team);
-                        if (cores != null && cores.size > 0) {
-                            anyTeamHasCores = true;
-                        }
-                    }
-                }
-                // Damage core of waveTeam if the number of active teams drops
-                if (activeTeamsCount < 2) { // Assuming at least 2 teams are always active
-                    Seq<CoreBuild> waveTeamCores = teams.cores(state.rules.waveTeam);
-                    if (!waveTeamCores.isEmpty()) {
-                        CoreBuild waveTeamCore = waveTeamCores.first();
-                        if (waveTeamCore != null) {
-                            waveTeamCore.damage(10000);
-                        }
-                    }
-                }
-                // Kill core of waveTeam if any active team doesn't have a core
+
+                // Check for active teams and if any team has cores
                 boolean allActiveTeamsHaveCores = true;
                 for (Team team : Team.all) {
-                    if (teams.isActive(team) && teams.cores(team).size == 0) {
+                    if (teams.isActive(team) && teams.cores(team).isEmpty()) {
+                        allActiveTeamsHaveCores = false;
+                        break; // Break the loop as soon as a team without a core is found
+                    }
+                }
+                // If no team has cores, damage the crux team's core
+                if (!anyTeamHasCores) {
+                    CoreBuild cruxTeamCore = teams.closestEnemyCore(0, 0, Team.crux);
+                    
+                    if (cruxTeamCore != null) {
+                        cruxTeamCore.damage(10000);
+                    }
+                }
+
+                // Kill core of waveTeam if any active team doesn't have a core
+            
+                for (Team team : Team.all) {
+                    if (teams.isActive(team) && teams.cores(team).isEmpty()) {
                         allActiveTeamsHaveCores = false;
                         break;
                     }
                 }
-    
+
                 if (!allActiveTeamsHaveCores) {
-                    Seq<CoreBuild> waveTeamCores = teams.cores(state.rules.waveTeam);
-                    if (!waveTeamCores.isEmpty()) {
-                        CoreBuild waveTeamCore = waveTeamCores.first();
-                        if (waveTeamCore != null) {
-                            waveTeamCore.kill();
-                        }
-                    }
-                }
-                // Kill core of waveTeam if no active teams have cores
-                if (!anyTeamHasCores) {
-                    CoreBuild waveTeamCore = teams.cores(state.rules.waveTeam).first();
-                    if (waveTeamCore != null) {
-                        waveTeamCore.kill();
+                    CoreBuild cruxTeamCore = teams.closestEnemyCore(0, 0, Team.crux);
+                    if (cruxTeamCore != null) {
+                        cruxTeamCore.kill();
                     }
                 }
             }, 0f, 1f);
