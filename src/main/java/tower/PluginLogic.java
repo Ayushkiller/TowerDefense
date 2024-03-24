@@ -54,9 +54,9 @@ public class PluginLogic {
 
             if (core3 == null|| core3.health <= 0)
             return; 
-            Call.effect(Fx.forceShrink, unit.x, unit.y, 200f, Color.crimson);
+            Call.effect(Fx.greenCloud, core3.x, core3.y, 200f, Color.crimson);
     
-        }), 0f, 2f);
+        }), 0f, 1f);
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
             spawnedTiles.clear();
