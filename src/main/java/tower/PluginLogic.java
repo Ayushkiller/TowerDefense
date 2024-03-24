@@ -9,6 +9,7 @@ import java.util.Random;
 import arc.Events;
 import arc.graphics.Color;
 import arc.math.geom.Vec2;
+import arc.struct.Seq;
 import arc.util.Timer;
 import arc.util.Tmp;
 import mindustry.Vars;
@@ -63,9 +64,12 @@ public class PluginLogic {
             }
 
             if (!allActiveTeamsHaveCores) {
-                CoreBuild waveTeamCore = teams.cores(state.rules.waveTeam).first();
-                if (waveTeamCore != null) {
-                    waveTeamCore.kill();
+                Seq<CoreBuild> waveTeamCores = teams.cores(state.rules.waveTeam);
+                if (!waveTeamCores.isEmpty()) {
+                    CoreBuild waveTeamCore = waveTeamCores.first();
+                    if (waveTeamCore != null) {
+                        waveTeamCore.kill();
+                    }
                 }
             }
             // Kill core of waveTeam if no active teams have cores
