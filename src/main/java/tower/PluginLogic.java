@@ -41,17 +41,20 @@ public class PluginLogic {
             for (Team team : Team.all) {
                 if (teams.isActive(team)) {
                     activeTeamsCount++;
-                    if (teams.cores(team).size > 0) {
+                    Seq<CoreBuild> cores = teams.cores(team);
+                    if (cores != null && cores.size > 0) {
                         anyTeamHasCores = true;
                     }
                 }
             }
-
             // Damage core of waveTeam if the number of active teams drops
             if (activeTeamsCount < 2) { // Assuming at least 2 teams are always active
-                CoreBuild waveTeamCore = teams.cores(state.rules.waveTeam).first();
-                if (waveTeamCore != null) {
-                    waveTeamCore.damage(10000);
+                Seq<CoreBuild> waveTeamCores = teams.cores(state.rules.waveTeam);
+                if (!waveTeamCores.isEmpty()) {
+                    CoreBuild waveTeamCore = waveTeamCores.first();
+                    if (waveTeamCore != null) {
+                        waveTeamCore.damage(10000);
+                    }
                 }
             }
             // Kill core of waveTeam if any active team doesn't have a core
