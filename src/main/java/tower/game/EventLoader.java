@@ -26,7 +26,6 @@ public class EventLoader {
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
         });
-        Events.run(EventType.Trigger.update, Players::forEach);
 
     }
 }
