@@ -57,7 +57,7 @@ public class PluginLogic {
                     if (randomTile != null) { // Ensure randomTile is not null
                         UnitType unitType = UnitTypes.oct;
                         Unit unit = unitType.spawn(state.rules.waveTeam,randomTile.getX(),randomTile.getY());
-                        event.unit.type.drag = 0.009f;
+                        event.unit.type.drag = 0.000001f;
                         unit.type.aiController = Newai::new;
                         unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
                         unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
@@ -69,7 +69,7 @@ public class PluginLogic {
         Events.on(EventType.UnitSpawnEvent.class, event -> {
 
             if (event.unit.team == state.rules.waveTeam) {
-                event.unit.type.drag = 0.009f;
+                event.unit.type.drag = 0.000001f;
                 event.unit.type.aiController = Newai::new;
                 event.unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
                 spawnedTiles.add(event.unit.tileOn());
