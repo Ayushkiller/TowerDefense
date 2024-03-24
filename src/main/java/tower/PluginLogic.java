@@ -2,38 +2,34 @@ package tower;
 
 import static mindustry.Vars.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import arc.Events;
 import arc.graphics.Color;
-import arc.math.Mathf;
 import arc.math.geom.Vec2;
-import arc.struct.ObjectMap;
-import arc.struct.Seq;
 import arc.util.Timer;
 import arc.util.Tmp;
 import mindustry.content.Fx;
+import mindustry.content.StatusEffects;
+import mindustry.content.UnitTypes;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.gen.Unit;
 import mindustry.net.Administration;
-import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
 import mindustry.world.Tile;
-import mindustry.world.blocks.defense.ForceProjector;
 import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
-import mindustry.world.blocks.units.RepairTurret;
 import useful.Bundle;
 
 public class PluginLogic {
-    public static float multiplier = 1f;
-    public static boolean multiplierAdjusted = false;
-    public static ObjectMap<UnitType, Seq<ItemStack>> drops;
-    public static ObjectMap<Tile, ForceProjector> forceProjectorTiles = new ObjectMap<>();
-    public static ObjectMap<Tile, RepairTurret> repairPointTiles = new ObjectMap<>();
-    public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
+   private static List<Tile> spawnedTiles = new ArrayList<>();
 
     public static void init() {
 
@@ -60,9 +56,7 @@ public class PluginLogic {
             var core = unit.closestEnemyCore();
             if (core == null || unit.dst(core) > 80f || core.health <= 0)
                 return; // Check if core is null, out of range, or already dead
-            float damage = (unit.health + unit.shield) / Mathf.sqrt(multiplier);
-            // Ensure damage does not exceed the core's health
-            damage = Math.min(damage, core.health);
+            float damage = (100000000);
             core.damage(Team.crux, damage);
             Call.effect(Fx.healWaveMend, unit.x, unit.y, 80f, Color.crimson);
             core.damage(1, true);
@@ -75,11 +69,30 @@ public class PluginLogic {
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
         });
+     Events.on(EventType.UnitDestroyEvent.class, event -> {
+            if (event.unit.team == state.rules.waveTeam) {
+                // Check if there are any spawned tiles
+                if (!spawnedTiles.isEmpty()) {
+                    // Select a random tile from the list
+                    Random random = new Random();
+                    Tile randomTile = spawnedTiles.get(random.nextInt(spawnedTiles.size()));
+                    UnitType unitType = UnitTypes.oct; 
+                    Unit unit = unitType.spawn(randomTile.x, randomTile.y);
+                    unit.type.drag=0.1f;
+                    unit.type.aiController=null;
+                    event.unit.apply(StatusEffects.invincible);
+                    
+                }
+            }
+        });
 
         Events.on(EventType.UnitSpawnEvent.class, event -> {
 
             if (event.unit.team == state.rules.waveTeam) {
                 event.unit.type.drag = 0.1f;
+                event.unit.type.aiController = null;
+                event.unit.apply(StatusEffects.invincible);
+                spawnedTiles.add(event.unit.tileOn());
             }
         });
         Events.run(EventType.Trigger.update, () -> {
@@ -106,20 +119,24 @@ public class PluginLogic {
             if (nearestPlayer[0] != null && nearestDistance[0] <= 105f && unit.team == state.rules.waveTeam) {
                 // Calculate the direction from the unit to the nearest player
                 Vec2 knockbackDirection = Tmp.v1.set(nearestPlayer[0].x, nearestPlayer[0].y).sub(unit.x, unit.y).nor();
-
+            
+                // Reverse the direction to apply the knockback away from the player
+                knockbackDirection.scl(-1);
+            
                 // Define the knockback strength
                 float knockbackStrength = 0.5f;
-
+            
                 // Apply the knockback force to the unit's velocity
                 unit.vel.add(knockbackDirection.x * knockbackStrength, knockbackDirection.y * knockbackStrength);
-
-                // Optionally, limit the maximum velocity to prevent the unit from moving too
-                // fast
+            
+                // Optionally, limit the maximum velocity to prevent the unit from moving too fast
                 unit.vel.limit(unit.type.speed);
                 Call.effect(Fx.healWaveMend,unit.x,unit.y,40f,Color.green);
             }
         });
 
     }
-
+    public static List<Tile> getSpawnedTiles() {
+        return spawnedTiles;
+    }
 }
