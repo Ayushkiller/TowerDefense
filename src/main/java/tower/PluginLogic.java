@@ -45,6 +45,7 @@ public class PluginLogic {
 
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
+            spawnedTiles.clear();
         });
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team == state.rules.waveTeam) {
@@ -55,7 +56,7 @@ public class PluginLogic {
                     Tile randomTile = spawnedTiles.get(random.nextInt(spawnedTiles.size()));
                     if (randomTile != null) { // Ensure randomTile is not null
                         UnitType unitType = UnitTypes.oct;
-                        Unit unit = unitType.spawn(randomTile.getX(), randomTile.getY());
+                        Unit unit = unitType.spawn(state.rules.waveTeam,randomTile.getX(),randomTile.getY());
                         event.unit.type.drag = 0.009f;
                         unit.type.aiController = Newai::new;
                         unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
