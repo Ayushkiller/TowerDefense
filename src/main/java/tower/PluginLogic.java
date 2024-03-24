@@ -31,46 +31,7 @@ public class PluginLogic {
     private static List<Tile> spawnedTiles = new ArrayList<>();
 
     public static void init() {
-        Events.on(EventType.WorldLoadEndEvent.class, event -> {
-            Timer.schedule(() -> {
-                Teams teams = Vars.state.teams;
-                boolean anyTeamHasCores = false;
 
-                // Check for active teams and if any team has cores
-                boolean allActiveTeamsHaveCores = true;
-                for (Team team : Team.all) {
-                    if (teams.isActive(team) && teams.cores(team).isEmpty()) {
-                        allActiveTeamsHaveCores = false;
-                        break; // Break the loop as soon as a team without a core is found
-                    }
-                }
-                // If no team has cores, damage the crux team's core
-                if (!anyTeamHasCores) {
-                    CoreBuild cruxTeamCore = teams.closestEnemyCore(0, 0, Team.crux);
-                    
-                    if (cruxTeamCore != null) {
-                        cruxTeamCore.damage(10000);
-                    }
-                }
-
-                // Kill core of waveTeam if any active team doesn't have a core
-            
-                for (Team team : Team.all) {
-                    if (teams.isActive(team) && teams.cores(team).isEmpty()) {
-                        allActiveTeamsHaveCores = false;
-                        break;
-                    }
-                }
-
-                if (!allActiveTeamsHaveCores) {
-                    CoreBuild cruxTeamCore = teams.closestEnemyCore(0, 0, Team.crux);
-                    if (cruxTeamCore != null) {
-                        cruxTeamCore.kill();
-                    }
-                }
-            }, 0f, 1f);
-        });
-   
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
 
@@ -85,6 +46,41 @@ public class PluginLogic {
                 core.block.health = 1;
             }
             unit.kill();
+            Teams teams = Vars.state.teams;
+            boolean anyTeamHasCores = false;
+
+            // Check for active teams and if any team has cores
+            boolean allActiveTeamsHaveCores = true;
+            for (Team team : Team.all) {
+                if (teams.isActive(team) && teams.cores(team).isEmpty()) {
+                    allActiveTeamsHaveCores = false;
+                    break; // Break the loop as soon as a team without a core is found
+                }
+            }
+            // If no team has cores, damage the crux team's core
+            if (!anyTeamHasCores) {
+                CoreBuild cruxTeamCore = teams.closestCore(0, 0, Team.crux);
+                
+                if (cruxTeamCore != null) {
+                    cruxTeamCore.damage(10000);
+                }
+            }
+
+            // Kill core of waveTeam if any active team doesn't have a core
+        
+            for (Team team : Team.all) {
+                if (teams.isActive(team) && teams.cores(team).isEmpty()) {
+                    allActiveTeamsHaveCores = false;
+                    break;
+                }
+            }
+
+            if (!allActiveTeamsHaveCores) {
+                CoreBuild cruxTeamCore = teams.closestCore(0, 0, Team.crux);
+                if (cruxTeamCore != null) {
+                    cruxTeamCore.kill();
+                }
+            }
 
         }), 0f, 0.1f);
 
