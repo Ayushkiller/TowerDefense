@@ -82,6 +82,7 @@ public class PluginLogic {
                         Unit unit = unitType.spawn(randomTile.getX(), randomTile.getY());
                         unit.type.drag=0.1f;
                         unit.type.aiController=FlyingAIForAss::new;
+                        unit.type.speed=0f;
                         event.unit.apply(StatusEffects.invincible);
                     }
                 }
@@ -94,6 +95,7 @@ public class PluginLogic {
                 event.unit.type.drag = 0.1f;
                 event.unit.type.aiController = FlyingAIForAss::new;
                 event.unit.apply(StatusEffects.invincible);
+                event.unit.type.speed=0f;
                 spawnedTiles.add(event.unit.tileOn());
             }
         });
