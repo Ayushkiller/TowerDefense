@@ -66,7 +66,6 @@ public class PluginLogic {
                 }
                 System.out.println("Active teams with cores: " + activeTeamsWithCores);
                 
-                List<Teams.TeamData> activeTeamsList = new ArrayList<>();
                 for (Teams.TeamData teamData : teams.active) {
                     activeTeamsList.add(teamData);
                 }
@@ -98,6 +97,7 @@ public class PluginLogic {
             spawnedTiles.clear();
             activeTeamsList.clear();
         });
+        
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team == state.rules.waveTeam) {
                 // Check if there are any spawned tiles
