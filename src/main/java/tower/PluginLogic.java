@@ -26,6 +26,7 @@ import tower.game.Newai;
 
 public class PluginLogic {
     private static List<Tile> spawnedTiles = new ArrayList<>();
+
     public static void init() {
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
@@ -55,7 +56,7 @@ public class PluginLogic {
                     if (randomTile != null) { // Ensure randomTile is not null
                         UnitType unitType = UnitTypes.oct;
                         Unit unit = unitType.spawn(randomTile.getX(), randomTile.getY());
-                        unit.type.drag = 0.4f;
+                        event.unit.type.drag = 0.009f;
                         unit.type.aiController = Newai::new;
                         unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
                         unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
@@ -67,7 +68,7 @@ public class PluginLogic {
         Events.on(EventType.UnitSpawnEvent.class, event -> {
 
             if (event.unit.team == state.rules.waveTeam) {
-                event.unit.type.drag = 0.4f;
+                event.unit.type.drag = 0.009f;
                 event.unit.type.aiController = Newai::new;
                 event.unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
                 spawnedTiles.add(event.unit.tileOn());

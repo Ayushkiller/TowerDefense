@@ -18,7 +18,8 @@ public class PlayerData {
     private boolean showStats;
     private float Cash;
     private Team team;
-   public static int getTotalPlayers() {
+
+    public static int getTotalPlayers() {
         return totalPlayers;
     }
 
@@ -26,7 +27,6 @@ public class PlayerData {
         this.Cash += amount;
 
     }
-
 
     public void subtractCash(float amount, Player player) {
         this.Cash -= amount;
@@ -76,6 +76,7 @@ public class PlayerData {
     public float getHp() {
         return hp;
     }
+
     public Team getTeam() {
         return team;
     }
@@ -86,16 +87,16 @@ public class PlayerData {
 
     public PlayerData(Player player) {
         this.uuid = player.uuid();
-        this.team= player.team();
         totalPlayers++;
         player.ip();
 
     }
-public static Collection<PlayerData> getAllPlayers() {
-    // Retrieve the map of all players from Players.java
-    Map<String, PlayerData> allPlayersMap = Players.players;
 
-    // Return the values of the map, which are PlayerData instances
-    return allPlayersMap.values();
-}
+    public static Collection<PlayerData> getAllPlayers() {
+        // Retrieve the map of all players from Players.java
+        Map<String, PlayerData> allPlayersMap = Players.players;
+
+        // Return the values of the map, which are PlayerData instances
+        return allPlayersMap.values();
+    }
 }
