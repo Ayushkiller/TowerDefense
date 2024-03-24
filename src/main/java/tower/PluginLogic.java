@@ -37,50 +37,50 @@ public class PluginLogic {
 
             if (core == null || unit.dst(core) > 200f || core.health <= 0)
                 return; // Check if core is null, out of range, or already dead
-            float damage = (100000000);
-            core.damage(Team.crux, damage);
-            Call.effect(Fx.healWaveMend, unit.x, unit.y, 80f, Color.crimson);
-            core.damage(1, true);
-            unit.kill();
-            if (core.block.health <= 0) {
-                core.block.health = 1;
-            }
-            unit.kill();
-            Teams teams = Vars.state.teams;
-            boolean anyTeamHasCores = false;
-
-            // Check for active teams and if any team has cores
-            boolean allActiveTeamsHaveCores = true;
-            for (Team team : Team.all) {
-                if (teams.isActive(team) && teams.cores(team).isEmpty()) {
-                    allActiveTeamsHaveCores = false;
-                    break; // Break the loop as soon as a team without a core is found
-                }
-            }
-            // If no team has cores, damage the crux team's core
-            if (!anyTeamHasCores) {
-                CoreBuild cruxTeamCore = teams.closestCore(0, 0, Team.crux);
+                float damage = (100000000);
+                core.damage(Team.crux, damage);
+                System.out.println("Damaged crux team core with " + damage + " damage.");
                 
-                if (cruxTeamCore != null) {
-                    cruxTeamCore.damage(10000);
+                Call.effect(Fx.healWaveMend, unit.x, unit.y, 80f, Color.crimson);
+                System.out.println("Applied healWaveMend effect at unit's location.");
+                
+                core.damage(1, true);
+                System.out.println("Damaged core with 1 damage.");
+                
+                unit.kill();
+                System.out.println("Killed unit.");
+                
+                if (core.block.health <= 0) {
+                    core.block.health = 1;
+                    System.out.println("Reset core block health to 1.");
                 }
-            }
-
-            // Kill core of waveTeam if any active team doesn't have a core
-        
-            for (Team team : Team.all) {
-                if (teams.isActive(team) && teams.cores(team).isEmpty()) {
-                    allActiveTeamsHaveCores = false;
-                    break;
+                
+                Teams teams = Vars.state.teams;
+                int activeTeamsWithCores = 0;
+                
+                // Check for active teams and count those with cores
+                for (Team team : Team.all) {
+                    if (teams.isActive(team) && !teams.cores(team).isEmpty()) {
+                        activeTeamsWithCores++;
+                    }
                 }
-            }
-
-            if (!allActiveTeamsHaveCores) {
-                CoreBuild cruxTeamCore = teams.closestCore(0, 0, Team.crux);
-                if (cruxTeamCore != null) {
-                    cruxTeamCore.kill();
+                System.out.println("Active teams with cores: " + activeTeamsWithCores);
+                
+                List<Teams.TeamData> activeTeamsList = new ArrayList<>();
+                for (Teams.TeamData teamData : teams.active) {
+                    activeTeamsList.add(teamData);
                 }
-            }
+                System.out.println("Total active teams: " + activeTeamsList.size());
+                
+                // If no active team has cores or if the number of active teams with cores is less than the total number of active teams,
+                // damage the crux team's core
+                if (activeTeamsWithCores == 0 || activeTeamsWithCores < activeTeamsList.size()) {
+                    CoreBuild cruxTeamCore = teams.closestCore(0, 0, Team.crux);
+                    if (cruxTeamCore != null) {
+                        cruxTeamCore.damage(10000);
+                        System.out.println("Damaged crux team's core with 10000 damage.");
+                    }
+                }
 
         }), 0f, 0.1f);
 
