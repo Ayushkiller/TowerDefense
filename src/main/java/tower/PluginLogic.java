@@ -1,13 +1,22 @@
 package tower;
 
+import static mindustry.Vars.*;
+
+import java.util.Map;
+
 import arc.Events;
 import arc.graphics.Color;
 import arc.math.Mathf;
-import arc.struct.*;
-import arc.util.*;
+import arc.struct.ObjectMap;
+import arc.struct.Seq;
+import arc.util.Strings;
+import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.ai.types.GroundAI;
-import mindustry.content.*;
+import mindustry.content.Blocks;
+import mindustry.content.Fx;
+import mindustry.content.StatusEffects;
+import mindustry.content.UnitTypes;
 import mindustry.game.EventType;
 import mindustry.game.Rules;
 import mindustry.game.Team;
@@ -15,8 +24,10 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.net.Administration;
-import mindustry.type.*;
-import mindustry.world.*;
+import mindustry.type.ItemStack;
+import mindustry.type.UnitType;
+import mindustry.world.Block;
+import mindustry.world.Tile;
 import mindustry.world.blocks.defense.ForceProjector;
 import mindustry.world.blocks.defense.RegenProjector;
 import mindustry.world.blocks.defense.ShockMine;
@@ -30,9 +41,6 @@ import tower.Domain.Unitsdrops;
 import tower.game.Scenarios;
 import tower.pathing.FlyingAIForAss;
 import useful.Bundle;
-import static mindustry.Vars.*;
-
-import java.util.Map;
 
 public class PluginLogic {
     public static float multiplier = 1f;
