@@ -29,7 +29,7 @@ import tower.game.Newai;
 
 public class PluginLogic {
     private static List<Tile> spawnedTiles = new ArrayList<>();
-
+    private static List<Teams.TeamData> activeTeamsList = new ArrayList<>();
     public static void init() {
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
@@ -74,7 +74,7 @@ public class PluginLogic {
                 
                 // If no active team has cores or if the number of active teams with cores is less than the total number of active teams,
                 // damage the crux team's core
-                if (activeTeamsWithCores == 0 || activeTeamsWithCores < activeTeamsList.size()) {
+                if (activeTeamsWithCores < activeTeamsList.size()) {
                     CoreBuild cruxTeamCore = teams.closestCore(0, 0, Team.crux);
                     if (cruxTeamCore != null) {
                         cruxTeamCore.damage(10000);
@@ -96,6 +96,7 @@ public class PluginLogic {
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
             spawnedTiles.clear();
+            activeTeamsList.clear();
         });
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team == state.rules.waveTeam) {
@@ -107,7 +108,7 @@ public class PluginLogic {
                     if (randomTile != null) { // Ensure randomTile is not null
                         UnitType unitType = UnitTypes.oct;
                         Unit unit = unitType.spawn(state.rules.waveTeam, randomTile.getX(), randomTile.getY());
-                        event.unit.type.drag = 0.01f;
+                        event.unit.type.drag = 0.002f;
                         unit.type.aiController = Newai::new;
                         unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
                         unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
@@ -119,7 +120,7 @@ public class PluginLogic {
         Events.on(EventType.UnitSpawnEvent.class, event -> {
 
             if (event.unit.team == state.rules.waveTeam) {
-                event.unit.type.drag = 0.01f;
+                event.unit.type.drag = 0.002f;
                 event.unit.type.aiController = Newai::new;
                 event.unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
                 spawnedTiles.add(event.unit.tileOn());
