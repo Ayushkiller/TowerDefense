@@ -1,6 +1,7 @@
 package tower;
 
 import mindustry.mod.Plugin;
+import tower.game.EventLoader;
 import useful.Bundle;
 
 public class TowerDefensePlugin extends Plugin {
@@ -9,8 +10,7 @@ public class TowerDefensePlugin extends Plugin {
     @Override
     public void init() {
         Bundle.load(TowerDefensePlugin.class);
-
-        PluginLogic.init(); 
+        EventLoader.init();
+        PluginLogic.init();
     }
 }
- 

@@ -26,6 +26,7 @@ import mindustry.world.Tile;
 import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
+import tower.game.FlyingAIForAss;
 import useful.Bundle;
 
 public class PluginLogic {
@@ -80,7 +81,7 @@ public class PluginLogic {
                         UnitType unitType = UnitTypes.oct; 
                         Unit unit = unitType.spawn(randomTile.getX(), randomTile.getY());
                         unit.type.drag=0.1f;
-                        unit.type.aiController=null;
+                        unit.type.aiController=FlyingAIForAss::new;
                         event.unit.apply(StatusEffects.invincible);
                     }
                 }
@@ -91,7 +92,7 @@ public class PluginLogic {
 
             if (event.unit.team == state.rules.waveTeam) {
                 event.unit.type.drag = 0.1f;
-                event.unit.type.aiController = null;
+                event.unit.type.aiController = FlyingAIForAss::new;
                 event.unit.apply(StatusEffects.invincible);
                 spawnedTiles.add(event.unit.tileOn());
             }

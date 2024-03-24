@@ -1,8 +1,9 @@
 package tower.Domain;
 
+import java.util.Collection;
 import java.util.Map;
 
-import mindustry.gen.Groups;
+import mindustry.game.Team;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import tower.Players;
@@ -16,6 +17,7 @@ public class PlayerData {
     private String name;
     private boolean showStats;
     private float Cash;
+    private Team team;
    public static int getTotalPlayers() {
         return totalPlayers;
     }
@@ -74,6 +76,9 @@ public class PlayerData {
     public float getHp() {
         return hp;
     }
+    public Team getTeam() {
+        return team;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -81,28 +86,16 @@ public class PlayerData {
 
     public PlayerData(Player player) {
         this.uuid = player.uuid();
+        this.team= player.team();
         totalPlayers++;
         player.ip();
-        this.hp = player.unit().health();
-        this.name = player.name();
-        this.Cash = 0;
+
     }
+public static Collection<PlayerData> getAllPlayers() {
+    // Retrieve the map of all players from Players.java
+    Map<String, PlayerData> allPlayersMap = Players.players;
 
-    public static Player[] getAllPlayers() {
-        // Retrieve the map of all players from Players.java
-        Map<String, PlayerData> allPlayersMap = Players.players;
-
-        // Initialize an array of Player objects with the size of the map
-        Player[] allPlayers = new Player[allPlayersMap.size()];
-
-        // Iterate over all players and match their UUIDs with those in allPlayersMap
-        int index = 0;
-        for (Player player : Groups.player) {
-            if (allPlayersMap.containsKey(player.uuid())) {
-                allPlayers[index++] = player;
-            }
-        }
-
-        return allPlayers;
-    }
+    // Return the values of the map, which are PlayerData instances
+    return allPlayersMap.values();
+}
 }
