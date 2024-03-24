@@ -111,7 +111,7 @@ public class PluginLogic {
             });
 
             // Check if the unit is an enemy and within the specified distance
-            if (nearestPlayer[0] != null && nearestDistance[0] <= 105f && unit.team == state.rules.waveTeam) {
+            if (nearestPlayer[0] != null && nearestDistance[0] <= 120f && unit.team == state.rules.waveTeam) {
                 // Calculate the direction from the unit to the nearest player
                 Vec2 directionToPlayer = Tmp.v1.set(nearestPlayer[0].x, nearestPlayer[0].y).sub(unit.x, unit.y).nor();
                 Vec2 playerVelocity = nearestPlayer[0].unit().vel;
@@ -130,7 +130,7 @@ public class PluginLogic {
                 // Apply the knockback force to the unit's velocity
                 unit.vel.add(directionToPlayer.x * knockbackStrength, directionToPlayer.y * knockbackStrength);
 
-                unit.vel.limit(unit.type.speed * 40f);
+                unit.vel.limit(unit.type.speed * 5.6f);
                 Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.green);
             }
         });
