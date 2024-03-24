@@ -82,7 +82,6 @@ public class PluginLogic {
                         Unit unit = unitType.spawn(randomTile.getX(), randomTile.getY());
                         unit.type.drag=0.1f;
                         unit.type.aiController=FlyingAIForAss::new;
-                        unit.type.speed=0f;
                         event.unit.apply(StatusEffects.invincible);
                     }
                 }
@@ -95,7 +94,6 @@ public class PluginLogic {
                 event.unit.type.drag = 0.1f;
                 event.unit.type.aiController = FlyingAIForAss::new;
                 event.unit.apply(StatusEffects.invincible);
-                event.unit.type.speed=0f;
                 spawnedTiles.add(event.unit.tileOn());
             }
         });
@@ -118,21 +116,23 @@ public class PluginLogic {
                     nearestPlayer[0] = player;
                 }
             });
-
+        
             // Check if the unit is an enemy and within the specified distance
             if (nearestPlayer[0] != null && nearestDistance[0] <= 105f && unit.team == state.rules.waveTeam) {
                 // Calculate the direction from the unit to the nearest player
-                Vec2 knockbackDirection = Tmp.v1.set(nearestPlayer[0].x, nearestPlayer[0].y).sub(unit.x, unit.y).nor();
-            
+                Vec2 directionToPlayer = Tmp.v1.set(nearestPlayer[0].x, nearestPlayer[0].y).sub(unit.x, unit.y).nor();
+                Vec2 playerVelocity = nearestPlayer[0].unit().vel;
+  
+                float angle = directionToPlayer.dot(playerVelocity);
+        
+                float knockbackStrength = 0.5f + Math.abs(angle) * 0.5f;
+        
                 // Reverse the direction to apply the knockback away from the player
-                knockbackDirection.scl(-1);
-            
-                // Define the knockback strength
-                float knockbackStrength = 0.5f;
-            
+                directionToPlayer.scl(-1);
+        
                 // Apply the knockback force to the unit's velocity
-                unit.vel.add(knockbackDirection.x * knockbackStrength, knockbackDirection.y * knockbackStrength);
-            
+                unit.vel.add(directionToPlayer.x * knockbackStrength, directionToPlayer.y * knockbackStrength);
+        
                 // Optionally, limit the maximum velocity to prevent the unit from moving too fast
                 unit.vel.limit(unit.type.speed);
                 Call.effect(Fx.healWaveMend,unit.x,unit.y,40f,Color.green);
