@@ -30,72 +30,53 @@ import tower.game.Newai;
 public class PluginLogic {
     private static List<Tile> spawnedTiles = new ArrayList<>();
     private static List<Teams.TeamData> activeTeamsList = new ArrayList<>();
-    public static void init() {
 
+    public static void init() {
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
             var core = unit.closestEnemyCore();
 
             if (core == null || unit.dst(core) > 200f || core.health <= 0)
                 return; // Check if core is null, out of range, or already dead
-                float damage = (100000000);
-                core.damage(Team.crux, damage);
-                System.out.println("Damaged crux team core with " + damage + " damage.");
-                
-                Call.effect(Fx.healWaveMend, unit.x, unit.y, 80f, Color.crimson);
-                System.out.println("Applied healWaveMend effect at unit's location.");
-                
-                core.damage(1, true);
-                System.out.println("Damaged core with 1 damage.");
-                
-                unit.kill();
-                System.out.println("Killed unit.");
-                
-                if (core.block.health <= 0) {
-                    core.block.health = 1;
-                    System.out.println("Reset core block health to 1.");
-                }
-                
-                Teams teams = Vars.state.teams;
-                int activeTeamsWithCores = 0;
-                
-                // Check for active teams and count those with cores
-                for (Team team : Team.all) {
-                    if (teams.isActive(team) && !teams.cores(team).isEmpty()) {
-                        activeTeamsWithCores++;
-                    }
-                }
-                System.out.println("Active teams with cores: " + activeTeamsWithCores);
-                
-                for (Teams.TeamData teamData : teams.active) {
-                    if (!activeTeamsList.contains(teamData)) {
-                        activeTeamsList.add(teamData);
-                    }
-                }
-                System.out.println("Total active teams: " + activeTeamsList.size());
-                
-                // If no active team has cores or if the number of active teams with cores is less than the total number of active teams,
-                // damage the crux team's core
-                if (activeTeamsWithCores < activeTeamsList.size()) {
-                    for (CoreBuild corea : teams.cores(Team.crux)) {
-                        corea.kill();
-                        System.out.println("Killed crux team's core.");
-                    }
+            float damage = (100000000);
+            core.damage(Team.crux, damage);
+            Call.effect(Fx.healWaveMend, unit.x, unit.y, 80f, Color.crimson);
+            core.damage(1, true);
+            unit.kill();
+            if (core.block.health <= 0) {
+                core.block.health = 1;
 
+            }
+            Teams teams = Vars.state.teams;
+            int activeTeamsWithCores = 0;
+            // Check for active teams and count those with cores
+            for (Team team : Team.all) {
+                if (teams.isActive(team) && !teams.cores(team).isEmpty()) {
+                    activeTeamsWithCores++;
                 }
-                if (activeTeamsWithCores < activeTeamsList.size()) {
-                    for (CoreBuild corea : teams.cores(Team.crux)) {
-                        corea.kill();
-                        System.out.println("Killed crux team's core.");
-                    }
-
+            }
+            for (Teams.TeamData teamData : teams.active) {
+                if (!activeTeamsList.contains(teamData)) {
+                    activeTeamsList.add(teamData);
                 }
-                if (activeTeamsWithCores < activeTeamsList.size()) {
-                    for (CoreBuild corea : teams.cores(Team.crux)) {
-                        corea.kill();
-                        System.out.println("Killed crux team's core.");
-                    }
-
+            }
+            // If no active team has cores or if the number of active teams with cores is
+            // less than the total number of active teams,
+            // damage the crux team's core
+            if (activeTeamsWithCores < activeTeamsList.size()) {
+                for (CoreBuild corea : teams.cores(Team.crux)) {
+                    corea.kill();
                 }
+            }
+            if (activeTeamsWithCores < activeTeamsList.size()) {
+                for (CoreBuild corea : teams.cores(Team.crux)) {
+                    corea.kill();
+                }
+            }
+            if (activeTeamsWithCores < activeTeamsList.size()) {
+                for (CoreBuild corea : teams.cores(Team.crux)) {
+                    corea.kill();
+                }
+            }
         }), 0f, 0.1f);
 
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
@@ -112,7 +93,7 @@ public class PluginLogic {
             spawnedTiles.clear();
             activeTeamsList.clear();
         });
-        
+
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team == state.rules.waveTeam) {
                 // Check if there are any spawned tiles
@@ -122,11 +103,36 @@ public class PluginLogic {
                     Tile randomTile = spawnedTiles.get(random.nextInt(spawnedTiles.size()));
                     if (randomTile != null) { // Ensure randomTile is not null
                         UnitType unitType = UnitTypes.oct;
-                        Unit unit = unitType.spawn(state.rules.waveTeam, randomTile.getX(), randomTile.getY());
+                        // Wrap the unit in a final wrapper class
+                        final UnitWrapper unitWrapper = new UnitWrapper();
+                        unitWrapper.unit = unitType.spawn(state.rules.waveTeam, randomTile.getX(), randomTile.getY());
                         event.unit.type.drag = 0.002f;
-                        unit.type.aiController = Newai::new;
-                        unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
-                        unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
+                        unitWrapper.unit.type.aiController = Newai::new;
+                        unitWrapper.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
+                        unitWrapper.unit.apply(StatusEffects.invincible, Float.POSITIVE_INFINITY);
+
+                        // Schedule a check to see if the unit is still alive after 0.5 seconds
+                        Timer.schedule(() -> {
+                            if (!unitWrapper.unit.dead()) {
+                                // Find the team with the least number of cores
+                                Team teamWithLeastCores = null;
+                                int minCores = Integer.MAX_VALUE;
+                                for (Team team : Team.all) {
+                                    int cores = Vars.state.teams.cores(team).size;
+                                    if (cores < minCores) {
+                                        minCores = cores;
+                                        teamWithLeastCores = team;
+                                    }
+                                }
+
+                                // Kill all cores of the team with the least number of cores
+                                if (teamWithLeastCores != null) {
+                                    for (CoreBuild core : Vars.state.teams.cores(teamWithLeastCores)) {
+                                        core.kill();
+                                    }
+                                }
+                            }
+                        }, 0.1f);
                     }
                 }
             }
@@ -191,6 +197,11 @@ public class PluginLogic {
 
     public static List<Tile> getSpawnedTiles() {
         return spawnedTiles;
+    }
+
+    // Ah dont knwo what else could have done
+    static class UnitWrapper {
+        Unit unit;
     }
 
 }
