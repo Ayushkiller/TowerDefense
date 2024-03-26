@@ -75,7 +75,7 @@ public class Bundle {
             return getResource(locale).getString(key);
         } catch (MissingResourceException e) {
             Log.err("Key '@' doesn't exist in locale '@'", key, locale);
-            return (locale == defaultLocale) ? "?" + key + "?" : get(key);
+            return (locale.equals(defaultLocale) ) ? "?" + key + "?" : get(key);
         }
     }
 

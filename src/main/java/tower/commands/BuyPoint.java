@@ -1,16 +1,17 @@
 package tower.commands;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.type.Item;
 import mindustry.ui.Menus;
-import tower.Domain.PlayerData;
 import tower.Bundle;
 import tower.Players;
 import tower.Domain.Currency;
-import java.util.Map;
-import java.util.HashMap;
+import tower.Domain.PlayerData;
 
 public class BuyPoint {
     private static Map<Player, Map<Item, Integer>> selectedItemsQuantities = new HashMap<>();
@@ -190,7 +191,7 @@ public class BuyPoint {
                     sendMessageToPlayer(player, "menu.0b");
                     return;
                 }
-                if (hasEnoughItems(player.team(), option, player)) {
+                if (hasEnoughItems(player.team(), player)) {
                     PlayerData playerData = Players.getPlayer(player);
                     playerData.addCash(totalCash, player);
                     removeItemsFromTeam(player.team(), selectedItems);
@@ -209,7 +210,7 @@ public class BuyPoint {
         }), title, description, buttons);
     }
 
-    private static boolean hasEnoughItems(Team team, int option, Player player) {
+    private static boolean hasEnoughItems(Team team, Player player) {
         Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
         for (int i = 0; i < Currency.items.size(); i++) {
             Map<String, Object> itemMap = Currency.items.get(i);

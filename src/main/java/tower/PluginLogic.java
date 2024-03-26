@@ -51,6 +51,13 @@ public class PluginLogic {
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
 
     public static void init() {
+        initializeDrops();
+        setupAdminActionFilters();
+        scheduleTimers();
+        setupEventHandlers();
+    }
+
+    private static void initializeDrops() {
         drops = new ObjectMap<>();
         for (Map<String, Object> dropEntry : Unitsdrops.drops) {
             UnitType unit = (UnitType) dropEntry.get("unit");
@@ -59,14 +66,16 @@ public class PluginLogic {
                 @SuppressWarnings("unchecked")
                 Seq<ItemStack> itemStacks = (Seq<ItemStack>) dropsObject;
                 drops.put(unit, itemStacks);
-            } else {
             }
         }
+    }
+
+    private static void setupAdminActionFilters() {
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null)
                 return true;
             if (action.type == Administration.ActionType.placeBlock) {
-                if (!(canBePlaced(action.tile, action.block) || action.block instanceof ShockMine
+                if (!canBePlaced(action.tile, action.block) && !(action.block instanceof ShockMine
                         || action.block instanceof Conduit || action.block instanceof CoreBlock)) {
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                     return false;
@@ -79,6 +88,9 @@ public class PluginLogic {
             }
             return true;
         });
+    }
+
+    private static void scheduleTimers() {
         Timer.schedule(() -> {
             repairPointTiles.each((tile, repairPointTiles) -> {
                 Groups.player.each(player -> {
@@ -154,7 +166,9 @@ public class PluginLogic {
         }), 0f, 1f);
         Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier",
                 Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
+    }
 
+    private static void setupEventHandlers() {
         Events.on(EventType.WorldLoadEvent.class, event -> {
             // Set the multiplier to 0.5f
             multiplier = 0.5f;
@@ -313,7 +327,7 @@ public class PluginLogic {
                 if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires) {
                     event.unit.kill();
                 }
-                event.unit.type.physics=false;
+                event.unit.type.physics = false;
                 event.unit.type.crashDamageMultiplier = 0f;
                 event.unit.type.crushDamage = 0f;
                 event.unit.type.deathExplosionEffect = Fx.shockwave;
@@ -321,7 +335,9 @@ public class PluginLogic {
                 event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
                 event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
                 event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange = 0f;
-                event.unit.type.aiController = (event.unit.type.naval || event.unit.type.canDrown) ? GroundAI::new : FlyingAIForAss::new;;
+                event.unit.type.aiController = (event.unit.type.naval || event.unit.type.canDrown) ? GroundAI::new
+                        : FlyingAIForAss::new;
+                ;
                 event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
             }
         });

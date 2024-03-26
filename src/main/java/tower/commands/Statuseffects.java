@@ -42,9 +42,9 @@ public class Statuseffects {
 
     private static void openGui(Player player) {
         if (buttons == null || buttons.length == 0) {
-            initEffectsTable(player);
+            initEffectsTable(); // Removed the unused parameter
         }
-
+    
         Call.menu(player.con, menu, Bundle.get("menu.effects.title", player.locale), "", buttons);
     }
 
@@ -59,10 +59,10 @@ public class Statuseffects {
         }
     });
 
-    private static void initEffectsTable(Player player) {
+    private static void initEffectsTable() {
         int rows = Effects.effects.size();
         buttons = new String[rows][1];
-
+    
         for (int i = 0; i < Effects.effects.size(); i++) {
             StatusEffect effect = (StatusEffect) Effects.effects.get(i).get("effect");
             int effectPrice = effectPrices.get(effect);

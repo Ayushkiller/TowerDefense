@@ -4,11 +4,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import mindustry.gen.Call;
+import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.ui.Menus;
 import tower.Bundle;
 import tower.PluginLogic;
-import tower.Domain.PlayerData;
 
 public class Scenarios {
     private static boolean isTaskScheduled = false;
@@ -65,29 +65,31 @@ public class Scenarios {
     }
 
     public static void requestDeploymentForAllPlayers() {
-        for (Player player : PlayerData.getAllPlayers()) {
+        // Use Groups.player.each to iterate over all players
+        Groups.player.each(player -> {
             if (player != null) {
                 requestDeployment(player);
             } else {
                 System.out.println("Warning: Skipping null player.");
             }
-        }
+        });
+
         if (!isTaskScheduled) { // Check if the task is already scheduled
             isTaskScheduled = true; // Set the flag to true to indicate the task is scheduled
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    for (Player player : PlayerData.getAllPlayers()) {
+                    // Use Groups.player.each again to iterate over all players
+                    Groups.player.each(player -> {
                         if (player != null) {
                             handleDeploymentOption1(player);
                         }
-                    }
+                    });
                     // Reset the flag after the task has been executed
                     isTaskScheduled = false;
                 }
             }, 40000); // = 40 seconds
         }
     }
-
 }

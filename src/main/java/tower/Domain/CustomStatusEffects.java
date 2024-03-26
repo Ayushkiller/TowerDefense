@@ -6,7 +6,12 @@ import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 
 public class CustomStatusEffects {
-    public static StatusEffect overdriveBuffed, overclockBuffed, shieldedBuffed, bossBuffed, speedBuffed, slowAsShit,
+    public static StatusEffect overdriveBuffed,
+            overclockBuffed,
+            shieldedBuffed,
+            bossBuffed,
+            speedBuffed,
+            slowAsShit,
             invincibleBuffed;
 
     public static void load() {

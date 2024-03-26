@@ -1,12 +1,11 @@
 package tower.pathing;
 
+import static mindustry.Vars.*;
+import static tower.PluginLogic.*;
+
 import mindustry.ai.Pathfinder;
 import mindustry.gen.PathTile;
 import mindustry.world.Tile;
-
-import static mindustry.Vars.pathfinder;
-import static mindustry.Vars.state;
-import static tower.PluginLogic.isPath;
 
 public class TowerPathfinder extends Pathfinder {
 

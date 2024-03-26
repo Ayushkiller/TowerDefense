@@ -1,11 +1,7 @@
 package tower.Domain;
 
-import java.util.Map;
-
-import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
-import tower.Players;
 
 public class PlayerData {
     private static int totalPlayers = 0;
@@ -81,28 +77,9 @@ public class PlayerData {
 
     public PlayerData(Player player) {
         this.uuid = player.uuid();
-        totalPlayers++;
         player.ip();
         this.hp = player.unit().health();
         this.name = player.name();
         this.Cash = 0;
-    }
-
-    public static Player[] getAllPlayers() {
-        // Retrieve the map of all players from Players.java
-        Map<String, PlayerData> allPlayersMap = Players.players;
-
-        // Initialize an array of Player objects with the size of the map
-        Player[] allPlayers = new Player[allPlayersMap.size()];
-
-        // Iterate over all players and match their UUIDs with those in allPlayersMap
-        int index = 0;
-        for (Player player : Groups.player) {
-            if (allPlayersMap.containsKey(player.uuid())) {
-                allPlayers[index++] = player;
-            }
-        }
-
-        return allPlayers;
     }
 }
