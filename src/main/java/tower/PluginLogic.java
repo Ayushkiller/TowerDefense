@@ -311,14 +311,11 @@ public class PluginLogic {
                 event.unit.type.hovering = true;
                 event.unit.disarmed = true;
                 if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires) {
-                    event.unit.type.abilities.clear();
-                    event.unit.type.abilities.clear();
-                    event.unit.type.abilities.clear();
-                    event.unit.type.abilities.clear();
-                    event.unit.type.abilities.clear();
+                    event.unit.kill();
                 }
+                event.unit.type.physics=false;
                 event.unit.type.crashDamageMultiplier = 0f;
-                event.unit.type.crushDamage = 10000f;
+                event.unit.type.crushDamage = 0f;
                 event.unit.type.deathExplosionEffect = Fx.shockwave;
                 event.unit.shield(event.unit.shield * multiplier);
                 event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
