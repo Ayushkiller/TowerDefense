@@ -3,6 +3,7 @@ package tower;
 import static mindustry.Vars.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -49,30 +50,26 @@ public class PluginLogic {
 
             }
             Teams teams = Vars.state.teams;
-            int activeTeamsWithCores = 0;
-            // Check for active teams and count those with cores
-            for (Team team : Team.all) {
-                if (teams.isActive(team) && !teams.cores(team).isEmpty()) {
-                    activeTeamsWithCores++;
+
+            // Convert the array to a stream and then count active teams with cores
+            int activeTeamsWithCores = (int) Arrays.stream(Team.all)
+                .filter(team -> teams.isActive(team))
+                .count();
+            
+            // Manually convert Seq to List and then update activeTeamsList using Stream API
+            List<Teams.TeamData> updatedActiveTeamsList = new ArrayList<>();
+            for (Teams.TeamData teamData : teams.active) {
+                if (!activeTeamsList.contains(teamData)) {
+                    updatedActiveTeamsList.add(teamData);
                 }
             }
-            // If no active team has cores or if the number of active teams with cores is
-            // less than the total number of active teams,
-            // damage the crux team's core
+            
+            // Add new active teams to the list
+            activeTeamsList.addAll(updatedActiveTeamsList);
+            
+            // If the number of active teams with cores is less than the size of activeTeamsList, kill cores
             if (activeTeamsWithCores < activeTeamsList.size()) {
-                for (CoreBuild corea : teams.cores(Team.crux)) {
-                    corea.kill();
-                }
-            }
-            if (activeTeamsWithCores < activeTeamsList.size()) {
-                for (CoreBuild corea : teams.cores(Team.crux)) {
-                    corea.kill();
-                }
-            }
-            if (activeTeamsWithCores < activeTeamsList.size()) {
-                for (CoreBuild corea : teams.cores(Team.crux)) {
-                    corea.kill();
-                }
+                teams.cores(Team.crux).forEach(CoreBuild::kill);
             }
         }), 0f, 0.1f);
 
@@ -91,15 +88,6 @@ public class PluginLogic {
             spawnedTiles.clear();
             unitPreviousVelocities.clear();
             unitHasMoved.clear();
-        });
-        Events.on(EventType.WorldLoadEndEvent.class, event -> {
-            Teams teams = Vars.state.teams;
-
-            for (Teams.TeamData teamData : teams.active) {
-                if (!activeTeamsList.contains(teamData)) {
-                    activeTeamsList.add(teamData);
-                }
-            }
         });
 
         Events.on(EventType.UnitDestroyEvent.class, event -> {
@@ -198,9 +186,9 @@ public class PluginLogic {
                 } else {
 
                     // If the unit has moved, give it a velocity in a random direction with at most
-                    // twice its speed
+                    // 5.6 its speed
                     Vec2 randomDirection = new Vec2(new Random().nextFloat() * 2 - 1, new Random().nextFloat() * 2 - 1).nor();
-                    unit.vel.set(randomDirection).scl(unit.type.speed * 4f);
+                    unit.vel.set(randomDirection).scl(unit.type.speed * 5.6f);
                 }
             }
         });
