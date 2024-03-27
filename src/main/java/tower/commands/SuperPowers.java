@@ -1,5 +1,11 @@
 package tower.commands;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import arc.Events;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
 import mindustry.core.World;
@@ -14,12 +20,6 @@ import mindustry.world.Tile;
 import tower.Bundle;
 import tower.Players;
 import tower.Domain.PlayerData;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-import arc.Events;
 
 public class SuperPowers {
     private static final float tilesize = 1.0f; // Adjust the value as needed
@@ -92,7 +92,7 @@ public class SuperPowers {
                                 unit.kill();
                             }
                         }, 50, TimeUnit.SECONDS);
-
+                        executor.shutdown();
                         if (unitType == UnitTypes.corvus) {
                             unitType.groundLayer = Layer.flyingUnit;
                             unitType.weapons.get(0).reload = 10f;
@@ -159,6 +159,7 @@ public class SuperPowers {
                             unit.kill();
                         }
                     }, 10, TimeUnit.SECONDS); // Adjusted to 5 seconds
+                    executor.shutdown();
                 } else {
                     allUnitsSpawned = false;
                     break; // Exit the loop if the tile is null
@@ -225,7 +226,8 @@ public class SuperPowers {
                                 if (unit != null && unit.isValid()) {
                                     unit.kill();
                                 }
-                            }, 120, TimeUnit.SECONDS); // Adjusted to 5 seconds
+                            }, 120, TimeUnit.SECONDS); 
+                            executor.shutdown();// Adjusted to 5 seconds
                         }
                     } else {
                         allUnitsSpawned[0] = false;
