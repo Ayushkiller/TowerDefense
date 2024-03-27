@@ -186,10 +186,11 @@ public class PluginLogic {
                 directionToPlayer.scl(-1);
 
                 // Apply the knockback force to the unit's velocity
-                unit.vel.add(directionToPlayer.x * knockbackStrength, directionToPlayer.y * knockbackStrength);
+                unit.vel.add(velocityTowardsUnit * knockbackStrength, velocityTowardsUnit * knockbackStrength);
 
                 unit.vel.limit(unit.type.speed * 5.6f);
-                Call.effect(Fx.healWaveMend, unit.x, unit.y, 120f, Color.green);
+                Call.effect(Fx.healWaveMend, unit.x, unit.y, 120f, Color.white);
+                Call.effect(Fx.healWaveMend, unit.x, unit.y, 120f, Color.white);
             }
         });
 
