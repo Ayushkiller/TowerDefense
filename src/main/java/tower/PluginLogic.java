@@ -93,7 +93,6 @@ public class PluginLogic {
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
             spawnedTiles.clear();
-            activeTeamsList.clear();
             unitPreviousVelocities.clear();
             unitHasMoved.clear();
         });

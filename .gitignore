@@ -12,3 +12,4 @@ build/libs/YES-3.jar
 *.class
 *.lock
 *.bin
+*.class
