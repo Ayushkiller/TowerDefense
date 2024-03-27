@@ -56,11 +56,6 @@ public class PluginLogic {
                     activeTeamsWithCores++;
                 }
             }
-            for (Teams.TeamData teamData : teams.active) {
-                if (!activeTeamsList.contains(teamData)) {
-                    activeTeamsList.add(teamData);
-                }
-            }
             // If no active team has cores or if the number of active teams with cores is
             // less than the total number of active teams,
             // damage the crux team's core
@@ -92,9 +87,19 @@ public class PluginLogic {
         }), 0f, 1f);
         Events.on(EventType.GameOverEvent.class, event -> {
             Players.clearMap();
+            activeTeamsList.clear();
             spawnedTiles.clear();
             unitPreviousVelocities.clear();
             unitHasMoved.clear();
+        });
+        Events.on(EventType.WorldLoadEndEvent.class, event -> {
+            Teams teams = Vars.state.teams;
+
+            for (Teams.TeamData teamData : teams.active) {
+                if (!activeTeamsList.contains(teamData)) {
+                    activeTeamsList.add(teamData);
+                }
+            }
         });
 
         Events.on(EventType.UnitDestroyEvent.class, event -> {
@@ -195,7 +200,7 @@ public class PluginLogic {
                     // If the unit has moved, give it a velocity in a random direction with at most
                     // twice its speed
                     Vec2 randomDirection = new Vec2(new Random().nextFloat() * 2 - 1, new Random().nextFloat() * 2 - 1).nor();
-                    unit.vel.set(randomDirection).scl(unit.type.speed * 2);
+                    unit.vel.set(randomDirection).scl(unit.type.speed * 4f);
                 }
             }
         });
