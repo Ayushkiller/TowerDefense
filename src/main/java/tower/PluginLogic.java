@@ -31,6 +31,7 @@ public class PluginLogic {
     private static List<Tile> spawnedTiles = new ArrayList<>();
     private static List<Teams.TeamData> activeTeamsList = new ArrayList<>();
     private static HashMap<Unit, Vec2> unitPreviousVelocities = new HashMap<>();
+    private static HashMap<Unit, Boolean> unitHasMoved = new HashMap<>();
 
     public static void init() {
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
@@ -93,6 +94,8 @@ public class PluginLogic {
             Players.clearMap();
             spawnedTiles.clear();
             activeTeamsList.clear();
+            unitPreviousVelocities.clear();
+            unitHasMoved.clear();
         });
 
         Events.on(EventType.UnitDestroyEvent.class, event -> {
@@ -176,13 +179,25 @@ public class PluginLogic {
             if (lastKnownVelocity == null || !currentVelocity.equals(lastKnownVelocity)) {
                 // Update the previous velocity for the unit
                 unitPreviousVelocities.put(unit, currentVelocity.cpy());
+                // Mark the unit as having moved
+                unitHasMoved.put(unit, true);
             }
+
             // Check if the unit has stopped
             if (currentVelocity.len() == 0 && lastKnownVelocity != null) {
-                // Calculate the opposite direction
-                Vec2 oppositeDirection = lastKnownVelocity.cpy().nor().scl(-1);
-                // Apply the opposite direction speed
-                unit.vel.set(oppositeDirection).scl(lastKnownVelocity.len());
+                // If the unit has moved, do not stop it
+                if (!unitHasMoved.getOrDefault(unit, false)) {
+                    // Calculate the opposite direction
+                    Vec2 oppositeDirection = lastKnownVelocity.cpy().nor().scl(-1);
+                    // Apply the opposite direction speed
+                    unit.vel.set(oppositeDirection).scl(lastKnownVelocity.len());
+                } else {
+
+                    // If the unit has moved, give it a velocity in a random direction with at most
+                    // twice its speed
+                    Vec2 randomDirection = new Vec2(new Random().nextFloat() * 2 - 1, new Random().nextFloat() * 2 - 1).nor();
+                    unit.vel.set(randomDirection).scl(unit.type.speed * 2);
+                }
             }
         });
     }
