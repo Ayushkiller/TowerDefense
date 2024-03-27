@@ -53,9 +53,9 @@ public class PluginLogic {
 
             // Convert the array to a stream and then count active teams with cores
             int activeTeamsWithCores = (int) Arrays.stream(Team.all)
-                .filter(team -> teams.isActive(team))
-                .count();
-            
+                    .filter(team -> teams.isActive(team))
+                    .count();
+
             // Manually convert Seq to List and then update activeTeamsList using Stream API
             List<Teams.TeamData> updatedActiveTeamsList = new ArrayList<>();
             for (Teams.TeamData teamData : teams.active) {
@@ -63,11 +63,22 @@ public class PluginLogic {
                     updatedActiveTeamsList.add(teamData);
                 }
             }
-            
+
             // Add new active teams to the list
             activeTeamsList.addAll(updatedActiveTeamsList);
-            
-            // If the number of active teams with cores is less than the size of activeTeamsList, kill cores
+
+            // If the number of active teams with cores is less than the size of
+            // activeTeamsList, kill cores
+            if (activeTeamsWithCores < activeTeamsList.size()) {
+                teams.cores(Team.crux).forEach(CoreBuild::kill);
+            }
+            // If the number of active teams with cores is less than the size of
+            // activeTeamsList, kill cores
+            if (activeTeamsWithCores < activeTeamsList.size()) {
+                teams.cores(Team.crux).forEach(CoreBuild::kill);
+            }
+            // If the number of active teams with cores is less than the size of
+            // activeTeamsList, kill cores
             if (activeTeamsWithCores < activeTeamsList.size()) {
                 teams.cores(Team.crux).forEach(CoreBuild::kill);
             }
@@ -187,7 +198,8 @@ public class PluginLogic {
 
                     // If the unit has moved, give it a velocity in a random direction with at most
                     // 5.6 its speed
-                    Vec2 randomDirection = new Vec2(new Random().nextFloat() * 2 - 1, new Random().nextFloat() * 2 - 1).nor();
+                    Vec2 randomDirection = new Vec2(new Random().nextFloat() * 2 - 1, new Random().nextFloat() * 2 - 1)
+                            .nor();
                     unit.vel.set(randomDirection).scl(unit.type.speed * 5.6f);
                 }
             }
