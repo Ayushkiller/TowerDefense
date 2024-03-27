@@ -10,7 +10,6 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.math.geom.Vec2;
 import arc.util.Timer;
-import arc.util.Tmp;
 import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
@@ -154,46 +153,46 @@ public class PluginLogic {
     }
 
     public static void checkUnitsWithinRadius() {
-
         Groups.unit.each(unit -> {
-            // Find the nearest player to the unit
-            Player[] nearestPlayer = new Player[1];
-            float[] nearestDistance = new float[1];
-            nearestDistance[0] = Float.MAX_VALUE;
-            Groups.player.each(player -> {
-                float distance = unit.dst(player.x, player.y);
-                if (distance < nearestDistance[0]) {
-                    nearestDistance[0] = distance;
-                    nearestPlayer[0] = player;
+            Player nearestPlayer = findNearestPlayer(unit);
+            if (nearestPlayer != null) {
+                float distance = unit.dst(nearestPlayer.x, nearestPlayer.y);
+                if (distance <= 120f && unit.team == state.rules.waveTeam) {
+                    Vec2 directionToPlayer = new Vec2().set(nearestPlayer.x - unit.x, nearestPlayer.y - unit.y).nor();
+                    Vec2 playerVelocity = nearestPlayer.unit().vel;
+                    float velocityTowardsUnit = directionToPlayer.dot(playerVelocity);
+                    float knockbackStrength = calculateKnockbackStrength(distance, velocityTowardsUnit);
+                    directionToPlayer.scl(-knockbackStrength);
+                    unit.vel.add(directionToPlayer);
+                    unit.vel.limit(unit.type.speed * 5.6f);
+                    Call.effect(Fx.pointShockwave, unit.x, unit.y, 120f, Color.white);
                 }
-            });
-
-            // Check if the unit is an enemy and within the specified distance
-            if (nearestPlayer[0] != null && nearestDistance[0] <= 120f && unit.team == state.rules.waveTeam) {
-                // Calculate the direction from the unit to the nearest player
-                Vec2 directionToPlayer = Tmp.v1.set(nearestPlayer[0].x, nearestPlayer[0].y).sub(unit.x, unit.y).nor();
-                Vec2 playerVelocity = nearestPlayer[0].unit().vel;
-
-                // Calculate the dot product of the direction to the player and the player's
-                // velocity
-                float velocityTowardsUnit = directionToPlayer.dot(playerVelocity);
-
-                // Calculate the knockback strength based on the player's velocity towards the
-                // unit
-                float knockbackStrength = Math.abs(velocityTowardsUnit);
-
-                // Reverse the direction to apply the knockback away from the player
-                directionToPlayer.scl(-1);
-
-                // Apply the knockback force to the unit's velocity
-                unit.vel.add(velocityTowardsUnit * knockbackStrength, velocityTowardsUnit * knockbackStrength);
-
-                unit.vel.limit(unit.type.speed * 5.6f);
-                Call.effect(Fx.healWaveMend, unit.x, unit.y, 120f, Color.white);
-                Call.effect(Fx.healWaveMend, unit.x, unit.y, 120f, Color.white);
             }
         });
-
+    }
+    
+    private static float calculateKnockbackStrength(float distance, float velocityTowardsUnit) {
+        // Adjust the multiplier based on the distance
+        float multiplier = 1.0f;
+        if (distance > 50f && distance <= 100f) {
+            multiplier = 1.5f;
+        } else if (distance > 100f) {
+            multiplier = 2.0f;
+        }
+        // Apply the multiplier to the velocity towards unit
+        return Math.abs(velocityTowardsUnit) * multiplier;
+    }
+    private static Player findNearestPlayer(Unit unit) {
+        Player nearestPlayer = null;
+        float nearestDistance = Float.MAX_VALUE;
+        for (Player player : Groups.player) {
+            float distance = unit.dst(player.x, player.y);
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestPlayer = player;
+            }
+        }
+        return nearestPlayer;
     }
 
     public static List<Tile> getSpawnedTiles() {
