@@ -3,6 +3,7 @@ package tower;
 import static mindustry.Vars.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -29,6 +30,7 @@ import tower.game.Newai;
 public class PluginLogic {
     private static List<Tile> spawnedTiles = new ArrayList<>();
     private static List<Teams.TeamData> activeTeamsList = new ArrayList<>();
+    private static HashMap<Unit, Vec2> unitPreviousVelocities = new HashMap<>();
 
     public static void init() {
         Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
@@ -168,9 +170,23 @@ public class PluginLogic {
                     Call.effect(Fx.pointShockwave, unit.x, unit.y, 120f, Color.white);
                 }
             }
+            // Check if the unit's velocity has changed
+            Vec2 currentVelocity = unit.vel;
+            Vec2 lastKnownVelocity = unitPreviousVelocities.get(unit);
+            if (lastKnownVelocity == null || !currentVelocity.equals(lastKnownVelocity)) {
+                // Update the previous velocity for the unit
+                unitPreviousVelocities.put(unit, currentVelocity.cpy());
+            }
+            // Check if the unit has stopped
+            if (currentVelocity.len() == 0 && lastKnownVelocity != null) {
+                // Calculate the opposite direction
+                Vec2 oppositeDirection = lastKnownVelocity.cpy().nor().scl(-1);
+                // Apply the opposite direction speed
+                unit.vel.set(oppositeDirection).scl(lastKnownVelocity.len());
+            }
         });
     }
-    
+
     private static float calculateKnockbackStrength(float distance, float velocityTowardsUnit) {
         // Adjust the multiplier based on the distance
         float multiplier = 1.0f;
@@ -182,6 +198,7 @@ public class PluginLogic {
         // Apply the multiplier to the velocity towards unit
         return Math.abs(velocityTowardsUnit) * multiplier;
     }
+
     private static Player findNearestPlayer(Unit unit) {
         Player nearestPlayer = null;
         float nearestDistance = Float.MAX_VALUE;
