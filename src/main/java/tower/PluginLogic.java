@@ -3,6 +3,7 @@ package tower;
 import static mindustry.Vars.*;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import arc.Events;
 import arc.graphics.Color;
@@ -92,16 +93,6 @@ public class PluginLogic {
 
     private static void scheduleTimers() {
         Timer.schedule(() -> {
-            repairPointTiles.each((tile, repairPointTiles) -> {
-                Groups.player.each(player -> {
-                    if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
-                        float cashGenerated = 1f;
-                        repairPointCash.put(tile, repairPointCash.get(tile, 0f) + cashGenerated);
-                    }
-                });
-            });
-        }, 0f, 20f);
-        Timer.schedule(() -> {
             forceProjectorTiles.each((tile, forceProjectorTiles) -> {
                 Groups.player.each(player -> {
                     if (player.dst(tile.worldx(), tile.worldy()) <= 100f) {
@@ -117,35 +108,41 @@ public class PluginLogic {
                 });
             });
         }, 0f, 2f);
+
+        Timer.schedule(() -> {
+            repairPointTiles.each((tile, repairPointTiles) -> {
+                AtomicInteger totalCashGenerated = new AtomicInteger(0);
+                Groups.player.each(player -> {
+                    if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
+                        totalCashGenerated.addAndGet(100); // Accumulate cash for all players within the distance,
+                                                           // multiplied by 100 to keep two decimal places
+                    }
+                });
+                float cashToStore = totalCashGenerated.get() / 100f; // Convert back to float
+                repairPointCash.put(tile, cashToStore); // Store the total cash generated for this tile
+            });
+        }, 0f, 20f);
+
         Timer.schedule(() -> {
             Groups.player.each(player -> {
                 repairPointTiles.each((tile, repairPointTiles) -> {
                     if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
-
-                        PlayerData playerData = Players.getPlayer(player);
                         float cashToAdd = repairPointCash.get(tile, 0f);
-                        playerData.addCash(cashToAdd, player);
-                        // Reset the cash for this tile after distribution
-                        repairPointCash.put(tile, 0f);
+                        if (cashToAdd > 0) {
+                            PlayerData playerData = Players.getPlayer(player);
+                            playerData.addCash(cashToAdd, player);
+                            // Reset the cash for this tile after distribution
+                            repairPointCash.put(tile, 0f);
+                        }
                     }
                 });
             });
         }, 0f, 1f);
         Timer.schedule(() -> {
-            boolean hasNegativePoints = false;
             for (Player player : Groups.player) {
                 PlayerData playerData = Players.getPlayer(player);
                 if (playerData != null && playerData.getCash() < 0) {
-                    hasNegativePoints = true;
-                    break;
-                }
-            }
-            if (hasNegativePoints) {
-                for (Player player : Groups.player) {
-                    PlayerData playerData = Players.getPlayer(player);
-                    if (playerData != null) {
-                        playerData.setCash(0, player);
-                    }
+                    playerData.setCash(0, player);
                 }
             }
         }, 0f, 2f); // Check every second
@@ -184,48 +181,11 @@ public class PluginLogic {
                     }
                 }
             }
-            Groups.player.each(player -> {
-                PlayerData playerData = Players.getPlayer(player);
-                if (playerData != null) {
-                    float currentCash = playerData.getCash();
-                    StringBuilder hud = new StringBuilder();
-                    hud.append("[green]Cash for[white] " + playerData.getName() + " - [lime]"
-                            + (int) playerData.getCash() + "\n ");
-                    Call.setHudText(player.con, hud.toString());
-                    playerData.setLastUpdatedCash(currentCash);
-
-                }
-            });
         });
         Events.on(EventType.WaveEvent.class, event -> {
-            if (state.wave == 50) {
+            if (state.wave % 50 == 0) {
                 Scenarios.requestDeploymentForAllPlayers();
             }
-            if (state.wave == 100) {
-                Scenarios.requestDeploymentForAllPlayers();
-            }
-            if (state.wave == 150) {
-                Scenarios.requestDeploymentForAllPlayers();
-            }
-            if (state.wave == 200) {
-                Scenarios.requestDeploymentForAllPlayers();
-            }
-            if (state.wave == 250) {
-                Scenarios.requestDeploymentForAllPlayers();
-            }
-            if (state.wave == 300) {
-                Scenarios.requestDeploymentForAllPlayers();
-            }
-            if (state.wave == 350) {
-                Scenarios.requestDeploymentForAllPlayers();
-            }
-            if (state.wave == 400) {
-                Scenarios.requestDeploymentForAllPlayers();
-            }
-            if (state.wave == 450) {
-                Scenarios.requestDeploymentForAllPlayers();
-            }
-
             if (state.wave <= 10) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 1.5f);
             } else if (state.wave > 10 && state.wave <= 30) {
@@ -310,12 +270,14 @@ public class PluginLogic {
                 event.unit.health(event.unit.health * multiplier);
                 event.unit.maxHealth(event.unit.maxHealth * multiplier);
                 event.unit.damageMultiplier(0f);
-                event.unit.apply(StatusEffects.overdrive, Float.POSITIVE_INFINITY);
-                event.unit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
-                event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
-                event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
-                event.unit.apply(StatusEffects.sporeSlowed, Float.POSITIVE_INFINITY);
-                event.unit.apply(StatusEffects.muddy, Float.POSITIVE_INFINITY);
+                if (state.wave <= 200f) {
+                    event.unit.apply(StatusEffects.overdrive, Float.POSITIVE_INFINITY);
+                    event.unit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
+                    event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
+                    event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
+                    event.unit.apply(StatusEffects.sporeSlowed, Float.POSITIVE_INFINITY);
+                    event.unit.apply(StatusEffects.muddy, Float.POSITIVE_INFINITY);
+                }
                 if (state.wave >= 250) {
                     event.unit.apply(StatusEffects.fast, Float.POSITIVE_INFINITY);
                 }
@@ -397,7 +359,7 @@ public class PluginLogic {
             Groups.unit.each(unit -> {
                 float distance = unit.dst(tile.worldx(), tile.worldy());
                 if (distance <= 105f && unit.team == state.rules.waveTeam) {
-                    unit.type.speed = 0.9f;
+                    unit.type.speed = 1.2f;
                     unit.healthMultiplier(0.75f);
                     unit.apply(StatusEffects.electrified, 200f);
                     unit.apply(StatusEffects.slow, 200f);

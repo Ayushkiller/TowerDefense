@@ -1,21 +1,20 @@
 package tower.Domain;
 
-import mindustry.content.Items;
-import mindustry.content.UnitTypes;
-import mindustry.type.ItemStack;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import arc.struct.Seq;
+import mindustry.content.Items;
+import mindustry.content.UnitTypes;
+import mindustry.type.ItemStack;
 
 public class Unitsdrops {
     public static List<Map<String, Object>> drops = new ArrayList<>();
 
     static {
         drops.add(Map.of("unit", UnitTypes.crawler, "drops",
-                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 10, Items.silicon, 3))));
+                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 15, Items.silicon, 5))));
         drops.add(Map.of("unit", UnitTypes.atrax, "drops",
                 Seq.with(ItemStack.list(Items.copper, 30, Items.lead, 40, Items.graphite, 10, Items.titanium, 5))));
         drops.add(Map.of("unit", UnitTypes.spiroct, "drops",
@@ -26,7 +25,7 @@ public class Unitsdrops {
                 Seq.with(ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 120, Items.silicon, 120,
                         Items.thorium, 40, Items.plastanium, 40, Items.surgeAlloy, 15, Items.phaseFabric, 5))));
         drops.add(Map.of("unit", UnitTypes.dagger, "drops",
-                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 10, Items.silicon, 3))));
+                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 15, Items.silicon, 5))));
         drops.add(Map.of("unit", UnitTypes.mace, "drops",
                 Seq.with(ItemStack.list(Items.copper, 30, Items.lead, 40, Items.graphite, 10, Items.titanium, 5))));
         drops.add(Map.of("unit", UnitTypes.fortress, "drops",
@@ -37,11 +36,11 @@ public class Unitsdrops {
                 Seq.with(ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 120, Items.silicon, 120,
                         Items.thorium, 40, Items.plastanium, 40, Items.surgeAlloy, 15, Items.phaseFabric, 5))));
         drops.add(Map.of("unit", UnitTypes.nova, "drops",
-                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3))));
+                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 15, Items.metaglass, 3))));
         drops.add(Map.of("unit", UnitTypes.pulsar, "drops",
                 Seq.with(ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10))));
         drops.add(Map.of("unit", UnitTypes.quasar, "drops", Seq.with(ItemStack.list(Items.lead, 100, Items.metaglass,
-                40, Items.silicon, 40, Items.titanium, 80, Items.thorium, 10))));
+                40, Items.silicon, 40, Items.titanium, 30, Items.thorium, 10))));
         drops.add(Map.of("unit", UnitTypes.vela, "drops", Seq.with(ItemStack.list(Items.copper, 300, Items.metaglass,
                 80, Items.graphite, 80, Items.titanium, 60, Items.plastanium, 20, Items.surgeAlloy, 5))));
         drops.add(Map.of("unit", UnitTypes.corvus, "drops",
@@ -49,7 +48,7 @@ public class Unitsdrops {
                         Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10,
                         Items.phaseFabric, 10))));
         drops.add(Map.of("unit", UnitTypes.flare, "drops",
-                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 10, Items.graphite, 3))));
+                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 15, Items.graphite, 3))));
         drops.add(Map.of("unit", UnitTypes.horizon, "drops",
                 Seq.with(ItemStack.list(Items.copper, 30, Items.lead, 40, Items.graphite, 10))));
         drops.add(Map.of("unit", UnitTypes.zenith, "drops", Seq.with(ItemStack.list(Items.lead, 100, Items.graphite, 40,
@@ -60,7 +59,7 @@ public class Unitsdrops {
                 Seq.with(ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 120, Items.silicon, 120,
                         Items.thorium, 120, Items.plastanium, 40, Items.surgeAlloy, 5, Items.phaseFabric, 10))));
         drops.add(Map.of("unit", UnitTypes.mono, "drops",
-                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 10, Items.silicon, 3))));
+                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 15, Items.silicon, 5))));
         drops.add(Map.of("unit", UnitTypes.poly, "drops",
                 Seq.with(ItemStack.list(Items.copper, 30, Items.lead, 40, Items.silicon, 10, Items.titanium, 5))));
         drops.add(Map.of("unit", UnitTypes.mega, "drops",
@@ -71,7 +70,7 @@ public class Unitsdrops {
                 Seq.with(ItemStack.list(Items.copper, 400, Items.lead, 400, Items.graphite, 120, Items.silicon, 120,
                         Items.thorium, 40, Items.plastanium, 40, Items.surgeAlloy, 15, Items.phaseFabric, 5))));
         drops.add(Map.of("unit", UnitTypes.risso, "drops",
-                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3))));
+                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 15, Items.metaglass, 3))));
         drops.add(Map.of("unit", UnitTypes.minke, "drops",
                 Seq.with(ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10))));
         drops.add(Map.of("unit", UnitTypes.bryde, "drops", Seq.with(ItemStack.list(Items.lead, 100, Items.metaglass, 40,
@@ -83,7 +82,7 @@ public class Unitsdrops {
                         Items.metaglass, 120, Items.titanium, 120, Items.thorium, 60, Items.surgeAlloy, 10,
                         Items.phaseFabric, 10))));
         drops.add(Map.of("unit", UnitTypes.retusa, "drops",
-                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 10, Items.metaglass, 3))));
+                Seq.with(ItemStack.list(Items.copper, 20, Items.lead, 15, Items.metaglass, 3))));
         drops.add(Map.of("unit", UnitTypes.oxynoe, "drops",
                 Seq.with(ItemStack.list(Items.copper, 30, Items.lead, 40, Items.metaglass, 10))));
         drops.add(Map.of("unit", UnitTypes.cyerce, "drops", Seq.with(ItemStack.list(Items.lead, 100, Items.metaglass,

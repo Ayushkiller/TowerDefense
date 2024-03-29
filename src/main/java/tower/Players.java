@@ -20,7 +20,6 @@ public class Players {
         // If player not present in map, create new PlayerData instance
         if (!players.containsKey(player.uuid())) {
             PlayerData playerData = new PlayerData(player);
-            playerData.setName(player.name); // Set player name
             players.put(player.uuid(), playerData); // Add PlayerData instance to map
         }
         // Return PlayerData instance for given player
@@ -43,12 +42,10 @@ public class Players {
         Groups.player.each(player -> {
             PlayerData playerData = Players.getPlayer(player); // Get PlayerData instance for player
             if (playerData != null) { // If PlayerData instance exists
-                float currentCash = playerData.getCash(); // Get current cash
                 StringBuilder hud = new StringBuilder(); // Initialize StringBuilder for HUD text
-                hud.append("[green]Cash for[white] " + playerData.getName() + " - [lime]") // Append cash text
+                hud.append("[green]Cash for[white] " + player.name + " - [lime]") // Append cash text
                         .append((int) playerData.getCash()); // Append current cash
                 Call.setHudText(player.con, hud.toString()); // Set HUD text for player
-                playerData.setLastUpdatedCash(currentCash); // Update last updated cash
             }
         });
     }

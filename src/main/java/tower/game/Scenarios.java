@@ -67,13 +67,9 @@ public class Scenarios {
     public static void requestDeploymentForAllPlayers() {
         // Use Groups.player.each to iterate over all players
         Groups.player.each(player -> {
-            if (player != null) {
-                requestDeployment(player);
-            } else {
-                System.out.println("Warning: Skipping null player.");
-            }
+            requestDeployment(player);
         });
-
+    
         if (!isTaskScheduled) { // Check if the task is already scheduled
             isTaskScheduled = true; // Set the flag to true to indicate the task is scheduled
             Timer timer = new Timer();
@@ -82,9 +78,7 @@ public class Scenarios {
                 public void run() {
                     // Use Groups.player.each again to iterate over all players
                     Groups.player.each(player -> {
-                        if (player != null) {
-                            handleDeploymentOption1(player);
-                        }
+                        handleDeploymentOption1(player);
                     });
                     // Reset the flag after the task has been executed
                     isTaskScheduled = false;

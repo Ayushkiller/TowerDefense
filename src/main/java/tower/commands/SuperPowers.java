@@ -2,14 +2,11 @@ package tower.commands;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import arc.Events;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
 import mindustry.core.World;
-import mindustry.game.EventType.PlayerLeave;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
@@ -71,78 +68,87 @@ public class SuperPowers {
             playerData.subtractCash(100, player); // Subtract Cash as soon as the player confirms the purchase
             float angleStep = 360f / 6;
             float radius = 100f; // Calculate the angle step for evenly spaced spawns
+            boolean allUnitsSpawned = true;
+    
+            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
             for (int i = 0; i < 6; i++) {
                 float angle = i * angleStep; // Calculate the angle for each unit
                 double radians = Math.toRadians(angle);
                 float x = playerX + radius * (float) Math.cos(radians);
                 float y = playerY + radius * (float) Math.sin(radians);
-
+    
                 int intX = (int) x;
                 int intY = (int) y;
                 float worldX = intX * tilesize;
                 float worldY = intY * tilesize;
-
+    
                 Tile tile = world.tileWorld(worldX, worldY);
                 if (tile != null) {
                     Unit unit = unitType.spawn(worldX, worldY);
                     if (unit != null && unit.isValid()) {
-                        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                        // Apply configurations to the individual unit
+                        if (unitType == UnitTypes.corvus) {
+                            unit.type.groundLayer = Layer.flyingUnit;
+                            unit.type.weapons.get(0).reload = 10f;
+                            unit.type.weapons.get(0).cooldownTime = 10f;
+                            unit.type.playerControllable = false;
+                            unit.type.autoFindTarget = true;
+                            unit.type.allowedInPayloads = false;
+                        } else if (unitType == UnitTypes.collaris) {
+                            unit.type.groundLayer = Layer.flyingUnit;
+                            unit.type.weapons.get(0).reload = 10f;
+                            unit.type.weapons.get(0).cooldownTime = 10f;
+                            unit.type.playerControllable = false;
+                            unit.type.autoFindTarget = true;
+                            unit.type.allowedInPayloads = false;
+                        }
+    
                         executor.schedule(() -> {
                             if (unit != null && unit.isValid()) {
                                 unit.kill();
                             }
                         }, 50, TimeUnit.SECONDS);
-                        executor.shutdown();
-                        if (unitType == UnitTypes.corvus) {
-                            unitType.groundLayer = Layer.flyingUnit;
-                            unitType.weapons.get(0).reload = 10f;
-                            unitType.weapons.get(0).cooldownTime = 10f;
-                            unit.type.playerControllable = false;
-                            unit.type.autoFindTarget = true;
-                            unit.type.allowedInPayloads = false;
-                        } else if (unitType == UnitTypes.collaris) {
-                            unitType.groundLayer = Layer.flyingUnit;
-                            unitType.weapons.get(0).reload = 10f;
-                            unitType.weapons.get(0).cooldownTime = 10f;
-                            unit.type.playerControllable = false;
-                            unit.type.autoFindTarget = true;
-                            unit.type.allowedInPayloads = false;
-                        }
                     } else {
-                        playerData.addCash(100, player);
-                        player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
+                        allUnitsSpawned = false;
+                        break; // Exit the loop if a unit fails to spawn
                     }
                 } else {
-                    player.sendMessage(Bundle.get("spawn.unit.invalid-location", player.locale()));
+                    allUnitsSpawned = false;
+                    break; // Exit the loop if the tile is null
                 }
+            }
+            executor.shutdown(); // Shutdown the executor after all tasks have been scheduled
+    
+            if (!allUnitsSpawned) {
+                playerData.addCash(100, player);
+                player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
             }
         } else {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-Cash", player.locale()));
         }
     }
-
     private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
-        int unitCost = 100; // Cost per unit
-        int totalCost = unitCost; // Total cost remains 40 for all units
-
+        int totalCost = 100;
+    
         if (playerData.getCash() >= totalCost) {
             float radius = 140f;
             float arcAngle = 180f;
             float angleStep = arcAngle / 20; // Divide the arc by the number of units
             boolean allUnitsSpawned = true;
-
+    
+            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
             for (int i = 0; i < 20; i++) {
                 float angle = i * angleStep - arcAngle / 2; // Calculate the angle for each unit
                 double radians = Math.toRadians(angle);
                 float x = playerX + radius * (float) Math.cos(radians);
                 float y = playerY + radius * (float) Math.sin(radians);
-
+    
                 int intX = (int) x;
                 int intY = (int) y;
                 float worldX = intX * tilesize;
                 float worldY = intY * tilesize;
-
+    
                 Tile tile = world.tileWorld(worldX, worldY);
                 if (tile != null) {
                     Unit unit = unitType.spawn(worldX, worldY);
@@ -153,19 +159,18 @@ public class SuperPowers {
                     unit.type.allowedInPayloads = false;
                     unit.type.playerControllable = false;
                     unit.type.autoFindTarget = true;
-                    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                     executor.schedule(() -> {
                         if (unit != null && unit.isValid()) {
                             unit.kill();
                         }
                     }, 10, TimeUnit.SECONDS); // Adjusted to 5 seconds
-                    executor.shutdown();
                 } else {
                     allUnitsSpawned = false;
                     break; // Exit the loop if the tile is null
                 }
             }
-
+            executor.shutdown(); // Shutdown the executor after all tasks have been scheduled
+    
             if (allUnitsSpawned) {
                 playerData.subtractCash(totalCost, player); // Subtract the total cost
                 player.sendMessage(Bundle.get("spawn.arc-of-units.success", player.locale()));
@@ -197,7 +202,7 @@ public class SuperPowers {
 
             // Schedule the spawning of units over the specified duration
             ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-            ScheduledFuture<?> scheduledTask = executor.schedule(() -> {
+            executor.schedule(() -> {
                 for (int i = 0; i < 20; i++) {
                     float angle = i * angleStep - arcAngle / 2; // Calculate the angle for each unit
                     double radians = Math.toRadians(angle);
@@ -226,7 +231,7 @@ public class SuperPowers {
                                 if (unit != null && unit.isValid()) {
                                     unit.kill();
                                 }
-                            }, 120, TimeUnit.SECONDS); 
+                            }, 120, TimeUnit.SECONDS);
                             executor.shutdown();// Adjusted to 5 seconds
                         }
                     } else {
@@ -244,13 +249,6 @@ public class SuperPowers {
                     player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
                 }
             }, spawnDuration, TimeUnit.SECONDS);
-
-            // Add a listener for the PlayerLeave event to cancel the scheduled task
-            Events.on(PlayerLeave.class, event -> {
-                if (event.player == player) {
-                    scheduledTask.cancel(false); // Cancel the scheduled task
-                }
-            });
         } else {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-Cash", player.locale()));
         }
