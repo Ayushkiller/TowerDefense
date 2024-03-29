@@ -24,8 +24,10 @@ import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.gen.Unit;
 import mindustry.net.Administration;
 import mindustry.type.ItemStack;
+import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.Tile;
@@ -265,49 +267,58 @@ public class PluginLogic {
             Timer.schedule(() -> multiplierAdjusted = false, 180f);
         });
         Events.on(EventType.UnitSpawnEvent.class, event -> {
-
             if (event.unit.team == state.rules.waveTeam) {
-                event.unit.health(event.unit.health * multiplier);
-                event.unit.maxHealth(event.unit.maxHealth * multiplier);
-                event.unit.damageMultiplier(0f);
-                if (state.wave <= 200f) {
-                    event.unit.apply(StatusEffects.overdrive, Float.POSITIVE_INFINITY);
-                    event.unit.apply(StatusEffects.overclock, Float.POSITIVE_INFINITY);
-                    event.unit.apply(StatusEffects.shielded, Float.POSITIVE_INFINITY);
-                    event.unit.apply(StatusEffects.boss, Float.POSITIVE_INFINITY);
-                    event.unit.apply(StatusEffects.sporeSlowed, Float.POSITIVE_INFINITY);
-                    event.unit.apply(StatusEffects.muddy, Float.POSITIVE_INFINITY);
+                if (event.unit != null) {
+                    event.unit.health(event.unit.health * multiplier);
+                    event.unit.maxHealth(event.unit.maxHealth * multiplier);
+                    event.unit.damageMultiplier(0f);
+                    if (state.wave <= 200f) {
+                        applyStatusEffect(event.unit, StatusEffects.overdrive, Float.POSITIVE_INFINITY);
+                        applyStatusEffect(event.unit, StatusEffects.overclock, Float.POSITIVE_INFINITY);
+                        applyStatusEffect(event.unit, StatusEffects.shielded, Float.POSITIVE_INFINITY);
+                        applyStatusEffect(event.unit, StatusEffects.boss, Float.POSITIVE_INFINITY);
+                        applyStatusEffect(event.unit, StatusEffects.sporeSlowed, Float.POSITIVE_INFINITY);
+                        applyStatusEffect(event.unit, StatusEffects.muddy, Float.POSITIVE_INFINITY);
+                    }
+                    if (state.wave >= 250) {
+                        applyStatusEffect(event.unit, StatusEffects.fast, Float.POSITIVE_INFINITY);
+                    }
+                    applyStatusEffect(event.unit, StatusEffects.disarmed, Float.POSITIVE_INFINITY);
+                    if (event.unit.type != null) {
+                        event.unit.type.speed = 0.8f;
+                        event.unit.type.range = -1f;
+                        event.unit.type.hovering = true;
+                        event.unit.disarmed = true;
+                        if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires) {
+                            event.unit.kill();
+                        }
+                        event.unit.type.physics = false;
+                        event.unit.type.crashDamageMultiplier = 0f;
+                        event.unit.type.crushDamage = 0f;
+                        event.unit.type.deathExplosionEffect = Fx.shockwave;
+                        event.unit.shield(event.unit.shield * multiplier);
+                        event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
+                        event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
+                        event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange = 0f;
+                        event.unit.type.aiController = (event.unit.type.naval || event.unit.type.canDrown) ? GroundAI::new
+                                : FlyingAIForAss::new;
+                        event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
+                    }
                 }
-                if (state.wave >= 250) {
-                    event.unit.apply(StatusEffects.fast, Float.POSITIVE_INFINITY);
-                }
-                event.unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
-                event.unit.type.speed = 0.8f;
-                event.unit.type.range = -1f;
-                event.unit.type.hovering = true;
-                event.unit.disarmed = true;
-                if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires) {
-                    event.unit.kill();
-                }
-                event.unit.type.physics = false;
-                event.unit.type.crashDamageMultiplier = 0f;
-                event.unit.type.crushDamage = 0f;
-                event.unit.type.deathExplosionEffect = Fx.shockwave;
-                event.unit.shield(event.unit.shield * multiplier);
-                event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
-                event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
-                event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange = 0f;
-                event.unit.type.aiController = (event.unit.type.naval || event.unit.type.canDrown) ? GroundAI::new
-                        : FlyingAIForAss::new;
-                ;
-                event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
             }
         });
+
         Events.run(EventType.Trigger.update, () -> {
             checkUnitsWithinRadius();
         });
     }
-
+        
+        // Helper method to apply status effects with null checks
+        private static void applyStatusEffect(Unit unit, StatusEffect effect, float duration) {
+            if (unit != null && effect != null) {
+                unit.apply(effect, duration);
+            }
+        }
     public static boolean isPath(Tile tile) {
         return tile.floor() == Vars.world.tile(0, 0).floor()
                 || tile.floor() == Vars.world.tile(0, 1).floor()
