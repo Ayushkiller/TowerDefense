@@ -24,7 +24,7 @@ public class TowerDefensePlugin extends Plugin {
         Bundle.load(TowerDefensePlugin.class);
         Loader.load();
         TowerPathfinder.init();
-        PluginLogic.init(); // Assuming PluginLogic is a class with initialization logic
+        PluginLogic.init(); 
         CustomStatusEffects.load();
     }
 
