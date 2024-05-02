@@ -10,9 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import arc.Events;
+import arc.util.Log;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
 import mindustry.game.EventType;
+import mindustry.game.EventType.BlockBuildEndEvent;
 import mindustry.gen.Building;
 import mindustry.gen.Groups;
 import mindustry.mod.Plugin;
@@ -40,6 +42,7 @@ public class TowerDefensePlugin extends Plugin {
 
     @SuppressWarnings("unchecked")
     public TowerDefensePlugin() {
+         Log.info("TowerDefensePlugin initialized.");
         allItems.addAll((Collection<? extends Item>) Items.serpuloItems);
         allItems.addAll((Collection<? extends Item>) Items.erekirItems);
 
@@ -55,9 +58,11 @@ public class TowerDefensePlugin extends Plugin {
         allLiquids.add(Liquids.nitrogen);
         allLiquids.add(Liquids.cyanogen);
         Events.run(EventType.Trigger.update, () -> onUpdate());
+        Events.on(EventType.BlockBuildEndEvent.class, this::onBlockBuildEndEvent);
     }
 
     private BlockConsumersCache buildCache(Block block) {
+         Log.info("Building cache for block: " + block.localizedName);
         List<Item> items = new ArrayList<>();
         List<Liquid> liquids = new ArrayList<>();
 
@@ -98,6 +103,7 @@ public class TowerDefensePlugin extends Plugin {
     }
 
     private void updateBuilding(Building building) {
+        Log.info("Updating building: " + building.block.localizedName);
         BlockConsumersCache cachedConsumers = blockConsumersCaches.computeIfAbsent(building.block, this::buildCache);
 
         for (ItemStack itemStack : cachedConsumers.items) {
@@ -109,17 +115,19 @@ public class TowerDefensePlugin extends Plugin {
         }
     }
 
-    public void onBlockBuildEndEvent(EventType.BlockBuildEndEvent event) {
-        if (event.breaking)
-            return;
+   public void onBlockBuildEndEvent(BlockBuildEndEvent event) {
+    Log.info("Block build end event triggered.");
+    if (event.breaking)
+        return;
 
-        if (filledBlockFilter(event.tile.build.block)) {
-            updateBuilding(event.tile.build);
-        }
+    if (filledBlockFilter(event.tile.build.block)) {
+        updateBuilding(event.tile.build);
     }
+}
 
     public void onUpdate() {
         Groups.build.each(building -> {
+            Log.info("Update method called.");
             if (filledBlockFilter(building.block)) {
                 updateBuilding(building);
             }
@@ -127,6 +135,7 @@ public class TowerDefensePlugin extends Plugin {
     }
 
     private boolean filledBlockFilter(Block block) {
+        Log.info("Checking block filter for block: " + block.localizedName);
         return block instanceof Separator || block instanceof GenericCrafter || block instanceof PowerGenerator;
     }
 }
