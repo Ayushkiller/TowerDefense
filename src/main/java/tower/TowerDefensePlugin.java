@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import arc.Events;
-import arc.util.Log;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
 import mindustry.game.EventType;
@@ -39,7 +38,6 @@ public class TowerDefensePlugin extends Plugin {
 
     private final ConcurrentHashMap<Block, BlockConsumersCache> blockConsumersCaches = new ConcurrentHashMap<>();
     public TowerDefensePlugin() {
-         Log.info("TowerDefensePlugin initialized.");
          Items.serpuloItems.each(item -> allItems.add(item));
          Items.erekirOnlyItems.each(item -> allItems.add(item));
 
@@ -59,7 +57,6 @@ public class TowerDefensePlugin extends Plugin {
     }
 
     private BlockConsumersCache buildCache(Block block) {
-         Log.info("Building cache for block: " + block.localizedName);
         List<Item> items = new ArrayList<>();
         List<Liquid> liquids = new ArrayList<>();
 
@@ -100,7 +97,6 @@ public class TowerDefensePlugin extends Plugin {
     }
 
     private void updateBuilding(Building building) {
-        Log.info("Updating building: " + building.block.localizedName);
         BlockConsumersCache cachedConsumers = blockConsumersCaches.computeIfAbsent(building.block, this::buildCache);
 
         for (ItemStack itemStack : cachedConsumers.items) {
@@ -113,7 +109,6 @@ public class TowerDefensePlugin extends Plugin {
     }
 
    public void onBlockBuildEndEvent(BlockBuildEndEvent event) {
-    Log.info("Block build end event triggered.");
     if (event.breaking)
         return;
 
@@ -124,7 +119,6 @@ public class TowerDefensePlugin extends Plugin {
 
     public void onUpdate() {
         Groups.build.each(building -> {
-            Log.info("Update method called.");
             if (filledBlockFilter(building.block)) {
                 updateBuilding(building);
             }
@@ -132,7 +126,6 @@ public class TowerDefensePlugin extends Plugin {
     }
 
     private boolean filledBlockFilter(Block block) {
-        Log.info("Checking block filter for block: " + block.localizedName);
         return block instanceof Separator || block instanceof GenericCrafter || block instanceof PowerGenerator;
     }
 }
