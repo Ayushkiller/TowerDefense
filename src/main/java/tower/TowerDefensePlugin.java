@@ -21,8 +21,12 @@ import mindustry.type.ItemStack;
 import mindustry.type.Liquid;
 import mindustry.type.LiquidStack;
 import mindustry.world.Block;
+import mindustry.world.blocks.defense.ForceProjector;
+import mindustry.world.blocks.defense.OverdriveProjector;
+import mindustry.world.blocks.power.ConsumeGenerator;
 import mindustry.world.blocks.power.NuclearReactor;
 import mindustry.world.blocks.power.PowerGenerator;
+import mindustry.world.blocks.production.BeamDrill;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.blocks.production.Separator;
 import mindustry.world.consumers.Consume;
@@ -85,12 +89,12 @@ public class TowerDefensePlugin extends Plugin {
             if (block instanceof NuclearReactor) {
                 itemsCache.add(new ItemStack(item, ((NuclearReactor) block).itemCapacity));
             } else {
-                itemsCache.add(new ItemStack(item, Integer.MAX_VALUE));
+                itemsCache.add(new ItemStack(item, block.itemCapacity));
             }
         }
 
         for (Liquid liquid : liquids) {
-            liquidsCache.add(new LiquidStack(liquid, Float.MAX_VALUE));
+            liquidsCache.add(new LiquidStack(liquid, block.liquidCapacity));
         }
 
         return new BlockConsumersCache(itemsCache, liquidsCache);
@@ -126,6 +130,6 @@ public class TowerDefensePlugin extends Plugin {
     }
 
     private boolean filledBlockFilter(Block block) {
-        return block instanceof Separator || block instanceof GenericCrafter || block instanceof PowerGenerator;
+        return block instanceof Separator || block instanceof GenericCrafter || block instanceof PowerGenerator|| block instanceof ConsumeGenerator || block instanceof NuclearReactor || block instanceof BeamDrill|| block instanceof OverdriveProjector || block instanceof ForceProjector;
     }
 }
