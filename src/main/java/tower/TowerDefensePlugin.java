@@ -2,7 +2,6 @@ package tower;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,12 +38,10 @@ public class TowerDefensePlugin extends Plugin {
     private final Set<Liquid> allLiquids = new HashSet<>();
 
     private final ConcurrentHashMap<Block, BlockConsumersCache> blockConsumersCaches = new ConcurrentHashMap<>();
-
-    @SuppressWarnings("unchecked")
     public TowerDefensePlugin() {
          Log.info("TowerDefensePlugin initialized.");
-        allItems.addAll((Collection<? extends Item>) Items.serpuloItems);
-        allItems.addAll((Collection<? extends Item>) Items.erekirItems);
+         Items.serpuloItems.each(item -> allItems.add(item));
+         Items.erekirOnlyItems.each(item -> allItems.add(item));
 
         allLiquids.add(Liquids.water);
         allLiquids.add(Liquids.slag);
