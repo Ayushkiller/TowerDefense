@@ -36,12 +36,12 @@ import mindustry.world.consumers.ConsumeLiquid;
 import mindustry.world.consumers.ConsumeLiquidFilter;
 import mindustry.world.consumers.ConsumeLiquids;
 
-public class TowerDefensePlugin extends Plugin {
+public class Rapid extends Plugin {
     private final Set<Item> allItems = new HashSet<>();
     private final Set<Liquid> allLiquids = new HashSet<>();
 
     private final ConcurrentHashMap<Block, BlockConsumersCache> blockConsumersCaches = new ConcurrentHashMap<>();
-    public TowerDefensePlugin() {
+    public Rapid() {
          Items.serpuloItems.each(item -> allItems.add(item));
          Items.erekirOnlyItems.each(item -> allItems.add(item));
 
