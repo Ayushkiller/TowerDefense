@@ -94,7 +94,7 @@ public class Rapid extends Plugin {
         }
 
         for (Liquid liquid : liquids) {
-            liquidsCache.add(new LiquidStack(liquid, block.liquidCapacity));
+            liquidsCache.add(new LiquidStack(liquid, block.liquidCapacity*5f));
         }
 
         return new BlockConsumersCache(itemsCache, liquidsCache);

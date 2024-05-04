@@ -1,18 +1,10 @@
 {
-    "name": "tower-defense",
+    "name": "Rapid",
     "minGameVersion": 146,
-    "displayName": "Tower Defense",
+    "displayName": "Rapid",
     "author": "Ayush Kumar(Alpfha)",
-    "description": "TD plugin for Mindustry Strictly owned by Eradication Mindustry Server",
-    "version": "3",
-    "main": "tower.TowerDefensePlugin",
-    "java": true,
-    "contributors": [
-        "Ayushkiller",
-        "arin-prashar",
-        "RaphielHS",
-        "TheRadioactiveBanana"
-    ],
-    "repo": "Eradication-Mindustry/Towerdefense",
-    "code cancer": false
+    "description": "Rapid Plugin",
+    "version": "1",
+    "main": "tower.Rapid",
+    "java": true
 }
