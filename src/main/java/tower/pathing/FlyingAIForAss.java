@@ -48,7 +48,7 @@ public class FlyingAIForAss extends AIController {
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground) {
-        Log.info("findTarget called");
+
         var result = findMainTarget(x, y, range, air, ground);
 
         // if the main target is in range, use it, otherwise target whatever is closest
@@ -57,7 +57,7 @@ public class FlyingAIForAss extends AIController {
 
     @Override
     public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground) {
-        Log.info("findMainTarget called");
+
         var core = targetFlag(x, y, BlockFlag.core, true);
 
         if (core!= null && Mathf.within(x, y, core.getX(), core.getY(), range)) {
