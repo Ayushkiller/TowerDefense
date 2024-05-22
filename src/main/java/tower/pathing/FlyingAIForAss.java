@@ -88,7 +88,7 @@ public class FlyingAIForAss extends AIController {
         Tile targetTile = pathfinder.getTargetTile(currentTile,
                 pathfinder.getField(unit.team, unit.pathType(), pathTarget));
 
-        if (currentTile.equals(targetTile) || (unit.pathType() == Pathfinder.costNaval && !targetTile.isDarkened())) {
+        if (currentTile.equals(targetTile) || (unit.pathType() == Pathfinder.costNaval || targetTile.isDarkened())) {
             return;
         }
         unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), prefSpeed()));
@@ -100,12 +100,10 @@ public class FlyingAIForAss extends AIController {
 
     // Method to check if the last pathfinding attempt was successful
     public boolean wasPathingSuccessful() {
-        Log.info("wasPathingSuccessful called");
         return pathingSuccess;
     }
 
     public float prefSpeed() {
-        Log.info("prefSpeed called");
         return unit.speed();
     }
 }

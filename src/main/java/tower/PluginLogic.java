@@ -289,7 +289,7 @@ public class PluginLogic {
                         event.unit.type.range = -1f;
                         event.unit.type.hovering = true;
                         event.unit.disarmed = true;
-                        if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires) {
+                        if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires||event.unit.type == UnitTypes.oct) {
                             event.unit.kill();
                         }
                         event.unit.type.physics = false;
@@ -300,7 +300,7 @@ public class PluginLogic {
                         event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
                         event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
                         event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange = 0f;
-                        event.unit.type.aiController = event.unit.type.naval  ? GroundAI::new
+                        event.unit.type.aiController = (event.unit.type.naval|| event.unit.canDrown())  ? GroundAI::new
                                 : FlyingAIForAss::new;
                         event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
                     }
