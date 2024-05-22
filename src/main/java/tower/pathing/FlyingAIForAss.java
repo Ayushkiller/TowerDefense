@@ -11,23 +11,23 @@ import mindustry.world.meta.BlockFlag;
 
 public class FlyingAIForAss extends AIController {
     private boolean pathingSuccess;
-
+    private long lastMoveTime;
     @Override
     public void updateMovement() {
         unloadPayloads();
-
+        lastMoveTime = System.currentTimeMillis();
         if (target != null && unit.hasWeapons()) {
             if (unit.type.circleTarget) {
                 pathfind(Pathfinder.fieldCore);
-                if (!wasPathingSuccessful()) {
+                if (!wasPathingSuccessful() || System.currentTimeMillis() - lastMoveTime > 5000) {
                     circleAttack(60f);
                     moveTo(target, unit.type.range * 0.8f);
                 }
-
             } else {
                 pathfind(Pathfinder.fieldCore);
                 unit.lookAt(target);
-                if (!wasPathingSuccessful()) {
+                if (!wasPathingSuccessful() || System.currentTimeMillis() - lastMoveTime > 5000) {
+                    circleAttack(60f);
                     moveTo(target, unit.type.range * 0.8f);
                 }
             }
@@ -84,6 +84,9 @@ public class FlyingAIForAss extends AIController {
         
         unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), prefSpeed()));
         pathingSuccess = true; // Pathing was successful
+        if (wasPathingSuccessful()) {
+            lastMoveTime = System.currentTimeMillis(); // Update the last move time
+        }
     }
 
     // Method to check if the last pathfinding attempt was successful
