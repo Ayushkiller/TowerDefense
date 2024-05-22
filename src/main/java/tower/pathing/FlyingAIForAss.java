@@ -1,13 +1,13 @@
 package tower.pathing;
 
-import arc.math.*;
-import mindustry.ai.Pathfinder;
-import mindustry.entities.units.*;
-import mindustry.gen.*;
-import mindustry.world.Tile;
-import mindustry.world.meta.*;
-
 import static mindustry.Vars.*;
+
+import arc.math.Mathf;
+import mindustry.ai.Pathfinder;
+import mindustry.entities.units.AIController;
+import mindustry.gen.Teamc;
+import mindustry.world.Tile;
+import mindustry.world.meta.BlockFlag;
 
 public class FlyingAIForAss extends AIController {
     private boolean pathingSuccess;
@@ -21,6 +21,7 @@ public class FlyingAIForAss extends AIController {
                 pathfind(Pathfinder.fieldCore);
                 if (!wasPathingSuccessful()) {
                     circleAttack(60f);
+                    moveTo(target, unit.type.range * 0.8f);
                 }
 
             } else {
@@ -80,7 +81,7 @@ public class FlyingAIForAss extends AIController {
 
         if (tile == targetTile || (costType == Pathfinder.costNaval && !targetTile.floor().isLiquid))
             return;
-
+        
         unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), prefSpeed()));
         pathingSuccess = true; // Pathing was successful
     }
