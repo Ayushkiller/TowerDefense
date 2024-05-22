@@ -3,7 +3,6 @@ package tower.pathing;
 import static mindustry.Vars.*;
 
 import arc.math.Mathf;
-import arc.util.Log;
 import mindustry.ai.Pathfinder;
 import mindustry.entities.units.AIController;
 import mindustry.gen.Teamc;

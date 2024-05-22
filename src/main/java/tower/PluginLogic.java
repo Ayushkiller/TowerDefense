@@ -300,8 +300,8 @@ public class PluginLogic {
                         event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
                         event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
                         event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange = 0f;
-                        event.unit.type.aiController = (event.unit.type.naval|| event.unit.canDrown())  ? GroundAI::new
-                                : FlyingAIForAss::new;
+                        event.unit.type.aiController = (event.unit.type.flying)? FlyingAIForAss::new
+        : GroundAI::new;
                         event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
                     }
                 }
