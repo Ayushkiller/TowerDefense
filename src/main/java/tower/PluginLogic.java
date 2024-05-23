@@ -52,7 +52,8 @@ public class PluginLogic {
     public static ObjectMap<Tile, ForceProjector> forceProjectorTiles = new ObjectMap<>();
     public static ObjectMap<Tile, RepairTurret> repairPointTiles = new ObjectMap<>();
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
-
+    public static ObjectMap<Tile, RegenProjector> regenProjectorTiles = new ObjectMap<>();
+    public static ObjectMap<Tile, ShockwaveTower> ShockerTiles = new ObjectMap<>();
     public static void init() {
         initializeDrops();
         setupAdminActionFilters();
@@ -214,30 +215,40 @@ public class PluginLogic {
             forceProjectorTiles.clear();
             repairPointTiles.clear();
             repairPointCash.clear();
+            ShockerTiles.clear();
+            repairPointTiles.clear();
         });
         Events.on(EventType.TileChangeEvent.class, event -> {
             Tile changedTile = event.tile;
             Block block = changedTile.block();
-
-            if (block instanceof ForceProjector || block instanceof RegenProjector) {
-                // If the tile is not already in the map, add it
+        
+            if (block instanceof ForceProjector) {
+                // Handle ForceProjector placement
                 if (!forceProjectorTiles.containsKey(changedTile)) {
                     forceProjectorTiles.put(changedTile, (ForceProjector) block);
-
                 }
-            } else {
-                // If the tile is in the map but no longer contains a ForceProjector, remove it
-                if (forceProjectorTiles.containsKey(changedTile)) {
-                    forceProjectorTiles.remove(changedTile);
-
+            } else if (block instanceof RegenProjector) {
+                // Handle RegenProjector placement
+                if (!regenProjectorTiles.containsKey(changedTile)) {
+                    regenProjectorTiles.put(changedTile, (RegenProjector) block);
                 }
-            }
-            if (block instanceof RepairTurret || block instanceof ShockwaveTower) {
-                if (!repairPointTiles.containsKey(changedTile) && repairPointTiles.size < 20) {
+            } else if (block instanceof RepairTurret) {
+                // Handle RepairTurret placement
+                if (!repairPointTiles.containsKey(changedTile)) {
                     repairPointTiles.put(changedTile, (RepairTurret) block);
                 }
+            } else if (block instanceof ShockwaveTower) {
+                // Handle ShockwaveTower placement
+                if (!ShockerTiles.containsKey(changedTile)) {
+                    ShockerTiles.put(changedTile, (ShockwaveTower) block);
+                }
             } else {
-                repairPointTiles.remove(changedTile);
+                if (forceProjectorTiles.containsKey(changedTile)) {
+                    forceProjectorTiles.remove(changedTile);
+                }
+                if (repairPointTiles.containsKey(changedTile)) {
+                    repairPointTiles.remove(changedTile);
+                }
             }
         });
         Events.on(EventType.UnitDestroyEvent.class, event -> {
