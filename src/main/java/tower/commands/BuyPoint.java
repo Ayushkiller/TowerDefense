@@ -19,21 +19,23 @@ public class BuyPoint {
     public static void execute(Player player) {
         openBuySellMenu(player);
     }
-
+    private static final int openBuySellMenu =Menus.registerMenu((player1, option) -> {
+        if (option == 0) { // Buy button
+            openMenu(player1);
+        } else if (option == 1) {
+            openSellMenu(player1);
+        }
+    });
     private static void openBuySellMenu(Player player) {
         String[][] buttons = {
                 { "[red]Buy Cash", "[cyan]Buy Items" }
         };
 
-        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            if (option == 0) { // Buy button
-                openMenu(player);
-            } else if (option == 1) {
-                openSellMenu(player);
-            }
-        }), "[red]Buy", "", buttons);
+        Call.menu(player.con,openBuySellMenu, "[red]Buy", "", buttons);
     }
-
+    private static final int openSellMenu =Menus.registerMenu((player1, option) -> {
+        openQuantityAdjustmentMenuForSell(player1, option);
+    });
     private static void openSellMenu(Player player) {
         String[][] buttons = new String[Currency.items.size()][1];
 
@@ -45,9 +47,7 @@ public class BuyPoint {
             buttons[i][0] = String.format("%s (-%d) [gray]Price: %d", item.emoji(), gain, price);
         }
 
-        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            openQuantityAdjustmentMenuForSell(player, option);
-        }), Bundle.get("menu.sellpoint.title", player.locale()), "", buttons);
+        Call.menu(player.con,openSellMenu, Bundle.get("menu.sellpoint.title", player.locale()), "", buttons);
     }
 
     private static void openQuantityAdjustmentMenuForSell(Player player, int option) {
@@ -135,7 +135,9 @@ public class BuyPoint {
         }
         return totalCashRequired;
     }
-
+    private static final int openMenu =Menus.registerMenu((player1, option) -> {
+        openQuantityAdjustmentMenu(player1, option);
+    });
     private static void openMenu(Player player) {
         String[][] buttons = new String[Currency.items.size()][1];
 
@@ -147,9 +149,7 @@ public class BuyPoint {
             buttons[i][0] = String.format("%s (+%d) [gray]Price: %d", item.emoji(), gain, price);
         }
 
-        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            openQuantityAdjustmentMenu(player, option);
-        }), Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
+        Call.menu(player.con,openMenu, Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
     }
 
     private static void openQuantityAdjustmentMenu(Player player, int option) {

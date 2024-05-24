@@ -1,11 +1,13 @@
 package tower.Domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import mindustry.gen.Player;
 
 public class PlayerData {
-    private final String uuid;
     private float Cash;
-
+ private static Map<String, PlayerData> playerDataInstances = new HashMap<>();
     public void addCash(float amount) {
         this.Cash += amount;
 
@@ -24,9 +26,13 @@ public class PlayerData {
         return Cash;
     }
 
-
+    public static PlayerData get(Player player) {
+        String playerId = player.uuid().toString(); 
+        return playerDataInstances.computeIfAbsent(playerId, id -> new PlayerData(player));
+    }
     public PlayerData(Player player) {
-        this.uuid = player.uuid();
+        player.uuid();
         this.Cash = 0;
     }
+
 }

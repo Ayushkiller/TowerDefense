@@ -19,10 +19,13 @@ import tower.Domain.Abilities;
 import tower.Domain.PlayerData;
 import tower.Domain.UnitsTable;
 
-
 public class Units {
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
-
+    private static int currentQuantity = 0;
+    private static int currentTotalPrice = 0;
+    private static UnitType currentUnitType = null;
+    private static Player currentPlayer = null;
+    private static boolean isMenuActive = false;
 
     public static void initUnitsTable() {
         for (Map<String, Object> unitMap : UnitsTable.units) {
@@ -106,6 +109,7 @@ public class Units {
             player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
         }
     }
+
     private static final int openTierMenuGui = Menus.registerMenu((player, option) -> {
         if (option >= 0 && option < 6) {
             openTierUnitsMenuGui(option, player);
@@ -113,13 +117,15 @@ public class Units {
             player.sendMessage("Invalid selection. Please try again.");
         }
     });
+
     private static void openTierMenuGui(Player player) {
         String[][] buttons = new String[6][1];
         for (int i = 0; i < 6; i++) {
             buttons[i][0] = "[cyan]Tier " + i;
         }
-        Call.menu(player.con,openTierMenuGui, "Select Tier", "", buttons);
+        Call.menu(player.con, openTierMenuGui, "Select Tier", "", buttons);
     }
+
     private static final int openTierMenuUnitsGui = Menus.registerMenu((player1, option) -> {
         List<Map<String, Object>> tierUnits = UnitsTable.units.stream()
                 .filter(unit -> (int) unit.get("tier") == option)
@@ -132,6 +138,7 @@ public class Units {
             player1.sendMessage("Invalid selection. Please try again.");
         }
     });
+
     private static void openTierUnitsMenuGui(int tier, Player player) {
         List<Map<String, Object>> tierUnits = UnitsTable.units.stream()
                 .filter(unit -> (int) unit.get("tier") == tier)
@@ -146,47 +153,102 @@ public class Units {
         }
         Call.menu(player.con, openTierMenuUnitsGui, "Select Unit", "", buttons);
     }
-    private static final int openUnitMenuGui =  Menus.registerMenu(((player1, option) -> {
-        switch (option) {
-            case 0 -> buyUnit((UnitType) UnitsTable.units.get(option), player1, true); // Pass true to allow unit control
-            case 1 -> openTierMenuGui(player1); // Go back to the tier selection menu
-            case 2 -> openQuantityAdjustmentMenu((UnitType) UnitsTable.units.get(option), player1, 1); // New case for buying multiple units
-        }
-    }));
+
+
     private static void openUnitMenuGui(UnitType unitType, Player player) {
         int price = unitPrices.get(unitType);
         String message = unitType.emoji() + "\n\n" +
                 Bundle.get("menu.units.info.health", player.locale) + " " + (int) unitType.health + "\n" +
                 Bundle.get("menu.units.info.armor", player.locale) + " " + (int) unitType.armor + "\n" +
                 Bundle.get("menu.units.info.price", player.locale) + " " + price;
-        Call.menu(player.con,openUnitMenuGui, Bundle.get("menu.units.title"), message, new String[][] {
+        Call.menu(player.con, openUnitMenuGui, Bundle.get("menu.units.title"), message, new String[][] {
                 { "[lime]Buy" },
                 { "[gray]Back" },
                 { "[blue]Buy Multiple" } // New option for buying multiple units
         });
     }
-//TODO: Make Menus.register into seprate like other examples above and call from there
+    private static final int openUnitMenuGui = Menus.registerMenu(((player1, option) -> {
+        switch (option) {
+            case 0 -> buyUnit((UnitType) UnitsTable.units.get(option), player1, true); // Pass true to allow unit
+                                                                                       // control
+            case 1 -> openTierMenuGui(player1); // Go back to the tier selection menu
+            case 2 -> openQuantityAdjustmentMenu((UnitType) UnitsTable.units.get(option), player1, 1); // New case for
+                                                                                                       // buying
+                                                                                                       // multiple units
+        }
+    }));
 
-    private static void openQuantityAdjustmentMenu(UnitType unitType, Player player, int defaultQuantity) {
-        String title = "[red]Adjust Quantity";
-        String[][] buttons = { { "-1", "0", "+1" }, { "[green]Buy", "[grey]Back", "[red]Close" } };
-        int price = unitPrices.get(unitType);
-        StringBuilder message = new StringBuilder("[green]Current Quantity: ").append(defaultQuantity)
-                .append("\n[red]Total Price: ").append(defaultQuantity * price);
+    private static final int quantityAdjustmentMenuId = Menus.registerMenu((player, option) -> {
+        if (!isMenuActive)
+            return; // Ignore inputs if the menu is not active
 
-        Call.menu(player.con, Menus.registerMenu((p, opt) -> {
-            if (opt < 3) { // Adjustment buttons
-                int adjustment = Integer.parseInt(buttons[0][opt]);
-                int currentQuantity = Math.max(1, defaultQuantity + adjustment);
-                openQuantityAdjustmentMenu(unitType, player, currentQuantity);
-            } else if (opt == 3) { // Buy button
-                buyMultipleUnits(unitType, player, defaultQuantity);
-            } else if (opt == 4) { // Back button
-                openUnitMenuGui(unitType, player);
-            } else if (opt == 5) { // Close button
-                player.sendMessage("Purchase cancelled.");
-            }
-        }), title, message.toString(), buttons);
+        switch (option) {
+            case 0: // Increase quantity
+                currentQuantity++;
+                currentTotalPrice += unitPrices.get(currentUnitType);
+                break;
+            case 1: // Decrease quantity
+                if (currentQuantity > 0) {
+                    currentQuantity--;
+                    currentTotalPrice -= unitPrices.get(currentUnitType);
+                }
+                break;
+            case 2: // Buy
+                buyMultipleUnits(currentUnitType, currentPlayer, currentQuantity);
+                isMenuActive = false; // Deactivate the menu after purchase
+                break;
+            case 3: // Close
+                isMenuActive = false; // Deactivate the menu without purchasing
+                break;
+            case 4: // Back
+            openUnitMenuGui(currentUnitType, player);
+                isMenuActive = false;
+                break;
+        }
+
+        // Update the menu display
+        updateQuantityAdjustmentMenuDisplay(player);
+    });
+
+    private static void openQuantityAdjustmentMenu(UnitType unitType, Player player, int initialQuantity) {
+        if (isMenuActive)
+            return; // Prevent re-opening the menu if it's already active
+
+        currentUnitType = unitType;
+        currentPlayer = player;
+        currentQuantity = initialQuantity;
+        currentTotalPrice = unitPrices.get(unitType) * initialQuantity;
+        isMenuActive = true;
+        PlayerData playerData = PlayerData.get(player);
+        String[][] options = {
+                { "+1" },
+                { "-1" },
+                { "Buy" },
+                { "Close" },
+                { "Back" }
+        };
+        String message = "Current Quantity: " + currentQuantity + "\nTotal Price: " + currentTotalPrice
+                + "\nYour Cash: " + playerData.getCash();
+
+        Call.menu(quantityAdjustmentMenuId, "Quantity Adjustment Menu", message, options);
+    }
+
+    private static void updateQuantityAdjustmentMenuDisplay(Player player) {
+        if (!isMenuActive)
+            return;
+
+        String[][] options = {
+                { "+1" },
+                { "-1" },
+                { "Buy" },
+                { "Close" },
+                { "Back" }
+        };
+        PlayerData playerData = PlayerData.get(player);
+        String message = "Current Quantity: " + currentQuantity + "\nTotal Price: " + currentTotalPrice
+                + "\nYour Cash: " + playerData.getCash();
+
+        Call.menu(quantityAdjustmentMenuId, "Quantity Adjustment Menu", message, options);
     }
 
     private static void buyMultipleUnits(UnitType unitType, Player player, int quantity) {
@@ -195,7 +257,7 @@ public class Units {
 
         if (playerData.getCash() >= totalCost) {
             for (int i = 0; i < quantity; i++) {
-                buyUnit(unitType, player, false); // Pass false to prevent unit control
+                buyUnit(unitType, player, false);
             }
             playerData.subtractCash(totalCost);
             player.sendMessage("[green]Units purchased successfully.");
@@ -203,6 +265,7 @@ public class Units {
             player.sendMessage("[red]You don't have enough funds to buy " + quantity + " units.");
         }
     }
+
     public static void execute(Player player) {
         openTierMenuGui(player);
     }
