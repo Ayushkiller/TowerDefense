@@ -66,9 +66,7 @@ public class Scenarios {
 
     public static void requestDeploymentForAllPlayers() {
         // Use Groups.player.each to iterate over all players
-        Groups.player.each(player -> {
-            requestDeployment(player);
-        });
+        Groups.player.each(Scenarios::requestDeployment);
     
         if (!isTaskScheduled) { // Check if the task is already scheduled
             isTaskScheduled = true; // Set the flag to true to indicate the task is scheduled
@@ -77,9 +75,7 @@ public class Scenarios {
                 @Override
                 public void run() {
                     // Use Groups.player.each again to iterate over all players
-                    Groups.player.each(player -> {
-                        handleDeploymentOption1(player);
-                    });
+                    Groups.player.each(Scenarios::handleDeploymentOption1);
                     // Reset the flag after the task has been executed
                     isTaskScheduled = false;
                 }

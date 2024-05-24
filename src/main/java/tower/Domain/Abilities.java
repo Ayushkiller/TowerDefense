@@ -15,7 +15,7 @@ public class Abilities {
         float duration = 60f * 6;
         float cooldown = 60f * 6f;
         float range = 20f;
-        return Arrays.asList(
+        return List.of(
                 new StatusFieldAbility(StatusEffects.boss, duration, cooldown, range));
 
     }
@@ -24,7 +24,7 @@ public class Abilities {
         float duration = 60f * 6;
         float cooldown = 60f * 6f;
         float range = 30f;
-        return Arrays.asList(
+        return List.of(
                 new StatusFieldAbility(StatusEffects.overclock, duration, cooldown, range));
 
     }
@@ -33,16 +33,16 @@ public class Abilities {
         float duration = 60f * 6;
         float cooldown = 60f * 6f;
         float range = 60f;
-        return Arrays.asList(
-            new StatusFieldAbility(StatusEffects.overclock, duration, cooldown, range));
+        return List.of(
+                new StatusFieldAbility(StatusEffects.overclock, duration, cooldown, range));
     }
 
     public static List<Ability> getAbility4() {
         float duration = 60f * 6;
         float cooldown = 60f * 6f;
         float range = 60f;
-        return Arrays.asList(
-            new StatusFieldAbility(StatusEffects.overclock, duration, cooldown, range));
+        return List.of(
+                new StatusFieldAbility(StatusEffects.overclock, duration, cooldown, range));
     }
 
     public static List<Ability> getAbility5() {
@@ -74,7 +74,7 @@ public class Abilities {
         float duration = 60f * 6;
         float cooldown = 60f * 6f;
         float range = 30f;
-        return Arrays.asList(
+        return List.of(
                 new StatusFieldAbility(StatusEffects.overclock, duration, cooldown, range));
 
     }
@@ -83,15 +83,15 @@ public class Abilities {
         float duration = 60f * 6;
         float cooldown = 60f * 6f;
         float range = 15f;
-        return Arrays.asList(
-            new StatusFieldAbility(StatusEffects.overclock, duration, cooldown, range));
+        return List.of(
+                new StatusFieldAbility(StatusEffects.overclock, duration, cooldown, range));
     }
 
     public static List<Ability> getAbility9() {
         float duration = 60f * 6;
         float cooldown = 60f * 6f;
         float range = 30f;
-        return Arrays.asList(
+        return List.of(
                 new StatusFieldAbility(StatusEffects.fast, duration, cooldown, range));
 
     }
@@ -100,7 +100,7 @@ public class Abilities {
         float duration = 60f * 6;
         float cooldown = 60f * 6f;
         float range = 30f;
-        return Arrays.asList(
+        return List.of(
                 new StatusFieldAbility(StatusEffects.overdrive, duration, cooldown, range));
         
     }

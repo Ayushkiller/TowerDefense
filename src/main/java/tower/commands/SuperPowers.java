@@ -65,7 +65,7 @@ public class SuperPowers {
     private static void spawnUnitWithType(Player player, World world, float playerX, float playerY, UnitType unitType) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= 100) { // Ensure the player has enough Cash
-            playerData.subtractCash(100, player); // Subtract Cash as soon as the player confirms the purchase
+            playerData.subtractCash(100); // Subtract Cash as soon as the player confirms the purchase
             float angleStep = 360f / 6;
             float radius = 100f; // Calculate the angle step for evenly spaced spawns
             boolean allUnitsSpawned = true;
@@ -104,7 +104,7 @@ public class SuperPowers {
                         }
     
                         executor.schedule(() -> {
-                            if (unit != null && unit.isValid()) {
+                            if (unit.isValid()) {
                                 unit.kill();
                             }
                         }, 50, TimeUnit.SECONDS);
@@ -120,7 +120,7 @@ public class SuperPowers {
             executor.shutdown(); // Shutdown the executor after all tasks have been scheduled
     
             if (!allUnitsSpawned) {
-                playerData.addCash(100, player);
+                playerData.addCash(100);
                 player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
             }
         } else {
@@ -160,7 +160,7 @@ public class SuperPowers {
                     unit.type.playerControllable = false;
                     unit.type.autoFindTarget = true;
                     executor.schedule(() -> {
-                        if (unit != null && unit.isValid()) {
+                        if (unit.isValid()) {
                             unit.kill();
                         }
                     }, 10, TimeUnit.SECONDS); // Adjusted to 5 seconds
@@ -172,11 +172,11 @@ public class SuperPowers {
             executor.shutdown(); // Shutdown the executor after all tasks have been scheduled
     
             if (allUnitsSpawned) {
-                playerData.subtractCash(totalCost, player); // Subtract the total cost
+                playerData.subtractCash(totalCost); // Subtract the total cost
                 player.sendMessage(Bundle.get("spawn.arc-of-units.success", player.locale()));
             } else {
                 // If any unit was not successfully spawned, give back the Cash
-                playerData.addCash(totalCost, player);
+                playerData.addCash(totalCost);
                 player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
             }
         } else {
@@ -184,12 +184,9 @@ public class SuperPowers {
         }
     }
 
-    boolean[] allUnitsSpawned = new boolean[] { true };
-
     private static void spawnDisruptUnit(Player player, World world, float playerX, float playerY) {
         PlayerData playerData = Players.getPlayer(player);
-        int unitCost = 40; // Cost per unit
-        int totalCost = unitCost; // Total cost for 4 unit types
+        int totalCost = 40; // Total cost for 4 unit types
 
         if (playerData.getCash() >= totalCost) {
             float radius = 140f;
@@ -223,12 +220,12 @@ public class SuperPowers {
                             unit.type.playerControllable = false;
                             unit.type.autoFindTarget = true;
                             unit.type.allowedInPayloads = false;
-                            if (unit == null || !unit.isValid()) {
+                            if (!unit.isValid()) {
                                 allUnitsSpawned[0] = false;
                                 break;
                             }
                             executor.schedule(() -> {
-                                if (unit != null && unit.isValid()) {
+                                if (unit.isValid()) {
                                     unit.kill();
                                 }
                             }, 120, TimeUnit.SECONDS);
@@ -241,11 +238,11 @@ public class SuperPowers {
                 }
 
                 if (allUnitsSpawned[0]) {
-                    playerData.subtractCash(totalCost, player); // Subtract the total cost
+                    playerData.subtractCash(totalCost); // Subtract the total cost
                     player.sendMessage(Bundle.get("spawn.arc-of-units.success", player.locale()));
                 } else {
                     // If any unit was not successfully spawned, give back the Cash
-                    playerData.addCash(totalCost, player);
+                    playerData.addCash(totalCost);
                     player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
                 }
             }, spawnDuration, TimeUnit.SECONDS);

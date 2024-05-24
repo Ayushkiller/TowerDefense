@@ -1,10 +1,8 @@
 
 build/classes/java/main/tower/Domain/Currency.class
 *.class
-*.class
 *.bin
 *.json
-*.bin
 *.lock
 *.bin
 /build

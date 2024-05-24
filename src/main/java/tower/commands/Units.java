@@ -17,19 +17,17 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
 
 public class Units {
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
-    private static final Map<UnitType, String> unitNames = new HashMap<>();
+
 
     public static void initUnitsTable() {
         for (Map<String, Object> unitMap : UnitsTable.units) {
             UnitType unitType = (UnitType) unitMap.get("unit");
-            String name = (String) unitMap.get("name");
             int price = (int) unitMap.get("price");
             price = (int) (price * 1.4);
-            unitNames.put(unitType, name);
             unitPrices.put(unitType, price);
         }
     }
@@ -38,7 +36,7 @@ public class Units {
         PlayerData playerData = Players.getPlayer(player);
         int price = unitPrices.get(unitType);
         if (playerData.getCash() >= price) {
-            playerData.subtractCash((float) price, player);
+            playerData.subtractCash((float) price);
 
             Unit spawned = unitType.spawn(player.x, player.y);
 
@@ -92,7 +90,7 @@ public class Units {
                 ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                 executor.schedule(() -> {
                     if (spawned.dead()) {
-                        playerData.addCash((float) price, player);
+                        playerData.addCash((float) price);
                         player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
                         player.sendMessage(Bundle.get("unit.died", player.locale));
                     }
@@ -100,7 +98,7 @@ public class Units {
 
                 player.sendMessage(Bundle.get("unit.brought", player.locale));
             } else {
-                playerData.addCash((float) price, player);
+                playerData.addCash((float) price);
                 player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
             }
         } else {
@@ -125,7 +123,7 @@ public class Units {
     private static void openTierUnitsMenuGui(int tier, Player player) {
         List<Map<String, Object>> tierUnits = UnitsTable.units.stream()
                 .filter(unit -> (int) unit.get("tier") == tier)
-                .collect(Collectors.toList());
+                .toList();
 
         String[][] buttons = new String[tierUnits.size()][1];
         for (int i = 0; i < tierUnits.size(); i++) {
@@ -199,7 +197,7 @@ public class Units {
             for (int i = 0; i < quantity; i++) {
                 buyUnit(unitType, player, false); // Pass false to prevent unit control
             }
-            playerData.subtractCash(totalCost, player);
+            playerData.subtractCash(totalCost);
             player.sendMessage("[green]Units purchased successfully.");
         } else {
             player.sendMessage("[red]You don't have enough funds to buy " + quantity + " units.");

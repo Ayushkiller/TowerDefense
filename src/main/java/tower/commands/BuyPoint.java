@@ -104,7 +104,7 @@ public class BuyPoint {
                 }
 
                 addItemsToTeam(player.team(), selectedItems);
-                playerData.subtractCash(totalCashRequired, player);
+                playerData.subtractCash(totalCashRequired);
                 selectedItemsQuantities.remove(player);
                 player.sendMessage(Bundle.get("menu.sellpoint.success"));
             } else if (opt == 7) { // Close button
@@ -128,7 +128,7 @@ public class BuyPoint {
                 if (itemMap.get("item") == item) {
                     int pointGain = (int) itemMap.get("gain");
                     int itemPrice = (int) itemMap.get("price");
-                    totalCashRequired += (float) pointGain / itemPrice * quantity;
+                    totalCashRequired += (int) ((float) pointGain / itemPrice * quantity);
                     break;
                 }
             }
@@ -193,7 +193,7 @@ public class BuyPoint {
                 }
                 if (hasEnoughItems(player.team(), player)) {
                     PlayerData playerData = Players.getPlayer(player);
-                    playerData.addCash(totalCash, player);
+                    playerData.addCash(totalCash);
                     removeItemsFromTeam(player.team(), selectedItems);
                     selectedItemsQuantities.remove(player);
                     player.sendMessage(Bundle.get("menu.buypoint.success"));
@@ -235,7 +235,7 @@ public class BuyPoint {
                 if (itemMap.get("item") == item) {
                     int pointGain = (int) itemMap.get("gain");
                     int itemPrice = (int) itemMap.get("price");
-                    totalCash += (float) pointGain / itemPrice * quantity;
+                    totalCash += (int) ((float) pointGain / itemPrice * quantity);
                     break;
                 }
             }
@@ -259,18 +259,9 @@ public class BuyPoint {
         }
     }
 
-    public static void createAndDisplayMenu(Player player, String title, String description, String[][] buttons) {
-        Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-        }), title, description, buttons);
-    }
 
     public static Map<Item, Integer> getSelectedItemsQuantities(Player player) {
-        Map<Item, Integer> selectedItems = selectedItemsQuantities.get(player);
-        if (selectedItems == null) {
-            selectedItems = new HashMap<>();
-            selectedItemsQuantities.put(player, selectedItems);
-        }
-        return selectedItems;
+        return selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
     }
 
     public static void sendMessageToPlayer(Player player, String messageKey) {
