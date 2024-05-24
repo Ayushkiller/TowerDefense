@@ -7,3 +7,4 @@ build/classes/java/main/tower/Domain/Currency.class
 *.bin
 /build
 .idea/compiler.xml
+build/classes/java/main/tower/PluginLogic.class
