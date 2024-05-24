@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d931a7a8-2588-4e20-9f72-da2622a2e4d4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/7.6/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.6/checksums/checksums.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/7.6/checksums/md5-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.6/checksums/md5-checksums.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/7.6/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.6/checksums/sha1-checksums.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/Domain/Abilities.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/Domain/Abilities.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/Domain/PlayerData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/Domain/PlayerData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/Players.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/Players.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/PluginLogic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/PluginLogic.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/TowerDefensePlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/TowerDefensePlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/commands/BuyPoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/commands/BuyPoint.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/commands/Info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/commands/Info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/commands/Statuseffects.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/commands/Statuseffects.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/commands/SuperPowers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/commands/SuperPowers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/commands/Units.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/commands/Units.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/game/Loader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/game/Loader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tower/game/Scenarios.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tower/game/Scenarios.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="2gu9qXzhoKXUxEuVYOaLBbV8EgA" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "New",
+    "kotlin-language-version-configured": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d931a7a8-2588-4e20-9f72-da2622a2e4d4" name="Changes" comment="" />
+      <created>1716536789488</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1716536789488</updated>
+    </task>
+    <servers />
+  </component>
+</project>

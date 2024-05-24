@@ -6,3 +6,4 @@ build/classes/java/main/tower/Domain/Currency.class
 *.lock
 *.bin
 /build
+.idea/compiler.xml
