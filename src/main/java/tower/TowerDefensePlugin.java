@@ -65,14 +65,12 @@ public class TowerDefensePlugin extends Plugin {
                     Groups.player.each(p -> {
                         PlayerData playerData = Players.getPlayer(p);
                         if (playerData != null) {
-                            playerData.addCash(cashToAdd, p);
+                            playerData.addCash(cashToAdd);
                         }
                     });
                 } catch (NumberFormatException e) {
                     // Handle potential parsing errors
                 }
-            } else {
-                // Handle case where no argument is provided
             }
         });
 
@@ -95,7 +93,7 @@ public class TowerDefensePlugin extends Plugin {
 
         // Ensure at least 2000 of the item always remains in the core
         if (remainingAmountAfterSale < 2000) {
-            player.sendMessage("[#f]⚠[] [#f]You must keep at least 2000 " + itemToSell.toString() + " in your core.");
+            player.sendMessage("[#f]⚠[] [#f]You must keep at least 2000 " + itemToSell + " in your core.");
             return;
         }
 
@@ -107,13 +105,13 @@ public class TowerDefensePlugin extends Plugin {
         }
 
         int cashGained = calculateCashGained(itemToSell, price, amount);
-        playerData.addCash(cashGained, player);
+        playerData.addCash(cashGained);
 
         // Remove items from the player's core
         player.team().core().items.remove(itemToSell, amount);
 
         player.sendMessage(
-                "[green]Sold " + amount + " " + itemToSell.toString() + ".[red] Transacted " + cashGained + " Cash.");
+                "[green]Sold " + amount + " " + itemToSell + ".[red] Transacted " + cashGained + " Cash.");
     }
 
     // Calculates the cash gained from selling an item

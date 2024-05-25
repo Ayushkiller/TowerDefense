@@ -46,8 +46,8 @@ public class Info {
     }
 
     private static void handleMenuOption(Player player, int option) {
-        switch (option) {
-            case 1 -> nextMessage(player); // Next
+        if (option == 1) {
+            nextMessage(player); // Next
         }
     }
 }

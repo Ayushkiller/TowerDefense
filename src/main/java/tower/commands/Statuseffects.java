@@ -50,8 +50,7 @@ public class Statuseffects {
 
     private static final int menu = Menus.registerMenu((player, option) -> {
         for (int i = 0; i < Effects.effects.size(); i++) {
-            int index = i;
-            if (index == option) {
+            if (i == option) {
                 StatusEffect effect = (StatusEffect) Effects.effects.get(i).get("effect");
                 buyEffect(effect, player);
                 break;
@@ -90,7 +89,7 @@ public class Statuseffects {
         }
 
         // Check if the unit position was found and unitMap is not null
-        if (row == -1 || unitMap == null) {
+        if (row == -1) {
             player.sendMessage("Error: Unit type not found in UnitsTable or unitMap is null.");
             return;
         }
@@ -105,7 +104,7 @@ public class Statuseffects {
 
         if (playerData.getCash() >= totalPrice) {
             if (effect != null) { // Ensure the effect is not null before applying it
-                playerData.subtractCash(totalPrice, player);
+                playerData.subtractCash(totalPrice);
                 player.unit().apply(effect, Float.POSITIVE_INFINITY);
                 // Modify the message to include the emoji, base effect price, and the
                 // additional price

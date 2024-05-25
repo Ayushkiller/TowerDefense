@@ -3,7 +3,6 @@ package tower;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -31,21 +30,16 @@ public class Players {
         players.clear();
     }
 
-    // Method to iterate over all PlayerData instances and perform a given action
-    public static void forEach(Consumer<PlayerData> action) {
-        players.values().forEach(action);
-    }
-
     // Method to update HUD text for each connected player
     public static void forEach() {
         // Iterate over all connected players
         Groups.player.each(player -> {
             PlayerData playerData = Players.getPlayer(player); // Get PlayerData instance for player
             if (playerData != null) { // If PlayerData instance exists
-                StringBuilder hud = new StringBuilder(); // Initialize StringBuilder for HUD text
-                hud.append("[green]Cash for[white] " + player.name + " - [lime]") // Append cash text
-                        .append((int) playerData.getCash()); // Append current cash
-                Call.setHudText(player.con, hud.toString()); // Set HUD text for player
+                // Initialize StringBuilder for HUD text
+                String hud = "[green]Cash for[white] " + player.name + " - [lime]" + // Append cash text
+                        (int) playerData.getCash(); // Append current cash
+                Call.setHudText(player.con, hud); // Set HUD text for player
             }
         });
     }

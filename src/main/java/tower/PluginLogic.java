@@ -133,7 +133,7 @@ public class PluginLogic {
                         float cashToAdd = repairPointCash.get(tile, 0f);
                         if (cashToAdd > 0) {
                             PlayerData playerData = Players.getPlayer(player);
-                            playerData.addCash(cashToAdd, player);
+                            playerData.addCash(cashToAdd);
                             // Reset the cash for this tile after distribution
                             repairPointCash.put(tile, 0f);
                         }
@@ -145,7 +145,7 @@ public class PluginLogic {
             for (Player player : Groups.player) {
                 PlayerData playerData = Players.getPlayer(player);
                 if (playerData != null && playerData.getCash() < 0) {
-                    playerData.setCash(0, player);
+                    playerData.setCash(0);
                 }
             }
         }, 0f, 2f); // Check every second
@@ -191,19 +191,19 @@ public class PluginLogic {
             }
             if (state.wave <= 10) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 1.5f);
-            } else if (state.wave > 10 && state.wave <= 30) {
+            } else if (state.wave <= 30) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 3f);
-            } else if (state.wave > 30 && state.wave <= 60) {
+            } else if (state.wave <= 60) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 3.5f);
-            } else if (state.wave > 60 && state.wave <= 120) {
+            } else if (state.wave <= 120) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 4f);
-            } else if (state.wave > 120 && state.wave <= 150) {
+            } else if (state.wave <= 150) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 6f);
-            } else if (state.wave > 150 && state.wave <= 200) {
+            } else if (state.wave <= 200) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 12f);
-            } else if (state.wave > 200 && state.wave <= 250) {
+            } else if (state.wave <= 250) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 18f);
-            } else if (state.wave > 250 && state.wave <= 350) {
+            } else if (state.wave <= 350) {
                 multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 48f);
             } else {
                 // After wave 350, increase the multiplier rapidly
@@ -279,55 +279,51 @@ public class PluginLogic {
         });
         Events.on(EventType.UnitSpawnEvent.class, event -> {
             if (event.unit.team == state.rules.waveTeam) {
-                if (event.unit != null) {
-                    event.unit.health(event.unit.health * multiplier);
-                    event.unit.maxHealth(event.unit.maxHealth * multiplier);
-                    event.unit.damageMultiplier(0f);
-                    if (state.wave <= 200f) {
-                        applyStatusEffect(event.unit, StatusEffects.overdrive, Float.POSITIVE_INFINITY);
-                        applyStatusEffect(event.unit, StatusEffects.overclock, Float.POSITIVE_INFINITY);
-                        applyStatusEffect(event.unit, StatusEffects.shielded, Float.POSITIVE_INFINITY);
-                        applyStatusEffect(event.unit, StatusEffects.boss, Float.POSITIVE_INFINITY);
-                        applyStatusEffect(event.unit, StatusEffects.sporeSlowed, Float.POSITIVE_INFINITY);
-                        applyStatusEffect(event.unit, StatusEffects.muddy, Float.POSITIVE_INFINITY);
+                event.unit.health(event.unit.health * multiplier);
+                event.unit.maxHealth(event.unit.maxHealth * multiplier);
+                event.unit.damageMultiplier(0f);
+                if (state.wave <= 200f) {
+                    applyStatusEffect(event.unit, StatusEffects.overdrive);
+                    applyStatusEffect(event.unit, StatusEffects.overclock);
+                    applyStatusEffect(event.unit, StatusEffects.shielded);
+                    applyStatusEffect(event.unit, StatusEffects.boss);
+                    applyStatusEffect(event.unit, StatusEffects.sporeSlowed);
+                    applyStatusEffect(event.unit, StatusEffects.muddy);
+                }
+                if (state.wave >= 250) {
+                    applyStatusEffect(event.unit, StatusEffects.fast);
+                }
+                applyStatusEffect(event.unit, StatusEffects.disarmed);
+                if (event.unit.type != null) {
+                    event.unit.type.speed = 0.8f;
+                    event.unit.type.range = -1f;
+                    event.unit.type.hovering = true;
+                    event.unit.disarmed = true;
+                    if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires||event.unit.type == UnitTypes.oct) {
+                        event.unit.kill();
                     }
-                    if (state.wave >= 250) {
-                        applyStatusEffect(event.unit, StatusEffects.fast, Float.POSITIVE_INFINITY);
-                    }
-                    applyStatusEffect(event.unit, StatusEffects.disarmed, Float.POSITIVE_INFINITY);
-                    if (event.unit.type != null) {
-                        event.unit.type.speed = 0.8f;
-                        event.unit.type.range = -1f;
-                        event.unit.type.hovering = true;
-                        event.unit.disarmed = true;
-                        if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires||event.unit.type == UnitTypes.oct) {
-                            event.unit.kill();
-                        }
-                        event.unit.type.physics = false;
-                        event.unit.type.crashDamageMultiplier = 0f;
-                        event.unit.type.crushDamage = 0f;
-                        event.unit.type.deathExplosionEffect = Fx.shockwave;
-                        event.unit.shield(event.unit.shield * multiplier);
-                        event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
-                        event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
-                        event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange = 0f;
-                        event.unit.type.aiController = (event.unit.type.flying)? FlyingAIForAss::new
-        : GroundAI::new;
-                        event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
-                    }
+                    event.unit.type.physics = false;
+                    event.unit.type.crashDamageMultiplier = 0f;
+                    event.unit.type.crushDamage = 0f;
+                    event.unit.type.deathExplosionEffect = Fx.shockwave;
+                    event.unit.shield(event.unit.shield * multiplier);
+                    event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
+                    event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
+                    event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange = 0f;
+                    event.unit.type.aiController = (event.unit.type.flying)? FlyingAIForAss::new
+    : GroundAI::new;
+                    event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
                 }
             }
         });
 
-        Events.run(EventType.Trigger.update, () -> {
-            checkUnitsWithinRadius();
-        });
+        Events.run(EventType.Trigger.update, PluginLogic::checkUnitsWithinRadius);
     }
         
         // Helper method to apply status effects with null checks
-        private static void applyStatusEffect(Unit unit, StatusEffect effect, float duration) {
+        private static void applyStatusEffect(Unit unit, StatusEffect effect) {
             if (unit != null && effect != null) {
-                unit.apply(effect, duration);
+                unit.apply(effect, Float.POSITIVE_INFINITY);
             }
         }
     public static boolean isPath(Tile tile) {
@@ -361,7 +357,7 @@ public class PluginLogic {
                 Groups.player.each(p -> {
                     PlayerData playerData = Players.getPlayer(p);
                     if (playerData != null) {
-                        playerData.addCash(300, p);
+                        playerData.addCash(300);
                         Team team = Team.sharded;
                         Rules.TeamRule teamRule = Vars.state.rules.teams.get(team);
                         teamRule.blockDamageMultiplier = 1.2f;
