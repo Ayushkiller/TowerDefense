@@ -1,6 +1,6 @@
 {
     "name": "tower-defense",
-    "minGameVersion": 146,
+    "minGameVersion": "146",
     "displayName": "Tower Defense",
     "author": "Ayush Kumar(Alpfha)",
     "description": "TD plugin for Mindustry Strictly owned by Eradication Mindustry Server",
