@@ -1,9 +1,38 @@
+## Gradle
+.gradle
+**/build/
+!src/**/build/
+!gradle-wrapper.jar
 
-build/classes/java/main/tower/Domain/Currency.class
+## Eclipse
+bin/
+.metadata/
+.settings/
+.classpath
+.project
+.loadpath
+
+## VSCode
+.vscode/*
+
+## Java
 *.class
-*.class
-*.bin
-*.json
-*.bin
-*.lock
-*.bin
+*.jar
+*.war
+*.rar
+*.nar
+*.ear
+*.zip
+*.tar.gz
+hs_err_pid*
+replay_pid*
+
+## Intellij
+.idea/
+*.ipr
+*.iws
+*.iml
+
+## OS Specific
+.DS_Store
+Thumbs.db
