@@ -1,7 +1,9 @@
-import groovy.json.JsonSlurper
+import fr.xpdustry.toxopid.dsl.mindustryDependencies
+import fr.xpdustry.toxopid.spec.ModMetadata
 
 plugins {
     java
+    id("fr.xpdustry.toxopid") version "3.2.0"
 }
 
 repositories {
@@ -10,15 +12,16 @@ repositories {
     maven(url = "https://jitpack.io")
 }
 
+val metadata = ModMetadata.fromJson(file("src/main/resources/plugin.json"))
+project.version = metadata.version
+
+toxopid {
+    compileVersion.set("v${metadata.minGameVersion}")
+}
+
 dependencies {
-    val json = JsonSlurper().parseText(file("src/main/resources/plugin.json").readText()) as Map<*, *>
-    project.version = json["version"]!!
-
-    val mindustryVersion = json["minGameVersion"]
+    mindustryDependencies()
     val usefulHash = "8caee092db"
-
-    compileOnly("com.github.Anuken.Arc:arc-core:v$mindustryVersion")
-    compileOnly("com.github.Anuken.Mindustry:core:v$mindustryVersion")
     implementation("com.github.xzxADIxzx.useful-stuffs:bundle:$usefulHash")
 }
 
@@ -29,4 +32,10 @@ tasks.jar {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+}
+
+// Little quirk of toxopid, since we are not building a mod,
+// we need to remove the plugin from the mindustry client
+tasks.runMindustryClient {
+    mods.setFrom()
 }

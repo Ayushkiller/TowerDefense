@@ -1,6 +1,4 @@
-# Project Title
-
-One Paragraph of project description goes here
+# TowerDefense
 
 ## Getting Started
 
@@ -16,14 +14,15 @@ $ gradle -version
 ```
 
 ## Installing
+
 To get a copy of this project, clone the repository to your local machine:
 ```sh
-$ git clone https://github.com/Ayushkiller/YES.git
+$ git clone https://github.com/Thisiscooliguess/Towerdefense.git
 ```
 
 Navigate to the project directory:
 ```sh
-$ cd YES
+$ cd Towerdefense
 ```
 
 Build the project using Gradle:
@@ -31,30 +30,27 @@ Build the project using Gradle:
 $ ./gradle build
 ```
 
-Running the tests
+## Testing
+
 To run the automated tests for this system, use the following command:
 ```sh
 $ ./gradle test
 ```
-## Deployment
-To deploy this on a live system, you can build a distributable version of the application:
 
-### TO deploy or test it on your local machine
+You can also run the plugin in a local server:
 ```sh
-> Download server.jar from official website<br>
-> Run  the server.jar once<br>
-> Exit the process using ```exit```<br>
-> Drop The Yes.*.jar file into the mods folder in the config<br>
-> Run the server.jar again<br>
-> Use ```host``` to locally host it and test the build<br> 
+$ ./gradle runMindustryServer
 ```
-<!-- ### Contributing
-Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests to us. -->
+The server files will be located in `build/tmp/runMindustryServer`
 
 ### Authors
-> Ayush Killer- Devloper and current head - [AyushKiller](https://github.com/Ayushkiller)<br>
-> Arin Prashar-  ReadMe and Documentation -  [Arin Prashar](https://github.com/arin-prashar)<br> 
-> RaphiesHS - Devloper and current head - [RaphielHS](https://github.com/RaphielHS)<br>
+
+> Ayush Killer - Developer and current head - [AyushKiller](https://github.com/Ayushkiller)<br>
+> Arin Prashar - README and Documentation - [Arin Prashar](https://github.com/arin-prashar)<br> 
+> RaphiesHS - Developer and current head - [RaphielHS](https://github.com/RaphielHS)<br>
 > RadioactiveBanana - Developer and Team Head - [TheRadioactiveBanana](https://github.com/TheRadioactiveBanana)<br>
+> Phinner - Code quality - [Phinner](https://github/phinner)<br>
+
 ### License
+
 This project is licensed under the MIT License - see the LICENSE.md file for details
