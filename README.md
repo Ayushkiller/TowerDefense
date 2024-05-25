@@ -49,7 +49,7 @@ The server files will be located in `build/tmp/runMindustryServer`
 > Arin Prashar - README and Documentation - [Arin Prashar](https://github.com/arin-prashar)<br> 
 > RaphiesHS - Developer and current head - [RaphielHS](https://github.com/RaphielHS)<br>
 > RadioactiveBanana - Developer and Team Head - [TheRadioactiveBanana](https://github.com/TheRadioactiveBanana)<br>
-> Phinner - Code quality - [Phinner](https://github/phinner)<br>
+> Phinner - Code quality - [Phinner](https://github.com/phinner)<br>
 
 ### License
 
