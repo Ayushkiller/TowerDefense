@@ -14,6 +14,10 @@ public class EventLoader {
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;
             Players.getPlayer(player); // This ensures a new PlayerData is created if necessary
+
+            int menu = Menus.registerMenu(((player1, option) -> {
+            }));
+
             Call.menu(player.con, menu, Bundle.get("welcome", player.locale),
                     Bundle.get("welcome.message", player.locale),
                     new String[][] { { Bundle.get("close", player.locale) } });
@@ -25,7 +29,4 @@ public class EventLoader {
         Events.run(EventType.Trigger.update, Players::forEach);
 
     }
-
-    private static final int menu = Menus.registerMenu(((player1, option) -> {
-    }));
 }

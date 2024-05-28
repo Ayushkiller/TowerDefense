@@ -26,6 +26,7 @@ public class Scenarios {
 
     public static void requestDeployment(Player player) {
         if (player == null) {
+
             return;
         }
 
