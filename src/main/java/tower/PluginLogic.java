@@ -150,30 +150,28 @@ public class PluginLogic {
                 }
             }
         });
-
-        CompletableFuture<Void> future5 = CompletableFuture.runAsync(() -> {
-            state.rules.waveTeam.data().units.each(unit -> {
-                var core = unit.closestEnemyCore();
-                if (core == null || unit.dst(core) > 80f || core.health <= 0)
-                    return;
-                float damage = (unit.health + unit.shield) / Mathf.sqrt(multiplier);
-                damage = Math.min(damage, core.health);
-                core.damage(Team.crux, damage);
-                Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.crimson);
-                core.damage(1, true);
-                unit.kill();
-                if (core.block.health <= 0) {
-                    core.block.health = 1;
-                }
-            });
-        });
+        Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
+            var core = unit.closestEnemyCore();
+            if (core == null || unit.dst(core) > 80f || core.health <= 0)
+                return; // Check if core is null, out of range, or already dead
+            float damage = (unit.health + unit.shield) / Mathf.sqrt(multiplier);
+            // Ensure damage does not exceed the core's health
+            damage = Math.min(damage, core.health);
+            core.damage(Team.crux, damage);
+            Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.crimson);
+            core.damage(1, true);
+            unit.kill();
+            if (core.block.health <= 0) {
+                core.block.health = 1;
+            }
+        }), 0f, 1f);
 
         CompletableFuture<Void> future6 = CompletableFuture.runAsync(() -> {
             Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f),
                     Strings.autoFixed(multiplier, 2));
         });
         CompletableFuture<Void> future7 = CompletableFuture.runAsync(PluginLogic::checkUnitsWithinRadius);
-        CompletableFuture.allOf(future1, future2, future3, future4, future5, future6,future7).join();
+        CompletableFuture.allOf(future1, future2, future3, future4, future6, future7).join();
     }
 
     private static void setupEventHandlers() {
