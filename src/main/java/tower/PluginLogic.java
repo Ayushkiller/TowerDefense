@@ -3,6 +3,7 @@ package tower;
 import static mindustry.Vars.*;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import arc.Events;
@@ -54,6 +55,7 @@ public class PluginLogic {
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
     public static ObjectMap<Tile, RegenProjector> regenProjectorTiles = new ObjectMap<>();
     public static ObjectMap<Tile, ShockwaveTower> ShockerTiles = new ObjectMap<>();
+
     public static void init() {
         initializeDrops();
         setupAdminActionFilters();
@@ -95,7 +97,7 @@ public class PluginLogic {
     }
 
     private static void scheduleTimers() {
-        Timer.schedule(() -> {
+        CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> {
             forceProjectorTiles.each((tile, forceProjectorTiles) -> {
                 Groups.player.each(player -> {
                     if (player.dst(tile.worldx(), tile.worldy()) <= 100f) {
@@ -110,23 +112,22 @@ public class PluginLogic {
                     }
                 });
             });
-        }, 0f, 2f);
+        });
 
-        Timer.schedule(() -> {
+        CompletableFuture<Void> future2 = CompletableFuture.runAsync(() -> {
             repairPointTiles.each((tile, repairPointTiles) -> {
                 AtomicInteger totalCashGenerated = new AtomicInteger(0);
                 Groups.player.each(player -> {
                     if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
-                        totalCashGenerated.addAndGet(100); // Accumulate cash for all players within the distance,
-                                                           // multiplied by 100 to keep two decimal places
+                        totalCashGenerated.addAndGet(100);
                     }
                 });
-                float cashToStore = totalCashGenerated.get() / 100f; // Convert back to float
-                repairPointCash.put(tile, cashToStore); // Store the total cash generated for this tile
+                float cashToStore = totalCashGenerated.get() / 100f;
+                repairPointCash.put(tile, cashToStore);
             });
-        }, 0f, 20f);
+        });
 
-        Timer.schedule(() -> {
+        CompletableFuture<Void> future3 = CompletableFuture.runAsync(() -> {
             Groups.player.each(player -> {
                 repairPointTiles.each((tile, repairPointTiles) -> {
                     if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
@@ -134,38 +135,47 @@ public class PluginLogic {
                         if (cashToAdd > 0) {
                             PlayerData playerData = Players.getPlayer(player);
                             playerData.addCash(cashToAdd);
-                            // Reset the cash for this tile after distribution
                             repairPointCash.put(tile, 0f);
                         }
                     }
                 });
             });
-        }, 0f, 1f);
-        Timer.schedule(() -> {
+        });
+
+        CompletableFuture<Void> future4 = CompletableFuture.runAsync(() -> {
             for (Player player : Groups.player) {
                 PlayerData playerData = Players.getPlayer(player);
                 if (playerData != null && playerData.getCash() < 0) {
                     playerData.setCash(0);
                 }
             }
-        }, 0f, 2f); // Check every second
-        Timer.schedule(() -> state.rules.waveTeam.data().units.each(unit -> {
-            var core = unit.closestEnemyCore();
-            if (core == null || unit.dst(core) > 80f || core.health <= 0)
-                return; // Check if core is null, out of range, or already dead
-            float damage = (unit.health + unit.shield) / Mathf.sqrt(multiplier);
-            // Ensure damage does not exceed the core's health
-            damage = Math.min(damage, core.health);
-            core.damage(Team.crux, damage);
-            Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.crimson);
-            core.damage(1, true);
-            unit.kill();
-            if (core.block.health <= 0) {
-                core.block.health = 1;
-            }
-        }), 0f, 1f);
-        Timer.schedule(() -> Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier",
-                Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2)), 0f, 1f);
+        });
+
+        CompletableFuture<Void> future5 = CompletableFuture.runAsync(() -> {
+            state.rules.waveTeam.data().units.each(unit -> {
+                var core = unit.closestEnemyCore();
+                if (core == null || unit.dst(core) > 80f || core.health <= 0)
+                    return;
+                float damage = (unit.health + unit.shield) / Mathf.sqrt(multiplier);
+                damage = Math.min(damage, core.health);
+                core.damage(Team.crux, damage);
+                Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.crimson);
+                core.damage(1, true);
+                unit.kill();
+                if (core.block.health <= 0) {
+                    core.block.health = 1;
+                }
+            });
+        });
+
+        CompletableFuture<Void> future6 = CompletableFuture.runAsync(() -> {
+            Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f),
+                    Strings.autoFixed(multiplier, 2));
+        });
+        CompletableFuture<Void> future7 = CompletableFuture.runAsync(() -> {
+            checkUnitsWithinRadius();
+        });
+        CompletableFuture.allOf(future1, future2, future3, future4, future5, future6,future7).join();
     }
 
     private static void setupEventHandlers() {
@@ -221,7 +231,7 @@ public class PluginLogic {
         Events.on(EventType.TileChangeEvent.class, event -> {
             Tile changedTile = event.tile;
             Block block = changedTile.block();
-        
+
             if (block instanceof ForceProjector) {
                 // Handle ForceProjector placement
                 if (!forceProjectorTiles.containsKey(changedTile)) {
@@ -299,7 +309,8 @@ public class PluginLogic {
                     event.unit.type.range = -1f;
                     event.unit.type.hovering = true;
                     event.unit.disarmed = true;
-                    if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires||event.unit.type == UnitTypes.oct) {
+                    if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires
+                            || event.unit.type == UnitTypes.oct) {
                         event.unit.kill();
                     }
                     event.unit.type.physics = false;
@@ -310,22 +321,21 @@ public class PluginLogic {
                     event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
                     event.unit.type.mineWalls = event.unit.type.mineFloor = event.unit.type.targetAir = event.unit.type.targetGround = false;
                     event.unit.type.payloadCapacity = event.unit.type.legSplashDamage = event.unit.type.range = event.unit.type.maxRange = event.unit.type.mineRange = 0f;
-                    event.unit.type.aiController = (event.unit.type.flying)? FlyingAIForAss::new
-    : GroundAI::new;
+                    event.unit.type.aiController = (event.unit.type.flying) ? FlyingAIForAss::new
+                            : GroundAI::new;
                     event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
                 }
             }
         });
-
-        Events.run(EventType.Trigger.update, PluginLogic::checkUnitsWithinRadius);
     }
-        
-        // Helper method to apply status effects with null checks
-        private static void applyStatusEffect(Unit unit, StatusEffect effect) {
-            if (unit != null && effect != null) {
-                unit.apply(effect, Float.POSITIVE_INFINITY);
-            }
+
+    // Helper method to apply status effects with null checks
+    private static void applyStatusEffect(Unit unit, StatusEffect effect) {
+        if (unit != null && effect != null) {
+            unit.apply(effect, Float.POSITIVE_INFINITY);
         }
+    }
+
     public static boolean isPath(Tile tile) {
         return tile.floor() == Vars.world.tile(0, 0).floor()
                 || tile.floor() == Vars.world.tile(0, 1).floor()
