@@ -172,9 +172,7 @@ public class PluginLogic {
             Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier", Color.HSVtoRGB(multiplier * 120f, 100f, 100f),
                     Strings.autoFixed(multiplier, 2));
         });
-        CompletableFuture<Void> future7 = CompletableFuture.runAsync(() -> {
-            checkUnitsWithinRadius();
-        });
+        CompletableFuture<Void> future7 = CompletableFuture.runAsync(PluginLogic::checkUnitsWithinRadius);
         CompletableFuture.allOf(future1, future2, future3, future4, future5, future6,future7).join();
     }
 
