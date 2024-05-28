@@ -148,7 +148,6 @@ public class TowerDefensePlugin extends Plugin {
         return 0;
     }
 
-    // Requests deployment for all players (likely a server-side function)
     private void requestDeploymentForAll() {
         Scenarios.requestDeploymentForAllPlayers();
     }

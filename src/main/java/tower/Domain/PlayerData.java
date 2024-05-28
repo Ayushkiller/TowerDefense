@@ -3,7 +3,7 @@ package tower.Domain;
 import mindustry.gen.Player;
 
 public class PlayerData {
-    private final String uuid;
+
     private float Cash;
 
     public void addCash(float amount) {
@@ -26,7 +26,7 @@ public class PlayerData {
 
 
     public PlayerData(Player player) {
-        this.uuid = player.uuid();
+        player.uuid();
         this.Cash = 0;
     }
 }

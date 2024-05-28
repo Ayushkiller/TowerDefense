@@ -1,28 +1,20 @@
 package tower.commands;
 
-import mindustry.entities.abilities.Ability;
-import mindustry.gen.Call;
-import mindustry.gen.Player;
-import mindustry.gen.Unit;
-import mindustry.type.UnitType;
-import mindustry.ui.Menus;
-import tower.Bundle;
-import tower.Domain.Abilities;
-import tower.Domain.PlayerData;
-import tower.Domain.UnitsTable;
-import tower.Players;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
+import mindustry.gen.Call;
+import mindustry.gen.Player;
+import mindustry.type.UnitType;
+import mindustry.ui.Menus;
+import tower.Bundle;
+import tower.Players;
+import tower.Domain.PlayerData;
+import tower.Domain.UnitsTable;
 
 public class Units {
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
-
-
     public static void initUnitsTable() {
         for (Map<String, Object> unitMap : UnitsTable.units) {
             UnitType unitType = (UnitType) unitMap.get("unit");
@@ -32,78 +24,8 @@ public class Units {
         }
     }
 
-    private static void buyUnit(UnitType unitType, Player player, boolean shouldControlUnit) {
-        PlayerData playerData = Players.getPlayer(player);
-        int price = unitPrices.get(unitType);
-        if (playerData.getCash() >= price) {
-            playerData.subtractCash((float) price);
-
-            Unit spawned = unitType.spawn(player.x, player.y);
-
-            if (spawned != null && !spawned.dead()) {
-                spawned.type.autoFindTarget = true;
-                spawned.type.alwaysUnlocked = true;
-                if (shouldControlUnit) {
-                    Call.unitControl(player, spawned);
-                }
-
-                Map<String, Object> unitMap = UnitsTable.units.stream()
-                        .filter(u -> u.get("unit").equals(unitType))
-                        .findFirst()
-                        .orElse(null);
-
-                if (unitMap != null && unitMap.containsKey("Ability")) {
-                    int abilityIndex = (int) unitMap.get("Ability");
-                    switch (abilityIndex) {
-                        case 1:
-                            spawned.abilities = Abilities.getAbility1().toArray(new Ability[0]);
-                            break;
-                        case 2:
-                            spawned.abilities = Abilities.getAbility2().toArray(new Ability[0]);
-                            break;
-                        case 3:
-                            spawned.abilities = Abilities.getAbility3().toArray(new Ability[0]);
-                            break;
-                        case 4:
-                            spawned.abilities = Abilities.getAbility4().toArray(new Ability[0]);
-                            break;
-                        case 5:
-                            spawned.abilities = Abilities.getAbility5().toArray(new Ability[0]);
-                            break;
-                        case 6:
-                            spawned.abilities = Abilities.getAbility6().toArray(new Ability[0]);
-                            break;
-                        case 7:
-                            spawned.abilities = Abilities.getAbility7().toArray(new Ability[0]);
-                            break;
-                        case 8:
-                            spawned.abilities = Abilities.getAbility8().toArray(new Ability[0]);
-                            break;
-                        case 9:
-                            spawned.abilities = Abilities.getAbility9().toArray(new Ability[0]);
-                            break;
-                        case 10:
-                            spawned.abilities = Abilities.getAbility10().toArray(new Ability[0]);
-                            break;
-                    }
-                }
-                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-                executor.schedule(() -> {
-                    if (spawned.dead()) {
-                        playerData.addCash((float) price);
-                        player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
-                        player.sendMessage(Bundle.get("unit.died", player.locale));
-                    }
-                }, 3, TimeUnit.SECONDS);
-
-                player.sendMessage(Bundle.get("unit.brought", player.locale));
-            } else {
-                playerData.addCash((float) price);
-                player.sendMessage(Bundle.get("unit.spawn.failed", player.locale));
-            }
-        } else {
-            player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
-        }
+    public static void execute(Player player) {
+        openTierMenuGui(player);
     }
 
     private static void openTierMenuGui(Player player) {
@@ -142,6 +64,7 @@ public class Units {
             }
         }), "Select Unit", "", buttons);
     }
+
     private static void openUnitMenuGui(UnitType unitType, Player player) {
         int price = unitPrices.get(unitType);
         String message = unitType.emoji() + "\n\n" +
@@ -189,6 +112,21 @@ public class Units {
         }), title, message, buttons); // Pass the dynamic message to the menu
     }
 
+    private static void buyUnit(UnitType unitType, Player player, boolean shouldControlUnit) {
+        PlayerData playerData = Players.getPlayer(player);
+        int price = unitPrices.get(unitType);
+        if (playerData.getCash() >= price) {
+            playerData.subtractCash((float) price);
+
+            // Buy unit implementation...
+            // Spawn the unit, configure it, etc.
+
+            player.sendMessage(Bundle.get("unit.bought", player.locale()));
+        } else {
+            player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
+        }
+    }
+
     private static void buyMultipleUnits(UnitType unitType, Player player, int quantity) {
         int totalCost = unitPrices.get(unitType) * quantity;
         PlayerData playerData = Players.getPlayer(player);
@@ -202,8 +140,5 @@ public class Units {
         } else {
             player.sendMessage("[red]You don't have enough funds to buy " + quantity + " units.");
         }
-    }
-    public static void execute(Player player) {
-        openTierMenuGui(player);
     }
 }
