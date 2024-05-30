@@ -89,8 +89,8 @@ public class Units {
 
     private static void openQuantityAdjustmentMenu(UnitType unitType, Player player, int defaultQuantity) {
         String title = "[red]Adjust Quantity";
-        String[][] buttons = new String[][] { { "-1", "0", "+1" }, { "[green]Buy", "[grey]Back", "[red]Close" } };
-        int price = unitPrices.get(unitType); // Assuming unitPrices is accessible and contains the price for each unit type
+        String[][] buttons = new String[][] { { "-1", "+1", "+10" }, { "[green]Buy", "[grey]Back", "[red]Close" } };
+        int price = unitPrices.get(unitType); 
         String message = "[green]Current Quantity: " + defaultQuantity + "\n[red]Total Price: " + (defaultQuantity * price);
     
         Call.menu(player.con, Menus.registerMenu((p, opt) -> {
@@ -117,10 +117,7 @@ public class Units {
         int price = unitPrices.get(unitType);
         if (playerData.getCash() >= price) {
             playerData.subtractCash((float) price);
-
-            // Buy unit implementation...
-            // Spawn the unit, configure it, etc.
-
+            unitType.spawn(player);
             player.sendMessage(Bundle.get("unit.bought", player.locale()));
         } else {
             player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
