@@ -77,13 +77,12 @@ public class BuyPoint {
             if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
                 int currentQuantity = quantities.getOrDefault(selectedItem, 0);
-                quantities.put(selectedItem, currentQuantity + adjustment);
-                // Check if total quantity is negative after adjustment
-                int totalQuantity = quantities.values().stream().mapToInt(Integer::intValue).sum();
-                if (totalQuantity < 0) {
+                int newQuantity = currentQuantity + adjustment;
+                if (newQuantity < 0) {
                     sendMessageToPlayer(player, "menu.sellpoint.negativeQuantity");
                     return;
                 }
+                quantities.put(selectedItem, newQuantity);
                 openQuantityAdjustmentMenuForSell(player, option);
             } else if (opt == 6) { // Sell button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
@@ -176,13 +175,12 @@ public class BuyPoint {
             if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
                 int currentQuantity = quantities.getOrDefault(selectedItem, 0);
-                quantities.put(selectedItem, currentQuantity + adjustment);
-                // Check if total quantity is negative after adjustment
-                int totalQuantity = quantities.values().stream().mapToInt(Integer::intValue).sum();
-                if (totalQuantity < 0) {
-                    sendMessageToPlayer(player, "menu.buypoint.negativeTotalQuantity");
+                int newQuantity = currentQuantity + adjustment;
+                if (newQuantity < 0) {
+                    sendMessageToPlayer(player, "menu.buypoint.negativeQuantity");
                     return;
                 }
+                quantities.put(selectedItem, newQuantity);
                 openQuantityAdjustmentMenu(player, option);
             } else if (opt == 6) { // Buy button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
@@ -258,7 +256,6 @@ public class BuyPoint {
             team.items().add(item, quantity);
         }
     }
-
 
     public static Map<Item, Integer> getSelectedItemsQuantities(Player player) {
         return selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());

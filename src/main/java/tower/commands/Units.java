@@ -6,6 +6,7 @@ import java.util.Map;
 
 import mindustry.gen.Call;
 import mindustry.gen.Player;
+import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 import mindustry.ui.Menus;
 import tower.Bundle;
@@ -74,16 +75,16 @@ public class Units {
 
         int menu = Menus.registerMenu(((player1, option) -> {
             switch (option) {
-                case 0 -> buyUnit(unitType, player, true); // Pass true to allow unit control
-                case 1 -> openTierMenuGui(player); // Go back to the tier selection menu
-                case 2 -> openQuantityAdjustmentMenu(unitType, player, 1); // New case for buying multiple units
+                case 0 -> buyUnit(unitType, player, true); 
+                case 1 -> openTierMenuGui(player);
+                case 2 -> openQuantityAdjustmentMenu(unitType, player, 1); 
             }
         }));
 
         Call.menu(player.con, menu, Bundle.get("menu.units.title"), message, new String[][] {
                 { "[lime]Buy" },
                 { "[gray]Back" },
-                { "[blue]Buy Multiple" } // New option for buying multiple units
+                { "[blue]Buy Multiple" } 
         });
     }
 
@@ -109,7 +110,7 @@ public class Units {
             } else if (opt == 5) { // Close button
                 player.sendMessage("Purchase cancelled.");
             }
-        }), title, message, buttons); // Pass the dynamic message to the menu
+        }), title, message, buttons); 
     }
 
     private static void buyUnit(UnitType unitType, Player player, boolean shouldControlUnit) {
@@ -117,7 +118,10 @@ public class Units {
         int price = unitPrices.get(unitType);
         if (playerData.getCash() >= price) {
             playerData.subtractCash((float) price);
-            unitType.spawn(player);
+            Unit spawned = unitType.spawn(player);
+            if(shouldControlUnit){
+                Call.unitControl(player,spawned);
+            }
             player.sendMessage(Bundle.get("unit.bought", player.locale()));
         } else {
             player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
@@ -130,7 +134,7 @@ public class Units {
 
         if (playerData.getCash() >= totalCost) {
             for (int i = 0; i < quantity; i++) {
-                buyUnit(unitType, player, false); // Pass false to prevent unit control
+                buyUnit(unitType, player, false);
             }
             playerData.subtractCash(totalCost);
             player.sendMessage("[green]Units purchased successfully.");

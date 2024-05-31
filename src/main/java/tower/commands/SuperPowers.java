@@ -16,7 +16,14 @@ import tower.Players;
 import tower.Domain.PlayerData;
 
 public class SuperPowers {
-    private static final float tilesize = 1.0f; // Adjust the value as needed
+    private static final float tileSize = 1.0f; 
+    private static final int unitCost = 100;
+    private static final int unitLife = 50_000; 
+    private static final int arcCost = 100;
+    private static final int DISRUPT_unitCost = 40;
+    private static final float ARC_RADIUS = 140f;
+    private static final float ARC_ANGLE = 180f;
+    private static final int ARC_UNIT_COUNT = 20;
 
     public static void execute(Player player) {
         Unit playerUnit = player.unit(); // Get the player's unit
@@ -30,210 +37,112 @@ public class SuperPowers {
         }
     }
 
-    private static void spawnCorvusUnit(Player player, World world, float playerX, float playerY) {
-        spawnUnitWithType(player, world, playerX, playerY, UnitTypes.corvus);
-    }
-
-    private static void spawnCollarisUnit(Player player, World world, float playerX, float playerY) {
-        spawnUnitWithType(player, world, playerX, playerY, UnitTypes.collaris);
-    }
-
     private static void openUnitSelectionMenu(Player player, World world, float playerX, float playerY) {
         String[][] buttons = {
-                { "Corvus" },
-                { "Collaris" },
-                { "Squad" },
-                { "Magic" }
+            {"Corvus"},
+            {"Collaris"},
+            {"Squad"},
+            {"Magic"}
         };
+
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            if (option == 0) {
-                spawnCorvusUnit(player, world, playerX, playerY);
-            } else if (option == 1) {
-                spawnCollarisUnit(player, world, playerX, playerY);
-            } else if (option == 2) {
-                spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt);
-            } else if (option == 3) { 
-                spawnDisruptUnit(player, world, playerX, playerY);
+            switch (option) {
+                case 0 -> spawnUnits(player, world, playerX, playerY, UnitTypes.corvus, 6, unitCost);
+                case 1 -> spawnUnits(player, world, playerX, playerY, UnitTypes.collaris, 6, unitCost);
+                case 2 -> spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt, ARC_UNIT_COUNT, arcCost);
+                case 3 -> spawnDisruptUnits(player, world, playerX, playerY);
             }
-
-        }), "[lime]Choose a ability to use:", "", buttons);
+        }), "[lime]Choose an ability to use:", "", buttons);
     }
 
-    private static void spawnUnitWithType(Player player, World world, float playerX, float playerY, UnitType unitType) {
+    private static void spawnUnits(Player player, World world, float playerX, float playerY, UnitType unitType, int unitCount, int cost) {
         PlayerData playerData = Players.getPlayer(player);
-        if (playerData.getCash() >= 100) { // Ensure the player has enough Cash
-            playerData.subtractCash(100); // Subtract Cash as soon as the player confirms the purchase
-            float angleStep = 360f / 6;
-            float radius = 100f; // Calculate the angle step for evenly spaced spawns
-            final boolean[] allUnitsSpawned = {true};
+        if (playerData.getCash() >= cost) {
+            playerData.subtractCash(cost); 
+            float angleStep = 360f / unitCount;
+            float radius = 100f;
 
-
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < unitCount; i++) {
                 int finalI = i;
                 Timer.schedule(() -> {
-                    float angle = finalI * angleStep; // Calculate the angle for each unit
-                    double radians = Math.toRadians(angle);
-                    float x = playerX + radius * (float) Math.cos(radians);
-                    float y = playerY + radius * (float) Math.sin(radians);
-
-                    int intX = (int) x;
-                    int intY = (int) y;
-                    float worldX = intX * tilesize;
-                    float worldY = intY * tilesize;
-
-                    Tile tile = world.tileWorld(worldX, worldY);
-                    if (tile != null) {
-                        Unit unit = unitType.spawn(worldX, worldY);
-                        if (unit != null && unit.isValid()) {
-                            // Apply configurations to the individual unit
-                            if (unitType == UnitTypes.corvus) {
-                                unit.type.groundLayer = Layer.flyingUnit;
-                                unit.type.weapons.get(0).reload = 10f;
-                                unit.type.weapons.get(0).cooldownTime = 10f;
-                                unit.type.playerControllable = false;
-                                unit.type.autoFindTarget = true;
-                                unit.type.allowedInPayloads = false;
-                            } else if (unitType == UnitTypes.collaris) {
-                                unit.type.groundLayer = Layer.flyingUnit;
-                                unit.type.weapons.get(0).reload = 10f;
-                                unit.type.weapons.get(0).cooldownTime = 10f;
-                                unit.type.playerControllable = false;
-                                unit.type.autoFindTarget = true;
-                                unit.type.allowedInPayloads = false;
-                            }
-
-                            Timer.schedule(() -> {
-                                if (unit.isValid()) {
-                                    unit.kill();
-                                }
-                            }, 50000L); // 50 seconds in milliseconds
-                            
-                            
-                        } else {
-                            allUnitsSpawned[0] = false;
-
-                        }
-                    } else {
-                        allUnitsSpawned[0] = false;
-
-                    }
+                    float angle = finalI * angleStep;
+                    float x = playerX + radius * (float) Math.cos(Math.toRadians(angle));
+                    float y = playerY + radius * (float) Math.sin(Math.toRadians(angle));
+                    spawnAndConfigureUnit(player, world, x, y, unitType, unitLife);
                 }, i * 0.1f); // Delay each spawn by 0.1 seconds
             }
+        } else {
+            player.sendMessage(Bundle.get("spawn.unit.not-enough-cash", player.locale()));
+        }
+    }
 
-            if (!allUnitsSpawned[0]) {
-                playerData.addCash(100);
+    private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType, int unitCount, int cost) {
+        PlayerData playerData = Players.getPlayer(player);
+        if (playerData.getCash() >= cost) {
+            playerData.subtractCash(cost);
+            float angleStep = ARC_ANGLE / unitCount;
+
+            for (int i = 0; i < unitCount; i++) {
+                int finalI = i;
+                Timer.schedule(() -> {
+                    float angle = finalI * angleStep - ARC_ANGLE / 2;
+                    float x = playerX + ARC_RADIUS * (float) Math.cos(Math.toRadians(angle));
+                    float y = playerY + ARC_RADIUS * (float) Math.sin(Math.toRadians(angle));
+                    spawnAndConfigureUnit(player, world, x, y, unitType, 10_000); 
+                }, i * 0.1f);
+            }
+        } else {
+            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-cash", player.locale()));
+        }
+    }
+
+    private static void spawnDisruptUnits(Player player, World world, float playerX, float playerY) {
+        PlayerData playerData = Players.getPlayer(player);
+        if (playerData.getCash() >= DISRUPT_unitCost) {
+            playerData.subtractCash(DISRUPT_unitCost);
+
+            for (int i = 0; i < ARC_UNIT_COUNT; i++) {
+                int finalI = i;
+                Timer.schedule(() -> {
+                    float angle = finalI * (ARC_ANGLE / ARC_UNIT_COUNT) - ARC_ANGLE / 2;
+                    float x = playerX + ARC_RADIUS * (float) Math.cos(Math.toRadians(angle));
+                    float y = playerY + ARC_RADIUS * (float) Math.sin(Math.toRadians(angle));
+
+                    for (UnitType unitType : new UnitType[]{UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert, UnitTypes.flare}) {
+                        spawnAndConfigureUnit(player, world, x, y, unitType, 10_000); 
+                    }
+                }, i * 0.1f);
+            }
+        } else {
+            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-cash", player.locale()));
+        }
+    }
+
+    private static void spawnAndConfigureUnit(Player player, World world, float x, float y, UnitType unitType, long lifetime) {
+        Tile tile = world.tileWorld(x * tileSize, y * tileSize);
+        if (tile != null) {
+            Unit unit = unitType.spawn(x * tileSize, y * tileSize);
+            if (unit != null && unit.isValid()) {
+                unit.type.allowedInPayloads = false;
+                unit.type.playerControllable = false;
+                unit.type.autoFindTarget = true;
+                if (unitType == UnitTypes.corvus || unitType == UnitTypes.collaris) {
+                    unit.type.groundLayer = Layer.flyingUnit;
+                    unit.type.weapons.get(0).reload = 10f;
+                    unit.type.weapons.get(0).cooldownTime = 10f;
+                }
+                Timer.schedule(() -> {
+                    if (unit.isValid()) {
+                        unit.kill();
+                    }
+                }, lifetime / 1000f); 
+            } else {
                 player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
+                Players.getPlayer(player).addCash(unitCost);
             }
         } else {
-            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-Cash", player.locale()));
-        }
-    }
-
-    private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType) {
-        PlayerData playerData = Players.getPlayer(player);
-        int totalCost = 100;
-
-        if (playerData.getCash() >= totalCost) {
-            float radius = 140f;
-            float arcAngle = 180f;
-            float angleStep = arcAngle / 20; // Divide the arc by the number of units
-
-            playerData.subtractCash(totalCost);
-
-            for (int i = 0; i < 20; i++) {
-                int finalI = i;
-                Timer.schedule(() -> {
-                    float angle = finalI * angleStep - arcAngle / 2; // Calculate the angle for each unit
-                    double radians = Math.toRadians(angle);
-                    float x = playerX + radius * (float) Math.cos(radians);
-                    float y = playerY + radius * (float) Math.sin(radians);
-
-                    int intX = (int) x;
-                    int intY = (int) y;
-                    float worldX = intX * tilesize;
-                    float worldY = intY * tilesize;
-
-                    Tile tile = world.tileWorld(worldX, worldY);
-                    if (tile != null) {
-                        Unit unit = unitType.spawn(worldX, worldY);
-                        if (unit == null || !unit.isValid()) {
-                            player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
-                            playerData.addCash(totalCost);
-                        } else {
-                            unit.type.allowedInPayloads = false;
-                            unit.type.playerControllable = false;
-                            unit.type.autoFindTarget = true;
-                            Timer.schedule(() -> {
-                                if (unit.isValid()) {
-                                    unit.kill();
-                                }
-                            }, 10000); // Adjusted to 10 seconds
-                        }
-                    } else {
-                        player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
-                        playerData.addCash(totalCost);
-                    }
-                }, i * 0.1f); // Delay each spawn by 0.1 seconds
-            }
-        } else {
-            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-Cash", player.locale()));
-        }
-    }
-
-    private static void spawnDisruptUnit(Player player, World world, float playerX, float playerY) {
-        PlayerData playerData = Players.getPlayer(player);
-        int totalCost = 40; // Total cost for 4 unit types
-
-        if (playerData.getCash() >= totalCost) {
-            float radius = 140f;
-            float arcAngle = 180f;
-            float angleStep = arcAngle / 20; // Divide the arc by the number of units
-
-            playerData.subtractCash(totalCost);
-
-            for (int i = 0; i < 20; i++) {
-                int finalI = i;
-                Timer.schedule(() -> {
-                    float angle = finalI * angleStep - arcAngle / 2; // Calculate the angle for each unit
-                    double radians = Math.toRadians(angle);
-                    float x = playerX + radius * (float) Math.cos(radians);
-                    float y = playerY + radius * (float) Math.sin(radians);
-
-                    int intX = (int) x;
-                    int intY = (int) y;
-                    float worldX = intX * tilesize;
-                    float worldY = intY * tilesize;
-
-                    Tile tile = world.tileWorld(worldX, worldY);
-                    if (tile != null) {
-                        // Spawn Zenith, Quell, Avert, and Flare units
-                        for (UnitType unitType : new UnitType[] { UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert,
-                                UnitTypes.flare }) {
-                            Unit unit = unitType.spawn(worldX, worldY);
-                            if (unit == null || !unit.isValid()) {
-                                player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
-                                playerData.addCash(totalCost);
-                                return;
-                            }
-                           
-                            unit.type.allowedInPayloads = false;
-                            unit.type.playerControllable = false;
-                            unit.type.autoFindTarget = true;
-                            Timer.schedule(() -> {
-                                if (unit.isValid()) {
-                                    unit.kill();
-                                }
-                            }, 10000); // Adjusted to 10 seconds
-                        }
-                    } else {
-                        player.sendMessage(Bundle.get("spawn.arc-of-units.failed", player.locale()));
-                        playerData.addCash(totalCost);
-                        return;
-                    }
-                }, i * 0.1f); // Delay each spawn by 0.1 seconds
-            }
-        } else {
-            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-Cash", player.locale()));
+            player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
+            Players.getPlayer(player).addCash(unitCost);
         }
     }
 }

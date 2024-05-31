@@ -4,7 +4,7 @@
     "displayName": "Tower Defense",
     "author": "Ayush Kumar(Alpfha)",
     "description": "TD plugin for Mindustry Strictly owned by DontVin Mindustry Server",
-    "version": "4",
+    "version": "5",
     "main": "tower.TowerDefensePlugin",
     "java": true,
     "contributors": [
