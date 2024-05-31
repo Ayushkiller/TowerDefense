@@ -8,10 +8,8 @@ import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 import mindustry.type.Item;
 import tower.Domain.Currency;
-import tower.Domain.CustomStatusEffects;
 import tower.Domain.PlayerData;
 import tower.game.Loader;
-import tower.game.Scenarios;
 import tower.menus.Menu;
 import tower.pathing.TowerPathfinder;
 import useful.Bundle;
@@ -25,7 +23,6 @@ public class TowerDefensePlugin extends Plugin {
         Loader.load();
         TowerPathfinder.init();
         PluginLogic.init(); 
-        CustomStatusEffects.load();
     }
 
     // Registers client-side chat commands
@@ -72,10 +69,6 @@ public class TowerDefensePlugin extends Plugin {
                     // Handle potential parsing errors
                 }
             }
-        });
-
-        handler.register("deployall", "Requests deployment for all players", (String[] args, Player player) -> {
-            requestDeploymentForAll();
         });
     }
 
@@ -148,7 +141,5 @@ public class TowerDefensePlugin extends Plugin {
         return 0;
     }
 
-    private void requestDeploymentForAll() {
-        Scenarios.requestDeploymentForAllPlayers();
-    }
+
 }

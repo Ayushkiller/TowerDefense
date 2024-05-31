@@ -2,6 +2,7 @@ package tower;
 
 import static mindustry.Vars.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,36 +23,33 @@ import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
-import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.net.Administration;
 import mindustry.type.ItemStack;
-import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.ForceProjector;
 import mindustry.world.blocks.defense.RegenProjector;
 import mindustry.world.blocks.defense.ShockMine;
-import mindustry.world.blocks.defense.ShockwaveTower;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.RepairTurret;
 import mindustry.world.meta.BlockFlag;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
-import tower.game.Scenarios;
 import tower.pathing.FlyingAIForAss;
 import useful.Bundle;
 
 public class PluginLogic {
     public static float multiplier = 1f;
     public static boolean multiplierAdjusted = false;
-    public static ObjectMap<UnitType, Seq<ItemStack>> drops;
+    public static ObjectMap<UnitType, Seq<ItemStack>> drops = new ObjectMap<>();
     public static ObjectMap<Tile, ForceProjector> forceProjectorTiles = new ObjectMap<>();
     public static ObjectMap<Tile, RepairTurret> repairPointTiles = new ObjectMap<>();
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
     private static Seq<Timer.Task> scheduledTasks = new Seq<>();
+    private static final HashMap<Tile, Boolean> pathCache = new HashMap<>();
 
     public static void init() {
         initializeDrops();
@@ -61,15 +59,11 @@ public class PluginLogic {
     }
 
     private static void initializeDrops() {
-        drops = new ObjectMap<>();
         for (Map<String, Object> dropEntry : Unitsdrops.drops) {
             UnitType unit = (UnitType) dropEntry.get("unit");
-            Object dropsObject = dropEntry.get("drops");
-            if (dropsObject instanceof Seq<?>) {
-                @SuppressWarnings("unchecked")
-                Seq<ItemStack> itemStacks = (Seq<ItemStack>) dropsObject;
-                drops.put(unit, itemStacks);
-            }
+            @SuppressWarnings("unchecked")
+            Seq<ItemStack> itemStacks = (Seq<ItemStack>) dropEntry.get("drops");
+            drops.put(unit, itemStacks);
         }
     }
 
@@ -78,14 +72,15 @@ public class PluginLogic {
             if (action.tile == null)
                 return true;
             if (action.type == Administration.ActionType.placeBlock) {
-                if (!canBePlaced(action.tile, action.block) && !(action.block instanceof ShockMine
-                        || action.block instanceof Conduit || action.block instanceof CoreBlock)) {
+                if (!canBePlaced(action.tile, action.block) &&
+                        !(action.block instanceof ShockMine || action.block instanceof Conduit
+                                || action.block instanceof CoreBlock)) {
                     Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                     return false;
                 }
             }
-            if ((action.type == Administration.ActionType.dropPayload
-                    || action.type == Administration.ActionType.pickupBlock)) {
+            if (action.type == Administration.ActionType.dropPayload
+                    || action.type == Administration.ActionType.pickupBlock) {
                 Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
                 return false;
             }
@@ -94,79 +89,86 @@ public class PluginLogic {
     }
 
     private static void scheduleTimers() {
-        addScheduledTask(() -> {
-            Groups.player.each(player -> {
-                forceProjectorTiles.each((tile, projector) -> {
-                    if (player.dst(tile.worldx(), tile.worldy()) <= 100f) {
-                        Call.effect(Fx.greenCloud, tile.x, tile.y, 100f, Color.royal);
-                    }
-                });
-                repairPointTiles.each((tile, turret) -> {
-                    if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
-                        Call.effect(Fx.reactorExplosion, tile.x, tile.y, 30f, Color.royal);
-                    }
-                });
-            });
-        }, 0f, 2f);
+        addScheduledTask(PluginLogic::applyForceProjectorEffects, 0f, 2f);
+        addScheduledTask(PluginLogic::accumulateRepairPointCash, 0f, 20f);
+        addScheduledTask(PluginLogic::distributeRepairPointCash, 0f, 1f);
+        addScheduledTask(PluginLogic::resetNegativePlayerCash, 0f, 2f);
+        addScheduledTask(PluginLogic::damageNearbyEnemyCores, 0f, 1f);
+        addScheduledTask(PluginLogic::showMultiplierPopup, 0f, 1f);
+    }
 
-        addScheduledTask(() -> {
+    private static void applyForceProjectorEffects() {
+        Groups.player.each(player -> {
+            forceProjectorTiles.each((tile, projector) -> {
+                if (player.dst(tile.worldx(), tile.worldy()) <= 100f) {
+                    Call.effect(Fx.greenCloud, tile.x, tile.y, 100f, Color.royal);
+                }
+            });
             repairPointTiles.each((tile, turret) -> {
-                AtomicInteger totalCashGenerated = new AtomicInteger(0);
-                Groups.player.each(player -> {
-                    if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
-                        totalCashGenerated.addAndGet(100);
-                    }
-                });
-                float cashToStore = totalCashGenerated.get() / 100f;
-                repairPointCash.put(tile, cashToStore);
+                if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
+                    Call.effect(Fx.reactorExplosion, tile.x, tile.y, 30f, Color.royal);
+                }
             });
-        }, 0f, 20f);
+        });
+    }
 
-        addScheduledTask(() -> {
+    private static void accumulateRepairPointCash() {
+        repairPointTiles.each((tile, turret) -> {
+            AtomicInteger totalCashGenerated = new AtomicInteger(0);
             Groups.player.each(player -> {
-                repairPointTiles.each((tile, turret) -> {
-                    if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
-                        float cashToAdd = repairPointCash.get(tile, 0f);
-                        if (cashToAdd > 0) {
-                            PlayerData playerData = Players.getPlayer(player);
-                            playerData.addCash(cashToAdd);
-                            repairPointCash.put(tile, 0f);
-                        }
+                if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
+                    totalCashGenerated.addAndGet(100);
+                }
+            });
+            float cashToStore = totalCashGenerated.get() / 100f;
+            repairPointCash.put(tile, cashToStore);
+        });
+    }
+
+    private static void distributeRepairPointCash() {
+        Groups.player.each(player -> {
+            repairPointTiles.each((tile, turret) -> {
+                if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
+                    float cashToAdd = repairPointCash.get(tile, 0f);
+                    if (cashToAdd > 0) {
+                        PlayerData playerData = Players.getPlayer(player);
+                        playerData.addCash(cashToAdd);
+                        repairPointCash.put(tile, 0f);
                     }
-                });
-            });
-        }, 0f, 1f);
-
-        addScheduledTask(() -> {
-            for (Player player : Groups.player) {
-                PlayerData playerData = Players.getPlayer(player);
-                if (playerData != null && playerData.getCash() < 0) {
-                    playerData.setCash(0);
                 }
+            });
+        });
+    }
+
+    private static void resetNegativePlayerCash() {
+        Groups.player.each(player -> {
+            PlayerData playerData = Players.getPlayer(player);
+            if (playerData != null && playerData.getCash() < 0) {
+                playerData.setCash(0);
             }
-        }, 0f, 2f);
+        });
+    }
 
-        addScheduledTask(() -> {
-            state.rules.waveTeam.data().units.each(unit -> {
-                var core = unit.closestEnemyCore();
-                if (core == null || unit.dst(core) > 80f || core.health <= 0)
-                    return;
-                float damage = (unit.health + unit.shield) / Mathf.sqrt(multiplier);
-                damage = Math.min(damage, core.health);
-                core.damage(Team.crux, damage);
-                Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.crimson);
-                core.damage(1, true);
-                unit.kill();
-                if (core.block.health <= 0) {
-                    core.block.health = 1;
-                }
-            });
-        }, 0f, 1f);
+    private static void damageNearbyEnemyCores() {
+        state.rules.waveTeam.data().units.each(unit -> {
+            var core = unit.closestEnemyCore();
+            if (core == null || unit.dst(core) > 80f || core.health <= 0)
+                return;
+            float damage = (unit.health + unit.shield) / Mathf.sqrt(multiplier);
+            damage = Math.min(damage, core.health);
+            core.damage(Team.crux, damage);
+            Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.crimson);
+            core.damage(1, true);
+            unit.kill();
+            if (core.block.health <= 0) {
+                core.block.health = 1;
+            }
+        });
+    }
 
-        addScheduledTask(() -> {
-            Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier",
-                    Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2));
-        }, 0f, 1f);
+    private static void showMultiplierPopup() {
+        Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier",
+                Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2));
     }
 
     private static void addScheduledTask(Runnable task, float delay, float interval) {
@@ -200,166 +202,136 @@ public class PluginLogic {
                 }
             }
         });
-
-        Events.on(EventType.WaveEvent.class, event -> {
-            if (state.wave % 50 == 0) {
-                Scenarios.requestDeploymentForAllPlayers();
-            }
-
-            if (state.wave <= 10) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f), multiplier, 1.5f);
-            } else if (state.wave <= 30) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 3f);
-            } else if (state.wave <= 60) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 3.5f);
-            } else if (state.wave <= 120) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 4f);
-            } else if (state.wave <= 150) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 6f);
-            } else if (state.wave <= 200) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 12f);
-            } else if (state.wave <= 250) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 16f);
-            } else if (state.wave <= 300) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 18f);
-            } else if (state.wave <= 400) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 20f);
-            } else if (state.wave <= 500) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 22f);
-            } else if (state.wave <= 800) {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 24f);
-            } else {
-                multiplier = Mathf.clamp(((state.wave * state.wave / 3200f) + 0.2f) * 2, multiplier, 25f);
-            }
-
-            multiplierAdjusted = true;
-        });
-
-        Events.on(EventType.GameOverEvent.class, event -> {
-            Players.clearMap();
-            forceProjectorTiles.clear();
-            repairPointTiles.clear();
-            repairPointCash.clear();
-            cancelAllTasks(); // Cancel all tasks on game over
-        });
-
-        Events.on(EventType.TileChangeEvent.class, event -> {
-            Tile changedTile = event.tile;
-            Block block = changedTile.block();
-
-            if (block instanceof ForceProjector || block instanceof RegenProjector) {
-                forceProjectorTiles.put(changedTile, (ForceProjector) block);
-            } else {
-                forceProjectorTiles.remove(changedTile);
-            }
-
-            if (block instanceof RepairTurret || block instanceof ShockwaveTower) {
-                if (!repairPointTiles.containsKey(changedTile) && repairPointTiles.size < 20) {
-                    repairPointTiles.put(changedTile, (RepairTurret) block);
-                }
-            } else {
-                repairPointTiles.remove(changedTile);
-            }
-        });
-
-        Events.on(EventType.UnitDestroyEvent.class, event -> {
-            if (event.unit.team != state.rules.waveTeam)
-                return;
-
-            var core = event.unit.closestEnemyCore();
-            var drop = drops.get(event.unit.type);
-
-            if (core == null || drop == null)
-                return;
-
-            var builder = new StringBuilder();
-
-            drop.each(stack -> {
-                int amount = multiplierAdjusted ? (int) (stack.amount * 0.75f)
-                        : Mathf.random(stack.amount - stack.amount / 2, stack.amount + stack.amount / 2);
-
-                builder.append("[accent]+").append(amount).append(stack.item.emoji()).append(" ");
-                Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x,
-                        event.unit.y, core);
-            });
-
-            Call.labelReliable(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
-
-            Timer.schedule(() -> multiplierAdjusted = false, 180f);
-        });
-
-        Events.on(EventType.UnitSpawnEvent.class, event -> {
-            if (event.unit.team == state.rules.waveTeam) {
-                if (event.unit != null) {
-                    event.unit.health(event.unit.health * multiplier);
-                    event.unit.maxHealth(event.unit.maxHealth * multiplier);
-                    event.unit.damageMultiplier(0f);
-
-                    if (state.wave <= 200f) {
-                        applyStatusEffect(event.unit, StatusEffects.overdrive, Float.POSITIVE_INFINITY);
-                        applyStatusEffect(event.unit, StatusEffects.overclock, Float.POSITIVE_INFINITY);
-                        applyStatusEffect(event.unit, StatusEffects.shielded, Float.POSITIVE_INFINITY);
-                        applyStatusEffect(event.unit, StatusEffects.boss, Float.POSITIVE_INFINITY);
-                        applyStatusEffect(event.unit, StatusEffects.sporeSlowed, Float.POSITIVE_INFINITY);
-                        applyStatusEffect(event.unit, StatusEffects.muddy, Float.POSITIVE_INFINITY);
-                    }
-                    if (state.wave >= 250) {
-                        applyStatusEffect(event.unit, StatusEffects.fast, Float.POSITIVE_INFINITY);
-                    }
-                    applyStatusEffect(event.unit, StatusEffects.disarmed, Float.POSITIVE_INFINITY);
-
-                    if (event.unit.type != null) {
-                        event.unit.type.speed = 0.8f;
-                        event.unit.type.range = -1f;
-                        event.unit.type.hovering = true;
-                        event.unit.disarmed = true;
-
-                        if (event.unit.type == UnitTypes.omura || event.unit.type == UnitTypes.aegires) {
-                            event.unit.kill();
-                        }
-
-                        event.unit.type.physics = false;
-                        event.unit.type.crashDamageMultiplier = 0f;
-                        event.unit.type.crushDamage = 0f;
-                        event.unit.type.deathExplosionEffect = Fx.shockwave;
-                        event.unit.shield(event.unit.shield * multiplier);
-                        event.unit.speedMultiplier(event.unit.speedMultiplier * multiplier);
-
-                        event.unit.type.mineWalls = false;
-                        event.unit.type.mineFloor = false;
-                        event.unit.type.targetAir = false;
-                        event.unit.type.targetGround = false;
-                        event.unit.type.payloadCapacity = 0f;
-                        event.unit.type.legSplashDamage = 0f;
-                        event.unit.type.range = 0f;
-                        event.unit.type.maxRange = 0f;
-                        event.unit.type.mineRange = 0f;
-
-                        event.unit.type.aiController = (event.unit.type.naval || event.unit.type.canDrown)
-                                ? GroundAI::new
-                                : FlyingAIForAss::new;
-                        event.unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
-                    }
+        Events.on(EventType.WorldLoadEvent.class, event -> {
+            // Populate the path cache after the world loads
+            for (int x = 0; x < Vars.world.width(); x++) {
+                for (int y = 0; y < Vars.world.height(); y++) {
+                    Tile tile = Vars.world.tile(x, y);
+                    isPath(tile); // This will now cache the result
                 }
             }
         });
+        Events.on(EventType.WaveEvent.class, event -> adjustMultiplierByWave());
+
+        Events.on(EventType.GameOverEvent.class, event -> resetGame());
+
+        Events.on(EventType.TileChangeEvent.class, event -> updateTiles(event.tile));
+
+        Events.on(EventType.UnitDestroyEvent.class, event -> handleUnitDestroy(event.unit));
+
+        Events.on(EventType.UnitSpawnEvent.class, event -> handleUnitSpawn(event.unit));
 
         Events.run(EventType.Trigger.update, PluginLogic::checkUnitsWithinRadius);
 
-        // Reload all tasks after game over
-        Events.on(EventType.ResetEvent.class, event -> {
-            reloadAllTasks();
-        });
+        Events.on(EventType.ResetEvent.class, event -> reloadAllTasks());
     }
 
-    private static void applyStatusEffect(Unit unit, StatusEffect effect, float duration) {
-        if (unit != null && effect != null) {
-            unit.apply(effect, duration);
+    private static void adjustMultiplierByWave() {
+        float baseValue = state.wave * state.wave / 3200f + 0.2f;
+        if (state.wave <= 10) {
+            multiplier = Mathf.clamp(baseValue, multiplier, 1.5f);
+        } else if (state.wave <= 30) {
+            multiplier = Mathf.clamp(baseValue * 2, multiplier, 3f);
+        } else if (state.wave <= 60) {
+            multiplier = Mathf.clamp(baseValue * 2, multiplier, 3.5f);
+        } else if (state.wave <= 120) {
+            multiplier = Mathf.clamp(baseValue * 2, multiplier, 4f);
+        } else if (state.wave <= 150) {
+            multiplier = Mathf.clamp(baseValue * 2, multiplier, 6f);
+        } else if (state.wave <= 200) {
+            multiplier = Mathf.clamp(baseValue * 2, multiplier, 12f);
+        } else {
+            multiplier = Mathf.clamp(baseValue * 2, multiplier, 30f);
+        }
+        multiplierAdjusted = true;
+    }
+
+    private static void resetGame() {
+        multiplierAdjusted = false;
+        multiplier = 1f;
+        repairPointCash.clear();
+        forceProjectorTiles.clear();
+        repairPointTiles.clear();
+    }
+
+    private static void updateTiles(Tile tile) {
+        Block block = tile.block();
+        if (block instanceof RegenProjector) {
+            forceProjectorTiles.put(tile, (ForceProjector) block);
+        } else if (block instanceof RepairTurret) {
+            repairPointTiles.put(tile, (RepairTurret) block);
+        } else {
+            forceProjectorTiles.remove(tile);
+            repairPointTiles.remove(tile);
+            repairPointCash.remove(tile);
         }
     }
 
+    private static void handleUnitDestroy(Unit unit) {
+        if (unit.type == UnitTypes.poly) {
+            Tile tile = unit.tileOn();
+            if (tile != null && repairPointTiles.containsKey(tile)) {
+                Call.effect(Fx.healWaveMend, tile.x, tile.y, 60f, Color.royal);
+            }
+        }
+    }
+
+    private static void handleUnitSpawn(Unit unit) {
+        if (unit.type != null) {
+            unit.type.speed = 0.8f;
+            unit.type.range = -1f;
+            unit.type.hovering = true;
+            unit.disarmed = true;
+            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires) {
+                unit.kill();
+            }
+            unit.type.physics = false;
+            unit.type.crashDamageMultiplier = 0f;
+            unit.type.crushDamage = 0f;
+            unit.type.deathExplosionEffect = Fx.shockwave;
+            unit.shield(unit.shield * multiplier);
+            unit.speedMultiplier(unit.speedMultiplier * multiplier);
+            unit.type.mineWalls = false;
+            unit.type.mineFloor = false;
+            unit.type.targetAir = false;
+            unit.type.targetGround = false;
+            unit.type.payloadCapacity = 0f;
+            unit.type.legSplashDamage = 0f;
+            unit.type.range = 0f;
+            unit.type.maxRange = 0f;
+            unit.type.mineRange = 0f;
+            unit.type.aiController = (unit.type.naval || unit.type.canDrown)
+                    ? GroundAI::new
+                    : FlyingAIForAss::new;
+            unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
+    }
+
+    private static void checkUnitsWithinRadius() {
+        Groups.unit.each(unit -> {
+            float effectRadius = 80f;
+            unit.apply(StatusEffects.overclock, 10f);
+            if (unit.dst(unit.closestEnemyCore()) <= effectRadius) {
+                unit.apply(StatusEffects.shielded, 10f);
+            }
+        });
+    }
+
+    private static boolean canBePlaced(Tile tile, Block block) {
+        if (!tile.solid()) return false;
+        if (block == null || block == Blocks.air) return false;
+        if (block.flags.contains(BlockFlag.turret) || block.flags.contains(BlockFlag.core)) return false;
+        if (tile.block() instanceof Conduit || tile.floor().isLiquid) return false;
+        return true;
+    }
+
     public static boolean isPath(Tile tile) {
-        return tile.floor() == Vars.world.tile(0, 0).floor()
+        // Check if the result is already cached
+        if (pathCache.containsKey(tile)) {
+            return pathCache.get(tile);
+        }
+    
+        // If not cached, perform the original checks and cache the result
+        boolean isPath = tile.floor() == Vars.world.tile(0, 0).floor()
                 || tile.floor() == Vars.world.tile(0, 1).floor()
                 || tile.floor() == Vars.world.tile(1, 0).floor()
                 || tile.floor() == Vars.world.tile(1, 1).floor()
@@ -368,23 +340,12 @@ public class PluginLogic {
                 || tile.floor() == Vars.world.tile(2, 1).floor()
                 || tile.floor() == Vars.world.tile(1, 2).floor()
                 || tile.floor() == Vars.world.tile(2, 2).floor();
-
+    
+        // Cache the result
+        pathCache.put(tile, isPath);
+    
+        return isPath;
     }
 
-    public static boolean canBePlaced(Tile tile, Block block) {
-        return !tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
-    }
 
-    public static void checkUnitsWithinRadius() {
-        forceProjectorTiles.each((tile, forceProjector) -> {
-            Groups.unit.each(unit -> {
-                if (unit.team == state.rules.waveTeam && unit.dst(tile.worldx(), tile.worldy()) <= 105f) {
-                    unit.type.speed = 1.2f;
-                    unit.healthMultiplier(0.75f);
-                    unit.apply(StatusEffects.electrified, 200f);
-                    unit.apply(StatusEffects.slow, 200f);
-                }
-            });
-        });
-    }
 }
