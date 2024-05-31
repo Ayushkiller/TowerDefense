@@ -304,6 +304,7 @@ public class PluginLogic {
                     ? GroundAI::new
                     : FlyingAIForAss::new;
             unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
+        }
     }
 
     private static void checkUnitsWithinRadius() {
@@ -312,6 +313,10 @@ public class PluginLogic {
             unit.apply(StatusEffects.overclock, 10f);
             if (unit.dst(unit.closestEnemyCore()) <= effectRadius) {
                 unit.apply(StatusEffects.shielded, 10f);
+                unit.type.speed = 1.2f;
+                unit.healthMultiplier(0.75f);
+                unit.apply(StatusEffects.electrified, 200f);
+                unit.apply(StatusEffects.slow, 200f);
             }
         });
     }
