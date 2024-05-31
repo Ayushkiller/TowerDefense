@@ -2,8 +2,8 @@ package tower;
 
 import static mindustry.Vars.*;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import arc.Events;
@@ -49,7 +49,7 @@ public class PluginLogic {
     public static ObjectMap<Tile, RepairTurret> repairPointTiles = new ObjectMap<>();
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
     private static Seq<Timer.Task> scheduledTasks = new Seq<>();
-    private static final HashMap<Tile, Boolean> pathCache = new HashMap<>();
+    private static final ConcurrentHashMap<Tile, Boolean> pathCache = new ConcurrentHashMap<>();
 
     public static void init() {
         initializeDrops();
