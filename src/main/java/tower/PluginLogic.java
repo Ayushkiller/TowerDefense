@@ -307,17 +307,16 @@ public class PluginLogic {
         }
     }
 
-    private static void checkUnitsWithinRadius() {
-        Groups.unit.each(unit -> {
-            float effectRadius = 80f;
-            unit.apply(StatusEffects.overclock, 10f);
-            if (unit.dst(unit.closestEnemyCore()) <= effectRadius) {
-                unit.apply(StatusEffects.shielded, 10f);
-                unit.type.speed = 1.2f;
-                unit.healthMultiplier(0.75f);
-                unit.apply(StatusEffects.electrified, 200f);
-                unit.apply(StatusEffects.slow, 200f);
-            }
+    public static void checkUnitsWithinRadius() {
+        forceProjectorTiles.each((tile, forceProjector) -> {
+            Groups.unit.each(unit -> {
+                if (unit.team == state.rules.waveTeam && unit.dst(tile.worldx(), tile.worldy()) <= 105f) {
+                    unit.type.speed = 1.2f;
+                    unit.healthMultiplier(0.75f);
+                    unit.apply(StatusEffects.electrified, 200f);
+                    unit.apply(StatusEffects.slow, 200f);
+                }
+            });
         });
     }
 
