@@ -285,6 +285,7 @@ public class PluginLogic {
             if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires) {
                 unit.kill();
             }
+            unit.apply(StatusEffects.disarmed,Float.POSITIVE_INFINITY);
             unit.type.physics = false;
             unit.type.crashDamageMultiplier = 0f;
             unit.type.crushDamage = 0f;
@@ -320,14 +321,20 @@ public class PluginLogic {
         });
     }
 
-    private static boolean canBePlaced(Tile tile, Block block) {
-        if (!tile.solid()) return false;
-        if (block == null || block == Blocks.air) return false;
-        if (block.flags.contains(BlockFlag.turret) || block.flags.contains(BlockFlag.core)) return false;
-        if (tile.block() instanceof Conduit || tile.floor().isLiquid) return false;
-        return true;
+    public static boolean canBePlaced(Tile tile, Block block) {
+        // Check if the tile is already in the cache
+        if (pathCache.containsKey(tile)) {
+            return!pathCache.get(tile);
+        }
+    
+        // If not in cache, perform the original checks and cache the result
+        boolean isPath = tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
+    
+        // Cache the result
+        pathCache.put(tile,!isPath);
+    
+        return!isPath;
     }
-
     public static boolean isPath(Tile tile) {
         // Check if the result is already cached
         if (pathCache.containsKey(tile)) {
