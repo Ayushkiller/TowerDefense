@@ -286,7 +286,6 @@ public class PluginLogic {
                 unit.kill();
             }
             unit.apply(StatusEffects.disarmed,Float.POSITIVE_INFINITY);
-            unit.type.physics = false;
             unit.type.crashDamageMultiplier = 0f;
             unit.type.crushDamage = 0f;
             unit.type.deathExplosionEffect = Fx.shockwave;
@@ -301,7 +300,7 @@ public class PluginLogic {
             unit.type.range = 0f;
             unit.type.maxRange = 0f;
             unit.type.mineRange = 0f;
-            unit.type.aiController = (unit.type.naval || unit.type.canDrown)
+            unit.type.aiController = (unit.type.naval || unit.type.canDrown||unit.type.canBoost)
                     ? GroundAI::new
                     : FlyingAIForAss::new;
             unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
@@ -316,6 +315,8 @@ public class PluginLogic {
                     unit.healthMultiplier(0.75f);
                     unit.apply(StatusEffects.electrified, 200f);
                     unit.apply(StatusEffects.slow, 200f);
+                    unit.apply(StatusEffects.freezing, 200f);
+                    unit.apply(StatusEffects.sporeSlowed, 200f);
                 }
             });
         });
