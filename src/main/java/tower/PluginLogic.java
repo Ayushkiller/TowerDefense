@@ -201,6 +201,33 @@ public class PluginLogic {
                     }
                 }
             }
+            
+        });
+        Events.on(EventType.UnitDestroyEvent.class, event -> {
+            if (event.unit.team != state.rules.waveTeam)
+                return;
+
+            var core = event.unit.closestEnemyCore();
+            var drop = drops.get(event.unit.type);
+
+            if (core == null || drop == null)
+                return;
+
+            var builder = new StringBuilder();
+
+            drop.each(stack -> {
+                // Adjust the amount based on the multiplierAdjusted flag
+                int amount = multiplierAdjusted ? (int) (stack.amount * 0.75f)
+                        : Mathf.random(stack.amount - stack.amount / 2, stack.amount + stack.amount / 2);
+
+                builder.append("[accent]+").append(amount).append(stack.item.emoji()).append(" ");
+                Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x,
+                        event.unit.y, core);
+            });
+
+            Call.labelReliable(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
+
+            Timer.schedule(() -> multiplierAdjusted = false, 180f);
         });
         Events.on(EventType.WorldLoadEvent.class, event -> {
             // Populate the path cache after the world loads
