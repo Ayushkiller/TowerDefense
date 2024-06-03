@@ -317,7 +317,7 @@ public class PluginLogic {
             unit.type.crushDamage = 0f;
             unit.type.deathExplosionEffect = Fx.shockwave;
             unit.shield(unit.shield * multiplier);
-            unit.health(unit.health*multiplier)
+            unit.health(unit.health*multiplier);
             unit.speedMultiplier(unit.speedMultiplier * multiplier);
             unit.type.mineWalls = false;
             unit.type.mineFloor = false;
