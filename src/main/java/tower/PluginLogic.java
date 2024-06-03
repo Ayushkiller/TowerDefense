@@ -305,7 +305,7 @@ public class PluginLogic {
 
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
-            unit.type.speed = 0.8f;
+            unit.type.speed = unit.speed()*multiplier;
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
@@ -317,6 +317,7 @@ public class PluginLogic {
             unit.type.crushDamage = 0f;
             unit.type.deathExplosionEffect = Fx.shockwave;
             unit.shield(unit.shield * multiplier);
+            unit.health(unit.health*multiplier)
             unit.speedMultiplier(unit.speedMultiplier * multiplier);
             unit.type.mineWalls = false;
             unit.type.mineFloor = false;
