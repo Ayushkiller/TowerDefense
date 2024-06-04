@@ -29,9 +29,9 @@ import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.Tile;
-import mindustry.world.blocks.defense.ForceProjector;
 import mindustry.world.blocks.defense.RegenProjector;
 import mindustry.world.blocks.defense.ShockMine;
+import mindustry.world.blocks.defense.ShockwaveTower;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.RepairTurret;
@@ -45,8 +45,8 @@ public class PluginLogic {
     public static float multiplier = 1f;
     public static boolean multiplierAdjusted = false;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops = new ObjectMap<>();
-    public static ObjectMap<Tile, ForceProjector> forceProjectorTiles = new ObjectMap<>();
-    public static ObjectMap<Tile, RepairTurret> repairPointTiles = new ObjectMap<>();
+    public static ObjectMap<Tile, Block> forceProjectorTiles = new ObjectMap<>();
+    public static ObjectMap<Tile, Block> repairPointTiles = new ObjectMap<>();
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
     private static Seq<Timer.Task> scheduledTasks = new Seq<>();
     private static final ConcurrentHashMap<Tile, Boolean> pathCache = new ConcurrentHashMap<>();
@@ -102,11 +102,13 @@ public class PluginLogic {
             forceProjectorTiles.each((tile, projector) -> {
                 if (player.dst(tile.worldx(), tile.worldy()) <= 100f) {
                     Call.effect(Fx.greenCloud, tile.x, tile.y, 100f, Color.royal);
+                    Bundle.label(player, 4f, tile.drawx(), tile.drawy(), "ui.force");
                 }
             });
             repairPointTiles.each((tile, turret) -> {
                 if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
                     Call.effect(Fx.reactorExplosion, tile.x, tile.y, 30f, Color.royal);
+                    Bundle.label(player, 4f, tile.drawx(), tile.drawy(), "ui.repair");
                 }
             });
         });
@@ -206,27 +208,20 @@ public class PluginLogic {
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam)
                 return;
-
             var core = event.unit.closestEnemyCore();
             var drop = drops.get(event.unit.type);
-
             if (core == null || drop == null)
                 return;
-
             var builder = new StringBuilder();
-
             drop.each(stack -> {
                 // Adjust the amount based on the multiplierAdjusted flag
                 int amount = multiplierAdjusted ? (int) (stack.amount * 0.75f)
                         : Mathf.random(stack.amount - stack.amount / 2, stack.amount + stack.amount / 2);
-
                 builder.append("[accent]+").append(amount).append(stack.item.emoji()).append(" ");
                 Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x,
                         event.unit.y, core);
             });
-
             Call.labelReliable(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
-
             Timer.schedule(() -> multiplierAdjusted = false, 180f);
         });
         Events.on(EventType.WorldLoadEvent.class, event -> {
@@ -268,7 +263,7 @@ public class PluginLogic {
         } else if (state.wave <= 200) {
             multiplier = Mathf.clamp(baseValue * 2, multiplier, 12f);
         } else {
-            multiplier = Mathf.clamp(baseValue * 2, multiplier, 30f);
+            multiplier = Mathf.clamp(baseValue * 2, multiplier, 100f);
         }
         multiplierAdjusted = true;
     }
@@ -283,10 +278,10 @@ public class PluginLogic {
 
     private static void updateTiles(Tile tile) {
         Block block = tile.block();
-        if (block instanceof RegenProjector) {
-            forceProjectorTiles.put(tile, (ForceProjector) block);
-        } else if (block instanceof RepairTurret) {
-            repairPointTiles.put(tile, (RepairTurret) block);
+        if (block instanceof RegenProjector|| block instanceof ShockwaveTower) {
+            forceProjectorTiles.put(tile,block);
+        } else if (block instanceof RepairTurret|| block instanceof RegenProjector) {
+            repairPointTiles.put(tile,block);
         } else {
             forceProjectorTiles.remove(tile);
             repairPointTiles.remove(tile);
@@ -305,11 +300,11 @@ public class PluginLogic {
 
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
-            unit.type.speed = unit.speed()*multiplier;
+            unit.type.speed = Math.max(1f, unit.speed() * multiplier);
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
-            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires) {
+            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires||unit.type == UnitTypes.eclipse||unit.type == UnitTypes.oct) {
                 unit.kill();
             }
             unit.apply(StatusEffects.disarmed,Float.POSITIVE_INFINITY);
@@ -318,10 +313,10 @@ public class PluginLogic {
             unit.type.deathExplosionEffect = Fx.shockwave;
             unit.shield(unit.shield * multiplier);
             unit.health(unit.health*multiplier);
-            unit.speedMultiplier(unit.speedMultiplier * multiplier);
+            unit.speedMultiplier(Math.max(1f, unit.speedMultiplier * multiplier));
             unit.type.mineWalls = false;
             unit.type.mineFloor = false;
-            unit.type.targetAir = false;
+            unit.type.targetAir = false; 
             unit.type.targetGround = false;
             unit.type.payloadCapacity = 0f;
             unit.type.legSplashDamage = 0f;
@@ -386,6 +381,4 @@ public class PluginLogic {
     
         return isPath;
     }
-
-
 }
