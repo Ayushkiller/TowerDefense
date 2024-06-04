@@ -230,6 +230,7 @@ public class PluginLogic {
                     isPath(tile); // This will now cache the result
                 }
             }
+            
         });
         Events.on(EventType.WaveEvent.class, event -> adjustMultiplierByWave());
 
@@ -288,7 +289,7 @@ public class PluginLogic {
 
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
-            unit.type.speed = Math.max(1f, unit.speed() + multiplier * 0.01f);
+            unit.type.speed = Math.max(unit.speed(), unit.speed() + multiplier * 0.01f);
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
@@ -301,7 +302,7 @@ public class PluginLogic {
             unit.type.crushDamage = 0f;
             unit.shield(unit.shield * multiplier);
             unit.health(unit.health * multiplier);
-            unit.speedMultiplier(Math.max(1f, unit.speedMultiplier + multiplier * 0.01f));
+            unit.speedMultiplier(Math.max(1f, unit.speedMultiplier * multiplier * 0.01f));
             unit.type.mineWalls = false;
             unit.type.mineFloor = false;
             unit.type.targetAir = false;
