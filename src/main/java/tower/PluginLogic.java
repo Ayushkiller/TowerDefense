@@ -38,7 +38,6 @@ import mindustry.world.blocks.units.RepairTurret;
 import mindustry.world.meta.BlockFlag;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
-import tower.pathing.FlyingAIForAss;
 import useful.Bundle;
 
 public class PluginLogic {
@@ -61,6 +60,7 @@ public class PluginLogic {
     private static void initializeDrops() {
         for (Map<String, Object> dropEntry : Unitsdrops.drops) {
             UnitType unit = (UnitType) dropEntry.get("unit");
+            @SuppressWarnings("unchecked")
             Seq<ItemStack> itemStacks = (Seq<ItemStack>) dropEntry.get("drops");
             drops.put(unit, itemStacks);
         }
@@ -183,7 +183,6 @@ public class PluginLogic {
     }
 
     private static void reloadAllTasks() {
-        cancelAllTasks();
         scheduleTimers();
     }
 
@@ -202,7 +201,7 @@ public class PluginLogic {
                     }
                 }
             }
-            
+
         });
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam)
@@ -270,48 +269,49 @@ public class PluginLogic {
         multiplier = 1f;
         repairPointCash.clear();
         forceProjectorTiles.clear();
+        cancelAllTasks();
         repairPointTiles.clear();
     }
 
     private static void updateTiles(Tile tile) {
         Block block = tile.block();
-        if (block instanceof RegenProjector|| block instanceof ShockwaveTower) {
-            forceProjectorTiles.put(tile,block);
-        } else if (block instanceof RepairTurret|| block instanceof RegenProjector) {
-            repairPointTiles.put(tile,block);
+        if (block instanceof RegenProjector || block instanceof ShockwaveTower) {
+            forceProjectorTiles.put(tile, block);
+        } else if (block instanceof RepairTurret || block instanceof RegenProjector) {
+            repairPointTiles.put(tile, block);
         } else {
             forceProjectorTiles.remove(tile);
             repairPointTiles.remove(tile);
             repairPointCash.remove(tile);
         }
     }
+
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
-            unit.type.speed = Math.max(1f, unit.speed() * multiplier);
+            unit.type.speed = Math.max(1f, unit.speed() + multiplier * 0.01f);
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
-            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires||unit.type == UnitTypes.eclipse||unit.type == UnitTypes.oct) {
+            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires || unit.type == UnitTypes.eclipse
+                    || unit.type == UnitTypes.oct) {
                 unit.kill();
             }
-            unit.apply(StatusEffects.disarmed,Float.POSITIVE_INFINITY);
+            unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
             unit.type.crashDamageMultiplier = 0f;
             unit.type.crushDamage = 0f;
             unit.shield(unit.shield * multiplier);
-            unit.health(unit.health*multiplier);
-            unit.speedMultiplier(Math.max(1f, unit.speedMultiplier * multiplier));
+            unit.health(unit.health * multiplier);
+            unit.speedMultiplier(Math.max(1f, unit.speedMultiplier + multiplier * 0.01f));
             unit.type.mineWalls = false;
             unit.type.mineFloor = false;
-            unit.type.targetAir = false; 
+            unit.type.targetAir = false;
             unit.type.targetGround = false;
             unit.type.payloadCapacity = 0f;
             unit.type.legSplashDamage = 0f;
             unit.type.range = 0f;
             unit.type.maxRange = 0f;
             unit.type.mineRange = 0f;
-            unit.type.aiController = (unit.type.naval || unit.type.canDrown||unit.type.canBoost)
-                    ? GroundAI::new
-                    : FlyingAIForAss::new;
+            unit.type.aiController = GroundAI::new;
             unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
         }
     }
@@ -334,23 +334,24 @@ public class PluginLogic {
     public static boolean canBePlaced(Tile tile, Block block) {
         // Check if the tile is already in the cache
         if (pathCache.containsKey(tile)) {
-            return!pathCache.get(tile);
+            return !pathCache.get(tile);
         }
-    
+
         // If not in cache, perform the original checks and cache the result
         boolean isPath = tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
-    
+
         // Cache the result
-        pathCache.put(tile,!isPath);
-    
-        return!isPath;
+        pathCache.put(tile, !isPath);
+
+        return !isPath;
     }
+
     public static boolean isPath(Tile tile) {
         // Check if the result is already cached
         if (pathCache.containsKey(tile)) {
             return pathCache.get(tile);
         }
-    
+
         // If not cached, perform the original checks and cache the result
         boolean isPath = tile.floor() == Vars.world.tile(0, 0).floor()
                 || tile.floor() == Vars.world.tile(0, 1).floor()
@@ -361,10 +362,10 @@ public class PluginLogic {
                 || tile.floor() == Vars.world.tile(2, 1).floor()
                 || tile.floor() == Vars.world.tile(1, 2).floor()
                 || tile.floor() == Vars.world.tile(2, 2).floor();
-    
+
         // Cache the result
         pathCache.put(tile, isPath);
-    
+
         return isPath;
     }
 }
