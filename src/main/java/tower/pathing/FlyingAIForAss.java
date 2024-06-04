@@ -32,7 +32,7 @@ public class FlyingAIForAss extends AIController {
 
     private void executeCircleAttack() {
         pathfind(Pathfinder.fieldCore);
-        if (!wasPathingSuccessful() || timeSinceLastMove() > 5000) {
+        if (!wasPathingSuccessful() || timeSinceLastMove() > 1000) {
             performCircleAttack(60f);
             pursueTarget();
         }
@@ -41,9 +41,9 @@ public class FlyingAIForAss extends AIController {
     private void pursueTarget() {
         pathfind(Pathfinder.fieldCore);
         unit.lookAt(target);
-        if (!wasPathingSuccessful() || timeSinceLastMove() > 5000) {
+        if (!wasPathingSuccessful() || timeSinceLastMove() > 1000) {
             performCircleAttack(60f);
-            moveTo(target, unit.type.range * 0.8f);
+            moveTo(target, unit.type.range * 800f);
         }
     }
 
