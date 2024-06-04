@@ -61,7 +61,6 @@ public class PluginLogic {
     private static void initializeDrops() {
         for (Map<String, Object> dropEntry : Unitsdrops.drops) {
             UnitType unit = (UnitType) dropEntry.get("unit");
-            @SuppressWarnings("unchecked")
             Seq<ItemStack> itemStacks = (Seq<ItemStack>) dropEntry.get("drops");
             drops.put(unit, itemStacks);
         }
@@ -239,13 +238,11 @@ public class PluginLogic {
 
         Events.on(EventType.TileChangeEvent.class, event -> updateTiles(event.tile));
 
-        Events.on(EventType.UnitDestroyEvent.class, event -> handleUnitDestroy(event.unit));
-
         Events.on(EventType.UnitSpawnEvent.class, event -> handleUnitSpawn(event.unit));
 
         Events.run(EventType.Trigger.update, PluginLogic::checkUnitsWithinRadius);
 
-        Events.on(EventType.ResetEvent.class, event -> reloadAllTasks());
+        Events.on(EventType.WorldLoadEndEvent.class, event -> reloadAllTasks());
     }
 
     private static void adjustMultiplierByWave() {
@@ -288,16 +285,6 @@ public class PluginLogic {
             repairPointCash.remove(tile);
         }
     }
-
-    private static void handleUnitDestroy(Unit unit) {
-        if (unit.type == UnitTypes.poly) {
-            Tile tile = unit.tileOn();
-            if (tile != null && repairPointTiles.containsKey(tile)) {
-                Call.effect(Fx.healWaveMend, tile.x, tile.y, 60f, Color.royal);
-            }
-        }
-    }
-
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
             unit.type.speed = Math.max(1f, unit.speed() * multiplier);
@@ -310,7 +297,6 @@ public class PluginLogic {
             unit.apply(StatusEffects.disarmed,Float.POSITIVE_INFINITY);
             unit.type.crashDamageMultiplier = 0f;
             unit.type.crushDamage = 0f;
-            unit.type.deathExplosionEffect = Fx.shockwave;
             unit.shield(unit.shield * multiplier);
             unit.health(unit.health*multiplier);
             unit.speedMultiplier(Math.max(1f, unit.speedMultiplier * multiplier));
