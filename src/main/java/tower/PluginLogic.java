@@ -12,6 +12,7 @@ import arc.math.Mathf;
 import arc.math.geom.Point2;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
@@ -289,41 +290,51 @@ public class PluginLogic {
 
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
-            unit.type.speed = Math.max(unit.speed(), unit.speed() + multiplier * 0.01f);
+            unit.type.speed = Math.max(unit.speed() * 0.8f, unit.speed() * 0.8f + multiplier * 0.01f);
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
             if (unit.type.flying) {
-                Seq<Tile> spawnTiles = Vars.spawner.getSpawns();
-                Point2 nearestSpawn = new Point2();
-                float nearestDistance = Float.MAX_VALUE;
-            
-                for (Tile spawnTile : spawnTiles) {
-                    Point2 spawnPoint = new Point2();
-                    spawnPoint.set((int)spawnTile.worldx(), (int)spawnTile.worldy());
-                    float dist = unit.dst(spawnPoint.x, spawnPoint.y);
-                    
-                    if (dist < nearestDistance) {
-                        nearestDistance = dist;
-                        nearestSpawn.set(spawnPoint);
+                if (unit.type.flying) {
+                    Seq<Tile> spawnTiles = Vars.spawner.getSpawns();
+                    Point2 nearestSpawn = new Point2();
+                    float nearestDistance = Float.MAX_VALUE;
+
+                    for (Tile spawnTile : spawnTiles) {
+                        Point2 spawnPoint = new Point2();
+                        spawnPoint.set((int) spawnTile.worldx(), (int) spawnTile.worldy());
+                        float dist = unit.dst(spawnPoint.x, spawnPoint.y);
+
+                        if (dist < nearestDistance) {
+                            nearestDistance = dist;
+                            nearestSpawn.set(spawnPoint);
+                        }
                     }
-                }
-            
-                if (!(nearestSpawn.x == 0 && nearestSpawn.y == 0)) {
-                    float dirX = nearestSpawn.x - unit.x;
-                    float dirY = nearestSpawn.y - unit.y;
-                    float length = (float) Math.sqrt(dirX * dirX + dirY * dirY);
-                    
-                    if (length > 0) {
-                        dirX /= length;
-                        dirY /= length;
+
+                    if (!(nearestSpawn.x == 0 && nearestSpawn.y == 0)) {
+                        Log.debug("spawn tile distance: " + nearestDistance);
+                        float dirX = nearestSpawn.x - unit.x;
+                        float dirY = nearestSpawn.y - unit.y;
+                        float length = (float) Math.sqrt(dirX * dirX + dirY * dirY);
+
+                        if (length > 0) {
+                            dirX /= length;
+                            dirY /= length;
+                        }
+
+                        unit.vel.set(dirX * 2f, dirY * 2f);
                     }
-            
-                    unit.vel.set(dirX * 2f, dirY * 2f);
+
+                    // Check if the unit is close enough to the target spawn point
+                    if (unit.dst(nearestSpawn.x, nearestSpawn.y) <= 5f) { // Assuming 5f is the threshold distance
+                        // Set the new AI controller here
+                        unit.type.aiController = GroundAI::new;
+                    }
+
+                    Log.debug("setting velocity for unit " + unit.type.localizedName + " to (" + unit.vel.x + ", "
+                            + unit.vel.y + ")");
                 }
             }
-            
-            
             if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires) {
                 unit.kill();
             }
@@ -332,7 +343,7 @@ public class PluginLogic {
             unit.type.crushDamage = 0f;
             unit.shield(unit.shield * multiplier);
             unit.health(unit.health * multiplier);
-            unit.speedMultiplier(Math.max(1f, multiplier * 0.01f));
+            unit.speedMultiplier(Math.max(0.7f, multiplier * 0.01f));
             unit.type.mineWalls = false;
             unit.type.mineFloor = false;
             unit.type.targetAir = false;
@@ -342,7 +353,9 @@ public class PluginLogic {
             unit.type.range = 0f;
             unit.type.maxRange = 0f;
             unit.type.mineRange = 0f;
-            unit.type.aiController = GroundAI::new;
+            if (!unit.type.flying) {
+                unit.type.aiController = GroundAI::new;
+            }
             unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
         }
     }
