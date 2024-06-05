@@ -288,26 +288,25 @@ public class PluginLogic {
 
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
-            unit.type.speed = Math.max(unit.speed() * 0.8f, unit.speed() * 0.8f + multiplier * 0.01f);
+            unit.type.speed = Math.max(unit.speed(), unit.speed() * 0.8f + multiplier * 0.01f);
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
             if (unit.type.flying) {
-                if (unit.type.flying) {
-                    Seq<Tile> spawnTiles = Vars.spawner.getSpawns();
-                    Tile nearestSpawnPoint = null;
-                    float minDistance = Float.MAX_VALUE;
-                    for (Tile spawnTile : spawnTiles) {
-                        float distance = unit.dst(spawnTile);
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            nearestSpawnPoint = spawnTile;
-                        }
-                    }
-                    if (nearestSpawnPoint != null) {
-                        unit.velAddNet(nearestSpawnPoint.x, nearestSpawnPoint.y);
+                Seq<Tile> spawnTiles = Vars.spawner.getSpawns();
+                Tile nearestSpawnPoint = null;
+                float minDistance = Float.MAX_VALUE;
+                for (Tile spawnTile : spawnTiles) {
+                    float distance = unit.dst(spawnTile);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nearestSpawnPoint = spawnTile;
                     }
                 }
+                if (nearestSpawnPoint != null) {
+                    unit.vel.set(nearestSpawnPoint.x, nearestSpawnPoint.y);
+                }
+
             }
             if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires) {
                 unit.kill();
@@ -317,7 +316,6 @@ public class PluginLogic {
             unit.type.crushDamage = 0f;
             unit.shield(unit.shield * multiplier);
             unit.health(unit.health * multiplier);
-            unit.speedMultiplier(Math.max(1f, multiplier * 0.01f));
             unit.type.mineWalls = false;
             unit.type.mineFloor = false;
             unit.type.targetAir = false;
@@ -352,13 +350,10 @@ public class PluginLogic {
         if (pathCache.containsKey(tile)) {
             return !pathCache.get(tile);
         }
-
         // If not in cache, perform the original checks and cache the result
         boolean isPath = tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
-
         // Cache the result
         pathCache.put(tile, !isPath);
-
         return !isPath;
     }
 
@@ -367,7 +362,6 @@ public class PluginLogic {
         if (pathCache.containsKey(tile)) {
             return pathCache.get(tile);
         }
-
         // If not cached, perform the original checks and cache the result
         boolean isPath = tile.floor() == Vars.world.tile(0, 0).floor()
                 || tile.floor() == Vars.world.tile(0, 1).floor()
