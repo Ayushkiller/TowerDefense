@@ -313,7 +313,9 @@ public class PluginLogic {
             unit.type.range = 0f;
             unit.type.maxRange = 0f;
             unit.type.mineRange = 0f;
-            unit.type.aiController = GroundAI::new;
+            if (!unit.type.naval) {
+                unit.type.aiController = GroundAI::new;
+            }
             unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
         }
     }
