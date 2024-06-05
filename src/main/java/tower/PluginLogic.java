@@ -288,10 +288,10 @@ public class PluginLogic {
 
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
-            if (unit.type.naval) {
-                unit.type.speed = Math.max(unit.speed() * 0.9f, unit.speed() * 0.9f + multiplier * 0.005f);
+            if (unit.type.naval||unit.type.flying) {
+                unit.type.speed = 0.95f;
             } else {
-                unit.type.speed = Math.max(unit.speed(), unit.speed() * 0.8f + multiplier * 0.01f);
+                unit.type.speed = 1.2f;
             }
             unit.type.range = -1f;
             unit.type.hovering = true;
