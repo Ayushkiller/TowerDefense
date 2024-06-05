@@ -9,7 +9,7 @@ import mindustry.world.Tile;
 
 public class TowerPathfinder extends Pathfinder {
 
-    public static final int impassable = 2147483647, notPath = 99999;
+    public static final int impassable = 99999, notPath = 9999;
 
     public TowerPathfinder() {
         costTypes.set(costGround, (team, tile) -> {
