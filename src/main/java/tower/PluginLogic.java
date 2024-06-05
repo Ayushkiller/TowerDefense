@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import arc.Events;
 import arc.graphics.Color;
 import arc.math.Mathf;
-import arc.math.geom.Vec2;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Strings;
@@ -297,25 +296,6 @@ public class PluginLogic {
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
-            if (unit.type.flying) {
-                Seq<Tile> spawnTiles = Vars.spawner.getSpawns();
-                float minDistance = Float.MAX_VALUE; // Initialize with a high value
-                Tile nearestSpawnPoint = null; // Initialize to null
-                for (Tile spawnTile : spawnTiles) {
-                    float distance = unit.dst(spawnTile);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        nearestSpawnPoint = spawnTile;
-                    }
-                }
-                if (nearestSpawnPoint != null) {
-                    Vec2 directionToSpawn = new Vec2().set(nearestSpawnPoint.x - unit.x, nearestSpawnPoint.y - unit.y)
-                            .nor();
-                    // Set velocity towards the nearest spawn point
-                    unit.vel.set(directionToSpawn).scl(unit.type.speed);
-                }
-            }
-
             if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires) {
                 unit.kill();
             }
