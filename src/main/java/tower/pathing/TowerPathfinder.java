@@ -18,11 +18,11 @@ public class TowerPathfinder extends Pathfinder {
             }
             return (((PathTile.team(tile) == 0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable
                     : 1 +
-                      (PathTile.deep(tile) ? 300 : 0) +
-                      (PathTile.damages(tile) ? 50 : 0) +
-                      (PathTile.nearSolid(tile) ? 50 : 0) +
-                      (PathTile.solid(tile) ? 450 : 0) +
-                      (PathTile.nearLiquid(tile) ? 10 : 0);
+                            (PathTile.deep(tile) ? 300 : 0) +
+                            (PathTile.damages(tile) ? 50 : 0) +
+                            (PathTile.nearSolid(tile) ? 50 : 0) +
+                            (PathTile.solid(tile) ? 450 : 0) +
+                            (PathTile.nearLiquid(tile) ? 10 : 0);
         });
 
         costTypes.set(costLegs, (team, tile) -> {
@@ -31,26 +31,16 @@ public class TowerPathfinder extends Pathfinder {
             }
             return (((PathTile.team(tile) == 0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable
                     : 1 +
-                      (PathTile.deep(tile) ? 200 : 0) +
-                      (PathTile.damages(tile) ? 50 : 0) +
-                      (PathTile.nearSolid(tile) ? 50 : 0) +
-                      (PathTile.solid(tile) ? 450 : 0) +
-                      (PathTile.nearLiquid(tile) ? 10 : 0);
+                            (PathTile.deep(tile) ? 200 : 0) +
+                            (PathTile.damages(tile) ? 50 : 0) +
+                            (PathTile.nearSolid(tile) ? 50 : 0) +
+                            (PathTile.solid(tile) ? 450 : 0) +
+                            (PathTile.nearLiquid(tile) ? 10 : 0);
         });
-        costTypes.set(costNaval, (team, tile) -> {
-            if (team != state.rules.waveTeam.id) {
-                return 1; // Default cost for non-waveTeam units
-            }
-            return (((PathTile.team(tile) == 0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable
-                    : 1 +
-                      (PathTile.deep(tile) ? 20 : 0) +
-                      (PathTile.damages(tile) ? 50 : 0) +
-                      (PathTile.nearSolid(tile) ? 50 : 0) +
-                      (PathTile.liquid(tile) ? 10 : 0) +
-                      (PathTile.solid(tile) ? 45 : 0) +
-                      (PathTile.nearLiquid(tile) ? 10 : 0); 
-        });
-    
+        costTypes.set(costNaval, (team, tile) -> (PathTile.solid(tile) || !PathTile.liquid(tile) ? notPath : 1) +
+                (PathTile.damages(tile) ? 50 : 0) +
+                (PathTile.nearSolid(tile) ? 10 : 0) +
+                (PathTile.nearGround(tile) ? 10 : 0));
     }
 
     public static void init() {
@@ -64,13 +54,19 @@ public class TowerPathfinder extends Pathfinder {
 
         for (int i = 0; i < 4; i++) {
             var other = tile.nearby(i);
-            if (other == null) continue;
+            if (other == null)
+                continue;
 
-            if (other.floor().isLiquid) nearLiquid = true;
-            if (other.solid() || !isPath(other)) nearSolid = true;
-            if (other.legSolid() || !isPath(other)) nearLegSolid = true;
-            if (!other.floor().isLiquid) nearGround = true;
-            if (!other.floor().isDeep()) allDeep = false;
+            if (other.floor().isLiquid)
+                nearLiquid = true;
+            if (other.solid() || !isPath(other))
+                nearSolid = true;
+            if (other.legSolid() || !isPath(other))
+                nearLegSolid = true;
+            if (!other.floor().isLiquid)
+                nearGround = true;
+            if (!other.floor().isDeep())
+                allDeep = false;
         }
 
         return PathTile.get(
