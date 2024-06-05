@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import arc.Events;
 import arc.graphics.Color;
 import arc.math.Mathf;
+import arc.math.geom.Vec2;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Strings;
@@ -288,14 +289,18 @@ public class PluginLogic {
 
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
-            unit.type.speed = Math.max(unit.speed(), unit.speed() * 0.8f + multiplier * 0.01f);
+            if (unit.type.naval) {
+                unit.type.speed = Math.max(unit.speed() * 0.9f, unit.speed() * 0.9f + multiplier * 0.005f);
+            } else {
+                unit.type.speed = Math.max(unit.speed(), unit.speed() * 0.8f + multiplier * 0.01f);
+            }
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
             if (unit.type.flying) {
                 Seq<Tile> spawnTiles = Vars.spawner.getSpawns();
-                Tile nearestSpawnPoint = null;
-                float minDistance = Float.MAX_VALUE;
+                float minDistance = Float.MAX_VALUE; // Initialize with a high value
+                Tile nearestSpawnPoint = null; // Initialize to null
                 for (Tile spawnTile : spawnTiles) {
                     float distance = unit.dst(spawnTile);
                     if (distance < minDistance) {
@@ -304,10 +309,13 @@ public class PluginLogic {
                     }
                 }
                 if (nearestSpawnPoint != null) {
-                    unit.vel.set(nearestSpawnPoint.x, nearestSpawnPoint.y);
+                    Vec2 directionToSpawn = new Vec2().set(nearestSpawnPoint.x - unit.x, nearestSpawnPoint.y - unit.y)
+                            .nor();
+                    // Set velocity towards the nearest spawn point
+                    unit.vel.set(directionToSpawn).scl(unit.type.speed);
                 }
-
             }
+
             if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires) {
                 unit.kill();
             }
