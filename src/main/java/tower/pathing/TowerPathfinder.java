@@ -9,7 +9,7 @@ import mindustry.world.Tile;
 
 public class TowerPathfinder extends Pathfinder {
 
-    public static final int impassable = 9999999, notPath = 999999;
+    public static final int impassable = 9999999, notPath = 999999,semiPath=-1;
 
     public TowerPathfinder() {
         costTypes.set(costGround, (team, tile) -> {
@@ -42,13 +42,13 @@ public class TowerPathfinder extends Pathfinder {
             if (team != state.rules.waveTeam.id) {
                 return 1; // Default cost for non-waveTeam units
             }
-            return (((PathTile.team(tile) == 0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? impassable
+            return (((PathTile.team(tile) == 0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? semiPath
                     : 1 +
-                      (PathTile.deep(tile) ? 20000 : 0) +
+                      (PathTile.deep(tile) ? 200 : 0) +
                       (PathTile.damages(tile) ? 50 : 0) +
                       (PathTile.nearSolid(tile) ? 50 : 0) +
                       (PathTile.solid(tile) ? 450 : 0) +
-                      (PathTile.nearLiquid(tile) ? 10000 : 0); // Very high cost for any liquid near tile
+                      (PathTile.nearLiquid(tile) ? 100 : 0); // Very high cost for any liquid near tile
         });
     }
 
