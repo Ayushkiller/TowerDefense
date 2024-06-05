@@ -4,6 +4,7 @@ import static mindustry.Vars.*;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import arc.Events;
@@ -11,9 +12,12 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.Strings;
+import arc.util.Threads;
 import arc.util.Timer;
 import mindustry.Vars;
+import mindustry.ai.WaveSpawner;
 import mindustry.ai.types.GroundAI;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
@@ -49,12 +53,14 @@ public class PluginLogic {
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
     private static Seq<Timer.Task> scheduledTasks = new Seq<>();
     private static final ConcurrentHashMap<Tile, Boolean> pathCache = new ConcurrentHashMap<>();
+    private static ConcurrentLinkedQueue<Unit> respawnAsyncTaskQueue = new ConcurrentLinkedQueue<>();
 
     public static void init() {
         initializeDrops();
         setupAdminActionFilters();
         scheduleTimers();
         setupEventHandlers();
+        processRespawnAsyncTask();
     }
 
     private static void initializeDrops() {
@@ -230,7 +236,7 @@ public class PluginLogic {
                     isPath(tile); // This will now cache the result
                 }
             }
-            
+
         });
         Events.on(EventType.WaveEvent.class, event -> adjustMultiplierByWave());
 
@@ -287,49 +293,108 @@ public class PluginLogic {
         }
     }
 
+    private static final float NAVAL_FLARE_SPEED = 0.8f;
+
     private static void handleUnitSpawn(Unit unit) {
-        if (unit.type != null) {
-            unit.type.speed = Math.max(unit.speed(), unit.speed() + multiplier * 0.01f);
-            unit.type.range = -1f;
-            unit.type.hovering = true;
-            unit.disarmed = true;
-            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires || unit.type == UnitTypes.eclipse
-                    || unit.type == UnitTypes.oct) {
-                unit.kill();
-            }
-            unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
-            unit.type.crashDamageMultiplier = 0f;
-            unit.type.crushDamage = 0f;
-            unit.shield(unit.shield * multiplier);
-            unit.health(unit.health * multiplier);
-            unit.speedMultiplier(Math.max(1f, unit.speedMultiplier * multiplier * 0.01f));
-            unit.type.mineWalls = false;
-            unit.type.mineFloor = false;
-            unit.type.targetAir = false;
-            unit.type.targetGround = false;
-            unit.type.payloadCapacity = 0f;
-            unit.type.legSplashDamage = 0f;
-            unit.type.range = 0f;
-            unit.type.maxRange = 0f;
-            unit.type.mineRange = 0f;
-            unit.type.aiController = GroundAI::new;
-            unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
+        if (unit.type == null)
+            return;
+
+        UnitType unitType = unit.type;
+
+        // Speed calculation
+        float calculatedSpeed = unitType.naval || unitType == UnitTypes.flare ? NAVAL_FLARE_SPEED
+                : Math.max(unit.speed(), unit.speed() + multiplier * 0.01f);
+        unitType.speed = calculatedSpeed;
+
+        // Unit type modifications
+        unitType.range = -1f;
+        unitType.hovering = true;
+        unit.disarmed = true;
+        unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
+
+        // Special cases for flying units and specific unit types
+        if (unitType.flying) {
+            enqueueUnitForRespawn(unit);
         }
+        if (unitType == UnitTypes.omura || unitType == UnitTypes.aegires) {
+            unit.kill();
+        }
+
+        // Apply multipliers
+        applyMultipliers(unit);
+
+        // AI and targeting settings
+        configureUnitType(unitType);
+    }
+
+    private static void applyMultipliers(Unit unit) {
+        unit.shield(unit.shield * multiplier);
+        unit.health(unit.health * multiplier);
+        unit.speedMultiplier(Math.max(1f, unit.speedMultiplier * multiplier * 0.01f));
+    }
+
+    private static void configureUnitType(UnitType unitType) {
+        unitType.crashDamageMultiplier = 0f;
+        unitType.crushDamage = 0f;
+        unitType.mineWalls = false;
+        unitType.mineFloor = false;
+        unitType.targetAir = false;
+        unitType.targetGround = false;
+        unitType.payloadCapacity = 0f;
+        unitType.legSplashDamage = 0f;
+        unitType.range = 0f;
+        unitType.maxRange = 0f;
+        unitType.mineRange = 0f;
+        unitType.aiController = GroundAI::new;
+        unitType.targetFlags = new BlockFlag[] { BlockFlag.core };
+    }
+
+    private static void processRespawnAsyncTask() {
+        Threads.daemon("RespawnThread", () -> {
+            while (true) {
+                Unit unit = respawnAsyncTaskQueue.poll();
+                if (unit != null) {
+                    Seq<Tile> nearbySpawnTiles = findNearbySpawnTiles(unit);
+                    if (!nearbySpawnTiles.isEmpty()) {
+                        Tile selectedTile = nearbySpawnTiles.random();
+                        moveUnitToTile(unit, selectedTile);
+                    }
+                }
+                Threads.sleep(10); // Prevent busy-waiting
+            }
+        }).start();
+    }
+
+    private static Seq<Tile> findNearbySpawnTiles(Unit unit) {
+        return new WaveSpawner().getSpawns().copy();
+    }
+
+    private static void moveUnitToTile(Unit unit, Tile tile) {
+        unit.move(tile.worldx(), tile.worldy());
+        Log.info("Commanded unit to move to {0}, {1}", tile.worldx(), tile.worldy());
+    }
+
+    public static void enqueueUnitForRespawn(Unit unit) {
+        respawnAsyncTaskQueue.add(unit);
     }
 
     public static void checkUnitsWithinRadius() {
         forceProjectorTiles.each((tile, forceProjector) -> {
             Groups.unit.each(unit -> {
                 if (unit.team == state.rules.waveTeam && unit.dst(tile.worldx(), tile.worldy()) <= 105f) {
-                    unit.type.speed = 1.2f;
-                    unit.healthMultiplier(0.75f);
-                    unit.apply(StatusEffects.electrified, 200f);
-                    unit.apply(StatusEffects.slow, 200f);
-                    unit.apply(StatusEffects.freezing, 200f);
-                    unit.apply(StatusEffects.sporeSlowed, 200f);
+                    applyAreaEffect(unit);
                 }
             });
         });
+    }
+
+    private static void applyAreaEffect(Unit unit) {
+        unit.type.speed = 1.2f;
+        unit.healthMultiplier(0.75f);
+        unit.apply(StatusEffects.electrified, 200f);
+        unit.apply(StatusEffects.slow, 200f);
+        unit.apply(StatusEffects.freezing, 200f);
+        unit.apply(StatusEffects.sporeSlowed, 200f);
     }
 
     public static boolean canBePlaced(Tile tile, Block block) {
@@ -343,7 +408,6 @@ public class PluginLogic {
 
         // Cache the result
         pathCache.put(tile, !isPath);
-
         return !isPath;
     }
 
