@@ -37,19 +37,6 @@ public class TowerPathfinder extends Pathfinder {
                       (PathTile.solid(tile) ? 450 : 0) +
                       (PathTile.nearLiquid(tile) ? 10 : 0);
         });
-
-        costTypes.set(costNaval, (team, tile) -> {
-            if (team != state.rules.waveTeam.id) {
-                return 1; // Default cost for non-waveTeam units
-            }
-            return (((PathTile.team(tile) == 0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? semiPath
-                    : 1 +
-                      (PathTile.deep(tile) ? 200 : 0) +
-                      (PathTile.damages(tile) ? 50 : 0) +
-                      (PathTile.nearSolid(tile) ? 50 : 0) +
-                      (PathTile.solid(tile) ? 450 : 0) +
-                      (PathTile.nearLiquid(tile) ? 100 : 0); // Very high cost for any liquid near tile
-        });
     }
 
     public static void init() {
