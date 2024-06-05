@@ -348,22 +348,28 @@ public class PluginLogic {
         unitType.aiController = GroundAI::new;
         unitType.targetFlags = new BlockFlag[] { BlockFlag.core };
     }
+    private static boolean respawnThreadStarted = false;
 
-    private static void processRespawnAsyncTask() {
-        Threads.daemon("RespawnThread", () -> {
-            while (true) {
-                Unit unit = respawnAsyncTaskQueue.poll();
-                if (unit != null) {
-                    Seq<Tile> nearbySpawnTiles = findNearbySpawnTiles(unit);
-                    if (!nearbySpawnTiles.isEmpty()) {
-                        Tile selectedTile = nearbySpawnTiles.random();
-                        moveUnitToTile(unit, selectedTile);
+    public static void processRespawnAsyncTask() {
+        if (!respawnThreadStarted) {
+            Threads.daemon("RespawnThread", () -> {
+                while (true) {
+                    Unit unit = respawnAsyncTaskQueue.poll();
+                    if (unit!= null) {
+                        Seq<Tile> nearbySpawnTiles = findNearbySpawnTiles(unit);
+                        if (!nearbySpawnTiles.isEmpty()) {
+                            Tile selectedTile = nearbySpawnTiles.random();
+                            moveUnitToTile(unit, selectedTile);
+                        }
                     }
+                    Threads.sleep(10); // Prevent busy-waiting
                 }
-                Threads.sleep(10); // Prevent busy-waiting
-            }
-        }).start();
+            }).start();
+    
+            respawnThreadStarted = true;
+        }
     }
+   
 
     private static Seq<Tile> findNearbySpawnTiles(Unit unit) {
         return new WaveSpawner().getSpawns().copy();
