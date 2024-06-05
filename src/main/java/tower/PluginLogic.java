@@ -296,7 +296,7 @@ public class PluginLogic {
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
-            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires) {
+            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires|| unit.type == UnitTypes.navanax) {
                 unit.kill();
             }
             unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
@@ -310,7 +310,6 @@ public class PluginLogic {
             unit.type.targetGround = false;
             unit.type.payloadCapacity = 0f;
             unit.type.legSplashDamage = 0f;
-            unit.type.range = 0f;
             unit.type.maxRange = 0f;
             unit.type.mineRange = 0f;
             if (!unit.type.naval) {
