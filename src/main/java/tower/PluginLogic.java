@@ -9,10 +9,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import arc.Events;
 import arc.graphics.Color;
 import arc.math.Mathf;
-import arc.math.geom.Point2;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
@@ -297,42 +295,18 @@ public class PluginLogic {
             if (unit.type.flying) {
                 if (unit.type.flying) {
                     Seq<Tile> spawnTiles = Vars.spawner.getSpawns();
-                    Point2 nearestSpawn = new Point2();
-                    float nearestDistance = Float.MAX_VALUE;
-
+                    Tile nearestSpawnPoint = null;
+                    float minDistance = Float.MAX_VALUE;
                     for (Tile spawnTile : spawnTiles) {
-                        Point2 spawnPoint = new Point2();
-                        spawnPoint.set((int) spawnTile.worldx(), (int) spawnTile.worldy());
-                        float dist = unit.dst(spawnPoint.x, spawnPoint.y);
-
-                        if (dist < nearestDistance) {
-                            nearestDistance = dist;
-                            nearestSpawn.set(spawnPoint);
+                        float distance = unit.dst(spawnTile);
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            nearestSpawnPoint = spawnTile;
                         }
                     }
-
-                    if (!(nearestSpawn.x == 0 && nearestSpawn.y == 0)) {
-                        Log.debug("spawn tile distance: " + nearestDistance);
-                        float dirX = nearestSpawn.x - unit.x;
-                        float dirY = nearestSpawn.y - unit.y;
-                        float length = (float) Math.sqrt(dirX * dirX + dirY * dirY);
-
-                        if (length > 0) {
-                            dirX /= length;
-                            dirY /= length;
-                        }
-
-                        unit.vel.set(dirX * 2f, dirY * 2f);
+                    if (nearestSpawnPoint != null) {
+                        unit.velAddNet(nearestSpawnPoint.x, nearestSpawnPoint.y);
                     }
-
-                    // Check if the unit is close enough to the target spawn point
-                    if (unit.dst(nearestSpawn.x, nearestSpawn.y) <= 5f) { // Assuming 5f is the threshold distance
-                        // Set the new AI controller here
-                        unit.type.aiController = GroundAI::new;
-                    }
-
-                    Log.debug("setting velocity for unit " + unit.type.localizedName + " to (" + unit.vel.x + ", "
-                            + unit.vel.y + ")");
                 }
             }
             if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires) {
@@ -343,7 +317,7 @@ public class PluginLogic {
             unit.type.crushDamage = 0f;
             unit.shield(unit.shield * multiplier);
             unit.health(unit.health * multiplier);
-            unit.speedMultiplier(Math.max(0.7f, multiplier * 0.01f));
+            unit.speedMultiplier(Math.max(1f, multiplier * 0.01f));
             unit.type.mineWalls = false;
             unit.type.mineFloor = false;
             unit.type.targetAir = false;
@@ -353,9 +327,7 @@ public class PluginLogic {
             unit.type.range = 0f;
             unit.type.maxRange = 0f;
             unit.type.mineRange = 0f;
-            if (!unit.type.flying) {
-                unit.type.aiController = GroundAI::new;
-            }
+            unit.type.aiController = GroundAI::new;
             unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
         }
     }
