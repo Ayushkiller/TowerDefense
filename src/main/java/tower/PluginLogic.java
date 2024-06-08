@@ -58,10 +58,9 @@ public class PluginLogic {
     }
 
     private static void initializeDrops() {
-        for (Map<String, Object> dropEntry : Unitsdrops.drops) {
-            UnitType unit = (UnitType) dropEntry.get("unit");
-            @SuppressWarnings("unchecked")
-            Seq<ItemStack> itemStacks = (Seq<ItemStack>) dropEntry.get("drops");
+        for (Map.Entry<UnitType, Seq<ItemStack>> dropEntry : Unitsdrops.drops.entrySet()) {
+            UnitType unit = dropEntry.getKey();
+            Seq<ItemStack> itemStacks = dropEntry.getValue();
             drops.put(unit, itemStacks);
         }
     }
@@ -214,9 +213,9 @@ public class PluginLogic {
             var builder = new StringBuilder();
             drop.each(stack -> {
                 // Adjust the amount based on the multiplierAdjusted flag
-                int amount = multiplierAdjusted ? (int) (stack.amount * 0.75f)
-                        : Mathf.random(stack.amount - stack.amount / 2, stack.amount + stack.amount / 2);
-                builder.append("[accent]+").append(amount).append(stack.item.emoji()).append(" ");
+                int amount = (int) (multiplierAdjusted ? (int) (stack.amount * 0.75f)
+                        : Mathf.random(stack.amount - stack.amount / 2, stack.amount*1.4f + stack.amount / 2));
+                builder.append("[accent]+").append(amount).append("[white]").append(stack.item.emoji()).append(" ");
                 Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x,
                         event.unit.y, core);
             });

@@ -121,8 +121,8 @@ public class Units {
             Unit spawned = unitType.spawn(player);
             if(shouldControlUnit){
                 Call.unitControl(player,spawned);
+                player.sendMessage(Bundle.get("unit.bought", player.locale()));
             }
-            player.sendMessage(Bundle.get("unit.bought", player.locale()));
         } else {
             player.sendMessage(Bundle.get("menu.units.not-enough", player.locale()));
         }
