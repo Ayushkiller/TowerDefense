@@ -3,6 +3,7 @@ package tower.commands;
 import java.util.Objects;
 
 import arc.Events;
+import arc.util.Time;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
@@ -19,6 +20,7 @@ import mindustry.world.Tile;
 import tower.Bundle;
 import tower.Players;
 import tower.Domain.PlayerData;
+
 public class SuperPowers {
     private static final float tileSize = 1.0f;
     private static final int unitCost = 100;
@@ -44,11 +46,11 @@ public class SuperPowers {
 
     private static void openUnitSelectionMenu(Player player, World world, float playerX, float playerY) {
         String[][] buttons = {
-            {"Corvus"},
-            {"Collaris"},
-            {"Squad"},
-            {"Magic"},
-            {"Alpha"}
+                { "Corvus" },
+                { "Collaris" },
+                { "Squad" },
+                { "Magic" },
+                { "Alfpha" }
         };
 
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
@@ -57,12 +59,13 @@ public class SuperPowers {
                 case 1 -> spawnUnits(player, world, playerX, playerY, UnitTypes.collaris, 6, unitCost);
                 case 2 -> spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt, ARC_UNIT_COUNT, arcCost);
                 case 3 -> spawnDisruptUnits(player, world, playerX, playerY);
-                case 4 -> useAlphaAbility(player, playerX, playerY);
+                case 4 -> useAlphaAbility(player);
             }
         }), "[lime]Choose an ability to use:", "", buttons);
     }
 
-    private static void spawnUnits(Player player, World world, float playerX, float playerY, UnitType unitType, int unitCount, int cost) {
+    private static void spawnUnits(Player player, World world, float playerX, float playerY, UnitType unitType,
+            int unitCount, int cost) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= cost) {
             playerData.subtractCash(cost);
@@ -83,7 +86,8 @@ public class SuperPowers {
         }
     }
 
-    private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType, int unitCount, int cost) {
+    private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType,
+            int unitCount, int cost) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= cost) {
             playerData.subtractCash(cost);
@@ -115,7 +119,8 @@ public class SuperPowers {
                     float x = playerX + ARC_RADIUS * (float) Math.cos(Math.toRadians(angle));
                     float y = playerY + ARC_RADIUS * (float) Math.sin(Math.toRadians(angle));
 
-                    for (UnitType unitType : new UnitType[]{UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert, UnitTypes.flare}) {
+                    for (UnitType unitType : new UnitType[] { UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert,
+                            UnitTypes.flare }) {
                         spawnAndConfigureUnit(player, world, x, y, unitType, 10_000);
                     }
                 }, i * 0.1f);
@@ -125,15 +130,21 @@ public class SuperPowers {
         }
     }
 
-    private static void useAlphaAbility(Player player, float playerX, float playerY) {
+    private static float lastUsedTime = 0;
+
+    private static void useAlphaAbility(Player player) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= ALPHA_COST) {
             playerData.subtractCash(ALPHA_COST);
             player.sendMessage(Bundle.get("alpha.ability.tap-target", player.locale()));
 
+            // Set the last used time to now
+            lastUsedTime = Time.millis();
+
+            // Register the tap event listener
             Events.on(EventType.TapEvent.class, event -> {
-                if (event.player == player) {
-                    sendEMPBullet(player, playerX, playerY, event.tile.worldx(), event.tile.worldy());
+                if (event.player == player && Time.millis() - lastUsedTime >= 4000) { // Check if enough time has passed
+                    sendEMPBullet(player, player.x, player.y, event.tile.worldx(), event.tile.worldy());
                 }
             });
         } else {
@@ -144,16 +155,19 @@ public class SuperPowers {
     private static void sendEMPBullet(Player player, float startX, float startY, float endX, float endY) {
         Unit playerUnit = player.unit();
         if (playerUnit != null) {
-            float angle = (float) Math.toDegrees(Math.atan2(endY - startY, endX - startX)); // Calculate angle in degrees
+            float angle = (float) Math.toDegrees(Math.atan2(endY - startY, endX - startX)); // Calculate angle in
+                                                                                            // degrees
             playerUnit.rotation(angle); // Rotate the player's unit to face the target
             float damage = 1.0f; // Damage of the bullet
             float velocityScl = 1.0f; // Velocity scale
             float lifetimeScl = 1.0f; // Lifetime scale
-            Call.createBullet(getBullet(UnitTypes.navanax,"emp-cannon-mount"), player.team(), startX, startY, angle, damage, velocityScl, lifetimeScl);
+            Call.createBullet(getBullet(UnitTypes.navanax, "emp-cannon-mount"), player.team(), startX, startY, angle,
+                    damage, velocityScl, lifetimeScl);
         }
     }
 
-    private static void spawnAndConfigureUnit(Player player, World world, float x, float y, UnitType unitType, long lifetime) {
+    private static void spawnAndConfigureUnit(Player player, World world, float x, float y, UnitType unitType,
+            long lifetime) {
         Tile tile = world.tileWorld(x * tileSize, y * tileSize);
         if (tile != null) {
             Unit unit = unitType.spawn(x * tileSize, y * tileSize);
@@ -180,6 +194,7 @@ public class SuperPowers {
             Players.getPlayer(player).addCash(unitCost);
         }
     }
+
     private static BulletType getBullet(final UnitType type, final String name) {
         return Objects.requireNonNull(type.weapons.find(w -> w.name.equals(name)).bullet);
     }

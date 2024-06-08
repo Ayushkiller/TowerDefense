@@ -93,6 +93,7 @@ public class PluginLogic {
         addScheduledTask(PluginLogic::resetNegativePlayerCash, 0f, 2f);
         addScheduledTask(PluginLogic::damageNearbyEnemyCores, 0f, 1f);
         addScheduledTask(PluginLogic::showMultiplierPopup, 0f, 1f);
+        addScheduledTask(PluginLogic::RemindPeople, 0f, 45f);
     }
 
     private static void applyForceProjectorEffects() {
@@ -109,6 +110,11 @@ public class PluginLogic {
                     Bundle.label(player, 4f, tile.drawx(), tile.drawy(), "ui.repair");
                 }
             });
+        });
+    }
+    private static void RemindPeople() {
+        Groups.player.each(player -> {
+          player.sendMessage("[green]Please [yellow]Type [white]/menu to open ingame [cyan] Shop");
         });
     }
 
