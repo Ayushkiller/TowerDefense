@@ -1,9 +1,14 @@
 package tower.commands;
 
+import java.util.Objects;
+
+import arc.Events;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
 import mindustry.core.World;
+import mindustry.entities.bullet.BulletType;
+import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
@@ -14,16 +19,16 @@ import mindustry.world.Tile;
 import tower.Bundle;
 import tower.Players;
 import tower.Domain.PlayerData;
-
 public class SuperPowers {
-    private static final float tileSize = 1.0f; 
+    private static final float tileSize = 1.0f;
     private static final int unitCost = 100;
-    private static final int unitLife = 50_000; 
+    private static final int unitLife = 50_000;
     private static final int arcCost = 100;
     private static final int DISRUPT_unitCost = 40;
     private static final float ARC_RADIUS = 140f;
     private static final float ARC_ANGLE = 180f;
     private static final int ARC_UNIT_COUNT = 20;
+    private static final int ALPHA_COST = 50;
 
     public static void execute(Player player) {
         Unit playerUnit = player.unit(); // Get the player's unit
@@ -42,7 +47,8 @@ public class SuperPowers {
             {"Corvus"},
             {"Collaris"},
             {"Squad"},
-            {"Magic"}
+            {"Magic"},
+            {"Alpha"}
         };
 
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
@@ -51,6 +57,7 @@ public class SuperPowers {
                 case 1 -> spawnUnits(player, world, playerX, playerY, UnitTypes.collaris, 6, unitCost);
                 case 2 -> spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt, ARC_UNIT_COUNT, arcCost);
                 case 3 -> spawnDisruptUnits(player, world, playerX, playerY);
+                case 4 -> useAlphaAbility(player, playerX, playerY);
             }
         }), "[lime]Choose an ability to use:", "", buttons);
     }
@@ -58,7 +65,7 @@ public class SuperPowers {
     private static void spawnUnits(Player player, World world, float playerX, float playerY, UnitType unitType, int unitCount, int cost) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= cost) {
-            playerData.subtractCash(cost); 
+            playerData.subtractCash(cost);
             float angleStep = 360f / unitCount;
             float radius = 100f;
 
@@ -88,7 +95,7 @@ public class SuperPowers {
                     float angle = finalI * angleStep - ARC_ANGLE / 2;
                     float x = playerX + ARC_RADIUS * (float) Math.cos(Math.toRadians(angle));
                     float y = playerY + ARC_RADIUS * (float) Math.sin(Math.toRadians(angle));
-                    spawnAndConfigureUnit(player, world, x, y, unitType, 10_000); 
+                    spawnAndConfigureUnit(player, world, x, y, unitType, 10_000);
                 }, i * 0.1f);
             }
         } else {
@@ -109,12 +116,40 @@ public class SuperPowers {
                     float y = playerY + ARC_RADIUS * (float) Math.sin(Math.toRadians(angle));
 
                     for (UnitType unitType : new UnitType[]{UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert, UnitTypes.flare}) {
-                        spawnAndConfigureUnit(player, world, x, y, unitType, 10_000); 
+                        spawnAndConfigureUnit(player, world, x, y, unitType, 10_000);
                     }
                 }, i * 0.1f);
             }
         } else {
             player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-cash", player.locale()));
+        }
+    }
+
+    private static void useAlphaAbility(Player player, float playerX, float playerY) {
+        PlayerData playerData = Players.getPlayer(player);
+        if (playerData.getCash() >= ALPHA_COST) {
+            playerData.subtractCash(ALPHA_COST);
+            player.sendMessage(Bundle.get("alpha.ability.tap-target", player.locale()));
+
+            Events.on(EventType.TapEvent.class, event -> {
+                if (event.player == player) {
+                    sendEMPBullet(player, playerX, playerY, event.tile.worldx(), event.tile.worldy());
+                }
+            });
+        } else {
+            player.sendMessage(Bundle.get("alpha.ability.not-enough-cash", player.locale()));
+        }
+    }
+
+    private static void sendEMPBullet(Player player, float startX, float startY, float endX, float endY) {
+        Unit playerUnit = player.unit();
+        if (playerUnit != null) {
+            float angle = (float) Math.toDegrees(Math.atan2(endY - startY, endX - startX)); // Calculate angle in degrees
+            playerUnit.rotation(angle); // Rotate the player's unit to face the target
+            float damage = 1.0f; // Damage of the bullet
+            float velocityScl = 1.0f; // Velocity scale
+            float lifetimeScl = 1.0f; // Lifetime scale
+            Call.createBullet(getBullet(UnitTypes.navanax,"emp-cannon-mount"), player.team(), startX, startY, angle, damage, velocityScl, lifetimeScl);
         }
     }
 
@@ -135,7 +170,7 @@ public class SuperPowers {
                     if (unit.isValid()) {
                         unit.kill();
                     }
-                }, lifetime / 1000f); 
+                }, lifetime / 1000f);
             } else {
                 player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
                 Players.getPlayer(player).addCash(unitCost);
@@ -144,5 +179,8 @@ public class SuperPowers {
             player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
             Players.getPlayer(player).addCash(unitCost);
         }
+    }
+    private static BulletType getBullet(final UnitType type, final String name) {
+        return Objects.requireNonNull(type.weapons.find(w -> w.name.equals(name)).bullet);
     }
 }
