@@ -9,7 +9,7 @@ import mindustry.world.Tile;
 
 public class TowerPathfinder extends Pathfinder {
 
-    public static final int impassable = 9999999, notPath = 999999;
+    public static final int impassable = -1, notPath = 99999999,semiimpassable=2147483647;
 
     public TowerPathfinder() {
         costTypes.set(costGround, (team, tile) -> {
@@ -37,11 +37,30 @@ public class TowerPathfinder extends Pathfinder {
                             (PathTile.solid(tile) ? 450 : 0) +
                             (PathTile.nearLiquid(tile) ? 10 : 0);
         });
+
         costTypes.set(costNaval, (team, tile) -> (PathTile.solid(tile) || !PathTile.liquid(tile) ? notPath : 1) +
                 (PathTile.damages(tile) ? 50 : 0) +
                 (PathTile.nearSolid(tile) ? 10 : 0) +
                 (PathTile.nearGround(tile) ? 10 : 0));
+
+        costTypes.set(costFlyer, (team, tile) -> {
+            if (team != state.rules.waveTeam.id) {
+                return 1; // Default cost for non-waveTeam units
+            }
+            return (((PathTile.team(tile) == 0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? semiimpassable
+                    : 1 +
+                            (PathTile.deep(tile) ? 300 : 0) +
+                            (PathTile.damages(tile) ? 50 : 0) +
+                            (PathTile.nearSolid(tile) ? 50 : 0) +
+                            (PathTile.solid(tile) ? 450 : 0) +
+                            (PathTile.nearLiquid(tile) ? 10 : 0);
+        });
     }
+
+    public static final int costGround = 0,
+            costLegs = 1,
+            costNaval = 2,
+            costFlyer = 3;
 
     public static void init() {
         pathfinder = new TowerPathfinder();

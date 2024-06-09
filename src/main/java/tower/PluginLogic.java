@@ -38,6 +38,7 @@ import mindustry.world.blocks.units.RepairTurret;
 import mindustry.world.meta.BlockFlag;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
+import tower.pathing.TowerPathfinder;
 import useful.Bundle;
 
 public class PluginLogic {
@@ -93,7 +94,7 @@ public class PluginLogic {
         addScheduledTask(PluginLogic::resetNegativePlayerCash, 0f, 2f);
         addScheduledTask(PluginLogic::damageNearbyEnemyCores, 0f, 1f);
         addScheduledTask(PluginLogic::showMultiplierPopup, 0f, 1f);
-        addScheduledTask(PluginLogic::RemindPeople, 0f, 45f);
+        addScheduledTask(PluginLogic::RemindPeople, 0f, 180f);
     }
 
     private static void applyForceProjectorEffects() {
@@ -112,9 +113,10 @@ public class PluginLogic {
             });
         });
     }
+
     private static void RemindPeople() {
         Groups.player.each(player -> {
-          player.sendMessage("[green]Please [yellow]Type [white]/menu to open ingame [cyan] Shop");
+            player.sendMessage("[green]Please [yellow]Type [white]/menu to open ingame [cyan] Shop");
         });
     }
 
@@ -220,7 +222,7 @@ public class PluginLogic {
             drop.each(stack -> {
                 // Adjust the amount based on the multiplierAdjusted flag
                 int amount = (int) (multiplierAdjusted ? (int) (stack.amount * 0.75f)
-                        : Mathf.random(stack.amount - stack.amount / 2, stack.amount*1.4f + stack.amount / 2));
+                        : Mathf.random(stack.amount - stack.amount / 2, stack.amount * 1.4f + stack.amount / 2));
                 builder.append("[accent]+").append(amount).append("[white]").append(stack.item.emoji()).append(" ");
                 Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x,
                         event.unit.y, core);
@@ -293,7 +295,7 @@ public class PluginLogic {
 
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
-            if (unit.type.naval||unit.type.flying) {
+            if (unit.type.naval || unit.type.flying) {
                 unit.type.speed = 0.95f;
             } else {
                 unit.type.speed = 1.2f;
@@ -301,7 +303,7 @@ public class PluginLogic {
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
-            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires|| unit.type == UnitTypes.navanax) {
+            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires || unit.type == UnitTypes.navanax) {
                 unit.kill();
             }
             unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
@@ -317,8 +319,9 @@ public class PluginLogic {
             unit.type.legSplashDamage = 0f;
             unit.type.maxRange = 0f;
             unit.type.mineRange = 0f;
-            if (!unit.type.naval) {
-                unit.type.aiController = GroundAI::new;
+            unit.type.aiController = GroundAI::new;
+            if (unit.type.flying) {
+                unit.type.pathCost = TowerPathfinder.costTypes.get(3);
             }
             unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
         }

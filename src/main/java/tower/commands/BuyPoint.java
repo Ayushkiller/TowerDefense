@@ -22,16 +22,16 @@ public class BuyPoint {
 
     private static void openBuySellMenu(Player player) {
         String[][] buttons = {
-            { "[red]Buy Cash", "[cyan]Sell Items" }
+                { "[red]Buy Cash", "[cyan]Buy Items" }
         };
 
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            if (option == 0) {
-                openBuyMenu(player);
+            if (option == 0) { // Buy button
+                openMenu(player);
             } else if (option == 1) {
                 openSellMenu(player);
             }
-        }), Bundle.get("menu.title"), "", buttons);
+        }), "[red]Buy", "", buttons);
     }
 
     private static void openSellMenu(Player player) {
@@ -52,28 +52,29 @@ public class BuyPoint {
 
     private static void openQuantityAdjustmentMenuForSell(Player player, int option) {
         if (option < 0 || option >= Currency.items.size()) {
-            player.sendMessage(Bundle.get("menu.sellpoint.invalidSelection", player.locale()));
+            player.sendMessage("Invalid selection. Please try again.");
             return;
         }
         Map<String, Object> selectedItemMap = Currency.items.get(option);
         Item selectedItem = (Item) selectedItemMap.get("item");
 
-        String title = Bundle.get("menu.sellpoint.adjustQuantity.title", player.locale());
+        String title = "Adjust Quantity";
         Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
         String updatedQuantities = "";
         for (Map.Entry<Item, Integer> entry : quantities.entrySet()) {
             updatedQuantities += entry.getKey().emoji() + ": " + entry.getValue() + "\n";
         }
-        String description = Bundle.get("menu.sellpoint.adjustQuantity.description", player.locale()) + "\n\n" + updatedQuantities;
+        String description = "Select quantity to sell\n\n" + updatedQuantities;
 
+        // Calculate total cash required to buy selected items
         int totalCashRequired = calculateTotalCashRequired(quantities);
-        description += "\n\n[orange]" + Bundle.get("menu.sellpoint.totalCashRequired", player.locale()) + ": " + totalCashRequired;
+        description += "\n\n[orange]Total Cash Required: " + totalCashRequired;
 
         String[][] buttons = new String[][] { { "-2000", "-1000", "-100", "+400", "+1000", "+2000" },
-                { Bundle.get("menu.sellpoint.sell", player.locale()), Bundle.get("close", player.locale()), Bundle.get("back", player.locale()) } };
+                { "Sell", "Close", "Back" } };
 
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-            if (opt < 6) {
+            if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
                 int currentQuantity = quantities.getOrDefault(selectedItem, 0);
                 int newQuantity = currentQuantity + adjustment;
@@ -83,7 +84,7 @@ public class BuyPoint {
                 }
                 quantities.put(selectedItem, newQuantity);
                 openQuantityAdjustmentMenuForSell(player, option);
-            } else if (opt == 6) {
+            } else if (opt == 6) { // Sell button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
 
                 int totalQuantity = selectedItems.values().stream().mapToInt(Integer::intValue).sum();
@@ -105,10 +106,10 @@ public class BuyPoint {
                 playerData.subtractCash(totalCashRequired);
                 selectedItemsQuantities.remove(player);
                 player.sendMessage(Bundle.get("menu.sellpoint.success"));
-            } else if (opt == 7) {
+            } else if (opt == 7) { // Close button
                 player.sendMessage(Bundle.get("menu.sellpoint.close"));
                 selectedItemsQuantities.remove(player);
-            } else if (opt == 8) {
+            } else if (opt == 8) { // Back button
                 openSellMenu(player);
             }
         }), title, description, buttons);
@@ -118,8 +119,9 @@ public class BuyPoint {
         int totalCashRequired = 0;
         for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
-            int quantity = Math.abs(entry.getValue());
+            int quantity = Math.abs(entry.getValue()); // Use absolute value to calculate Cash
 
+            // Directly calculate Cash for quantity
             for (int row = 0; row < Currency.items.size(); row++) {
                 Map<String, Object> itemMap = Currency.items.get(row);
                 if (itemMap.get("item") == item) {
@@ -133,7 +135,7 @@ public class BuyPoint {
         return totalCashRequired;
     }
 
-    private static void openBuyMenu(Player player) {
+    private static void openMenu(Player player) {
         String[][] buttons = new String[Currency.items.size()][1];
 
         for (int i = 0; i < Currency.items.size(); i++) {
@@ -145,32 +147,32 @@ public class BuyPoint {
         }
 
         Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            openQuantityAdjustmentMenuForBuy(player, option);
+            openQuantityAdjustmentMenu(player, option);
         }), Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
     }
 
-    private static void openQuantityAdjustmentMenuForBuy(Player player, int option) {
+    private static void openQuantityAdjustmentMenu(Player player, int option) {
         if (option < 0 || option >= Currency.items.size()) {
-            player.sendMessage(Bundle.get("menu.buypoint.error.invalidSelection", player.locale()));
+            player.sendMessage("Invalid selection. Please try again.");
             return;
         }
         Map<String, Object> selectedItemMap = Currency.items.get(option);
         Item selectedItem = (Item) selectedItemMap.get("item");
 
-        String title = Bundle.get("menu.buypoint.adjustQuantity.title", player.locale());
+        String title = "Adjust Quantity";
         Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
         String updatedQuantities = "";
         for (Map.Entry<Item, Integer> entry : quantities.entrySet()) {
-            int teamQuantity = player.team().items().get(entry.getKey());
-            updatedQuantities += entry.getKey().emoji() + ": " + entry.getValue() + " [gray]" + Bundle.get("menu.buypoint.teamQuantity", player.locale()) + ": " + teamQuantity + "\n";
+            int teamQuantity = player.team().items().get(entry.getKey()); // Assuming this method retrieves the quantity
+            updatedQuantities += entry.getKey().emoji() + ": " + entry.getValue() + " [gray]Team Quantity: "
+                    + teamQuantity + "\n";
         }
-        String description = Bundle.get("menu.buypoint.adjustQuantity.description", player.locale()) + "\n\n" + updatedQuantities;
-
+        String description = "Select quantity adjustment\n\n" + updatedQuantities;
         String[][] buttons = new String[][] { { "-2000", "-1000", "-100", "+400", "+1000", "+2000" },
-                { Bundle.get("menu.buypoint.buy", player.locale()), Bundle.get("close", player.locale()), Bundle.get("back", player.locale()) } };
+                { "Buy", "Close", "Back" } };
 
         Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
-            if (opt < 6) {
+            if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
                 int currentQuantity = quantities.getOrDefault(selectedItem, 0);
                 int newQuantity = currentQuantity + adjustment;
@@ -179,8 +181,8 @@ public class BuyPoint {
                     return;
                 }
                 quantities.put(selectedItem, newQuantity);
-                openQuantityAdjustmentMenuForBuy(player, option);
-            } else if (opt == 6) {
+                openQuantityAdjustmentMenu(player, option);
+            } else if (opt == 6) { // Buy button
                 Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
                 int totalCash = calculateTotalCash(selectedItems);
                 if (totalCash == 0) {
@@ -197,34 +199,41 @@ public class BuyPoint {
                     player.sendMessage(Bundle.get("critical.resource"));
                     selectedItemsQuantities.put(player, new HashMap<>());
                 }
-            } else if (opt == 7) {
+            } else if (opt == 7) { // Close button
                 player.sendMessage(Bundle.get("menu.buypoint.close"));
                 selectedItemsQuantities.remove(player);
-            } else if (opt == 8) {
-                openBuyMenu(player);
+            } else if (opt == 8) { // Back button
+                openMenu(player);
             }
         }), title, description, buttons);
     }
 
-    private static Map<Item, Integer> getSelectedItemsQuantities(Player player) {
-        return selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
-    }
-
-    private static void sendMessageToPlayer(Player player, String key) {
-        player.sendMessage(Bundle.get(key, player.locale()));
+    private static boolean hasEnoughItems(Team team, Player player) {
+        Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
+        for (int i = 0; i < Currency.items.size(); i++) {
+            Map<String, Object> itemMap = Currency.items.get(i);
+            Item item = (Item) itemMap.get("item");
+            int requiredAmount = selectedItems.getOrDefault(item, 0); // Use the quantity the player wants to purchase
+            if (team.items().get(item) < requiredAmount) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static int calculateTotalCash(Map<Item, Integer> selectedItems) {
         int totalCash = 0;
         for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
-            int quantity = entry.getValue();
+            int quantity = Math.abs(entry.getValue()); // Use absolute value to calculate Cash
 
+            // Directly calculate Cash for quantity
             for (int row = 0; row < Currency.items.size(); row++) {
                 Map<String, Object> itemMap = Currency.items.get(row);
                 if (itemMap.get("item") == item) {
-                    int gain = (int) itemMap.get("gain");
-                    totalCash += gain * quantity;
+                    int pointGain = (int) itemMap.get("gain");
+                    int itemPrice = (int) itemMap.get("price");
+                    totalCash += (int) ((float) pointGain / itemPrice * quantity);
                     break;
                 }
             }
@@ -232,25 +241,27 @@ public class BuyPoint {
         return totalCash;
     }
 
-    private static boolean hasEnoughItems(Team team, Player player) {
-        Map<Item, Integer> selectedItems = getSelectedItemsQuantities(player);
+    public static void removeItemsFromTeam(Team team, Map<Item, Integer> selectedItems) {
         for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
-            if (team.items().get(entry.getKey()) < Math.abs(entry.getValue())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static void addItemsToTeam(Team team, Map<Item, Integer> selectedItems) {
-        for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
-            team.items().add(entry.getKey(), entry.getValue());
+            Item item = entry.getKey();
+            int quantity = entry.getValue();
+            team.items().remove(item, quantity);
         }
     }
 
-    private static void removeItemsFromTeam(Team team, Map<Item, Integer> selectedItems) {
+    public static void addItemsToTeam(Team team, Map<Item, Integer> selectedItems) {
         for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
-            team.items().remove(entry.getKey(), Math.abs(entry.getValue()));
+            Item item = entry.getKey();
+            int quantity = entry.getValue();
+            team.items().add(item, quantity);
         }
+    }
+
+    public static Map<Item, Integer> getSelectedItemsQuantities(Player player) {
+        return selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
+    }
+
+    public static void sendMessageToPlayer(Player player, String messageKey) {
+        player.sendMessage(Bundle.get(messageKey, player.locale()));
     }
 }

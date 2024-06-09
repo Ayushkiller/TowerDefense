@@ -3,7 +3,6 @@ package tower.commands;
 import java.util.Objects;
 
 import arc.Events;
-import arc.util.Time;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
@@ -130,25 +129,33 @@ public class SuperPowers {
         }
     }
 
-    private static float lastUsedTime = 0;
+    private static final long ALPHA_COOLDOWN = 5000; // Cooldown time in milliseconds
+    private static long lastAlphaAbilityTime = 0; // Variable to store the last time the Alpha ability was used
 
     private static void useAlphaAbility(Player player) {
         PlayerData playerData = Players.getPlayer(player);
-        if (playerData.getCash() >= ALPHA_COST) {
-            playerData.subtractCash(ALPHA_COST);
-            player.sendMessage(Bundle.get("alpha.ability.tap-target", player.locale()));
+        long currentTime = System.currentTimeMillis(); // Get the current time
 
-            // Set the last used time to now
-            lastUsedTime = Time.millis();
+        // Check if enough time has passed since the last use of the ability
+        if (currentTime - lastAlphaAbilityTime >= ALPHA_COOLDOWN) {
+            if (playerData.getCash() >= ALPHA_COST) {
+                playerData.subtractCash(ALPHA_COST);
+                player.sendMessage(Bundle.get("alpha.ability.tap-target", player.locale()));
 
-            // Register the tap event listener
-            Events.on(EventType.TapEvent.class, event -> {
-                if (event.player == player && Time.millis() - lastUsedTime >= 4000) { // Check if enough time has passed
-                    sendEMPBullet(player, player.x, player.y, event.tile.worldx(), event.tile.worldy());
-                }
-            });
+                // Register the tap event listener
+                Events.on(EventType.TapEvent.class, event -> {
+                    if (event.player == player) {
+                        sendEMPBullet(player, player.x, player.y, event.tile.worldx(), event.tile.worldy());
+                    }
+                });
+
+                lastAlphaAbilityTime = currentTime; // Update the last ability use time
+            } else {
+                player.sendMessage(Bundle.get("alpha.ability.not-enough-cash", player.locale()));
+            }
         } else {
-            player.sendMessage(Bundle.get("alpha.ability.not-enough-cash", player.locale()));
+            long remainingCooldown = ALPHA_COOLDOWN - (currentTime - lastAlphaAbilityTime);
+            player.sendMessage("Alpha ability is on cooldown. Please wait " + (remainingCooldown / 1000) + " seconds.");
         }
     }
 
