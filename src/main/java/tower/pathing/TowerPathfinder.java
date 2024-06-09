@@ -12,6 +12,7 @@ public class TowerPathfinder extends Pathfinder {
     public static final int impassable = -1, notPath = 99999999,semiimpassable=2147483647;
 
     public TowerPathfinder() {
+        costTypes.setSize(4);
         costTypes.set(costGround, (team, tile) -> {
             if (team != state.rules.waveTeam.id) {
                 return 1; // Default cost for non-waveTeam units
