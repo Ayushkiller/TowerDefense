@@ -9,10 +9,12 @@ import mindustry.ui.Menus;
 import tower.Bundle;
 import tower.Players;
 import tower.Domain.PlayerData;
+import tower.commands.Units;
 
 public class EventLoader {
     public static void init() {
-
+        EventLoader.init();
+        Units.initUnitsTable();
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;
             Players.getPlayer(player); // This ensures a new PlayerData is created if necessary

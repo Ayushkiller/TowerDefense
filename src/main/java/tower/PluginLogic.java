@@ -295,6 +295,7 @@ public class PluginLogic {
 
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null) {
+            if (unit.team == state.rules.waveTeam) {
             if (unit.type.naval || unit.type.flying) {
                 unit.type.speed = 0.95f;
             } else {
@@ -324,6 +325,7 @@ public class PluginLogic {
                 unit.type.pathCost = TowerPathfinder.costTypes.get(3);
             }
             unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
+        }
         }
     }
 

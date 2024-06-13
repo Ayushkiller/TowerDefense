@@ -9,7 +9,6 @@ import mindustry.mod.Plugin;
 import mindustry.type.Item;
 import tower.Domain.Currency;
 import tower.Domain.PlayerData;
-import tower.game.Loader;
 import tower.menus.Menu;
 import tower.pathing.TowerPathfinder;
 import useful.Bundle;
@@ -20,7 +19,6 @@ public class TowerDefensePlugin extends Plugin {
     @Override
     public void init() {
         Bundle.load(TowerDefensePlugin.class);
-        Loader.load();
         TowerPathfinder.init();
         PluginLogic.init(); 
     }
