@@ -156,7 +156,7 @@ public class Units {
         PlayerData playerData = Players.getPlayer(player);
         int price = unitPrices.get(unitType);
         if (playerData.getCash() >= price) {
-            playerData.subtractCash((float) price);
+            playerData.subtractCash((float) price, player);
             Unit spawned = unitType.spawn(player);
             if (shouldControlUnit) {
                 Call.unitControl(player, spawned);
@@ -175,7 +175,7 @@ public class Units {
             for (int i = 0; i < quantity; i++) {
                 buyUnit(unitType, player, false);
             }
-            playerData.subtractCash(totalCost);
+            playerData.subtractCash(totalCost, player);
             player.sendMessage("[green]Units purchased successfully.");
         } else {
             player.sendMessage("[red]You don't have enough funds to buy " + quantity + " units.");

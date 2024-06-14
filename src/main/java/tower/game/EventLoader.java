@@ -7,13 +7,11 @@ import java.util.function.BiConsumer;
 import arc.Events;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
-import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.ui.Menus;
 import tower.Bundle;
 import tower.Players;
 import tower.PluginLogic;
-import tower.Domain.PlayerData;
 import tower.commands.BuyPoint;
 import tower.commands.Info;
 import tower.commands.Statuseffects;
@@ -37,16 +35,6 @@ public class EventLoader {
             Player player = event.player;
             Players.getPlayer(player); // This ensures a new PlayerData is created if necessary
             openWelcomeMenu(player);
-        });
-
-        Events.on(EventType.GameOverEvent.class, event -> {
-            Players.clearMap();
-            Groups.player.each(player -> {
-                PlayerData playerData = Players.getPlayer(player);
-                if (playerData != null) {
-                    playerData.setCash(0);
-                }
-            });
         });
 
         Events.run(EventType.Trigger.update, PluginLogic::checkUnitsWithinRadius);

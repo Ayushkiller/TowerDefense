@@ -140,7 +140,7 @@ public class PluginLogic {
                     float cashToAdd = repairPointCash.get(tile, 0f);
                     if (cashToAdd > 0) {
                         PlayerData playerData = Players.getPlayer(player);
-                        playerData.addCash(cashToAdd);
+                        playerData.addCash(cashToAdd, player);
                         repairPointCash.put(tile, 0f);
                     }
                 }
@@ -152,7 +152,7 @@ public class PluginLogic {
         Groups.player.each(player -> {
             PlayerData playerData = Players.getPlayer(player);
             if (playerData != null && playerData.getCash() < 0) {
-                playerData.setCash(0);
+                playerData.setCash(0,player);
             }
         });
     }

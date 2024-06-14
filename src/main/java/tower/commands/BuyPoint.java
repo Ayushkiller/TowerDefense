@@ -124,7 +124,7 @@ public class BuyPoint {
                 }
 
                 addItemsToTeam(player.team(), selectedItems);
-                playerData.subtractCash(totalCashRequired);
+                playerData.subtractCash(totalCashRequired, p);
                 selectedItemsQuantities.remove(player);
                 player.sendMessage(Bundle.get("menu.sellpoint.success"));
             } else if (opt == 7) { // Close button
@@ -216,7 +216,7 @@ public class BuyPoint {
                 }
                 if (hasEnoughItems(player.team(), player)) {
                     PlayerData playerData = Players.getPlayer(player);
-                    playerData.addCash(totalCash);
+                    playerData.addCash(totalCash, p);
                     removeItemsFromTeam(player.team(), selectedItems);
                     selectedItemsQuantities.remove(player);
                     player.sendMessage(Bundle.get("menu.buypoint.success"));

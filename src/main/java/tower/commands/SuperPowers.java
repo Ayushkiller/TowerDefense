@@ -87,7 +87,7 @@ public class SuperPowers {
                                    int unitCount, int cost) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= cost) {
-            playerData.subtractCash(cost);
+            playerData.subtractCash(cost, player);
             float angleStep = 360f / unitCount;
             float radius = 100f;
 
@@ -109,7 +109,7 @@ public class SuperPowers {
                                         int unitCount, int cost) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= cost) {
-            playerData.subtractCash(cost);
+            playerData.subtractCash(cost, player);
             float angleStep = ARC_ANGLE / unitCount;
 
             for (int i = 0; i < unitCount; i++) {
@@ -129,7 +129,7 @@ public class SuperPowers {
     private static void spawnDisruptUnits(Player player, World world, float playerX, float playerY) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= DISRUPT_unitCost) {
-            playerData.subtractCash(DISRUPT_unitCost);
+            playerData.subtractCash(DISRUPT_unitCost, player);
 
             for (int i = 0; i < ARC_UNIT_COUNT; i++) {
                 int finalI = i;
@@ -156,7 +156,7 @@ public class SuperPowers {
 
         if (currentTime - lastAlphaAbilityTime >= ALPHA_COOLDOWN) {
             if (playerData.getCash() >= ALPHA_COST) {
-                playerData.subtractCash(ALPHA_COST);
+                playerData.subtractCash(ALPHA_COST, player);
                 player.sendMessage(Bundle.get("alpha.ability.tap-target", player.locale()));
 
                 // Check if the tap event listener is already registered for this player

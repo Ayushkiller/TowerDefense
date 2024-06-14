@@ -105,7 +105,7 @@ public class Statuseffects {
     }
 
     private static void applyEffectToPlayer(StatusEffect effect, Player player, PlayerData playerData, int totalPrice, int effectPrice, int additionalPrice) {
-        playerData.subtractCash(totalPrice);
+        playerData.subtractCash(totalPrice, player);
         player.unit().apply(effect, Float.POSITIVE_INFINITY);
         player.sendMessage(effect.emoji() + " " + Bundle.get("effect.bought.with.additional", player.locale()) + effectPrice + " + " + additionalPrice + " = " + totalPrice);
     }
