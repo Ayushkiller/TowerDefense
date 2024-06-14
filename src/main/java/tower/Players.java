@@ -35,12 +35,10 @@ public class Players {
         // Iterate over all connected players
         Groups.player.each(player -> {
             PlayerData playerData = Players.getPlayer(player); // Get PlayerData instance for player
-            if (playerData != null) { // If PlayerData instance exists
-                // Initialize StringBuilder for HUD text
-                String hud = "[green]Cash for[white] " + player.name + " - [lime]" + // Append cash text
-                        (int) playerData.getCash(); // Append current cash
-                Call.setHudText(player.con, hud); // Set HUD text for player
-            }
+            // Initialize StringBuilder for HUD text
+            String hud = "[green]Cash for[white] " + player.name + " - [lime]" + // Append cash text
+                    (int) playerData.getCash(); // Append current cash
+            Call.setHudText(player.con, hud); // Set HUD text for player
         });
     }
 }
