@@ -12,6 +12,7 @@ import mindustry.gen.Player;
 import mindustry.ui.Menus;
 import tower.Bundle;
 import tower.Players;
+import tower.PluginLogic;
 import tower.Domain.PlayerData;
 import tower.commands.BuyPoint;
 import tower.commands.Info;
@@ -30,7 +31,6 @@ public class EventLoader {
         Info.registerMenu();
         BuyPoint.registerMenus();
         Units.initUnitsTable();
-
         registerWelcomeMenu();
 
         Events.on(EventType.PlayerJoin.class, event -> {
@@ -49,8 +49,8 @@ public class EventLoader {
             });
         });
 
+        Events.run(EventType.Trigger.update, PluginLogic::checkUnitsWithinRadius);
         Events.run(EventType.Trigger.update, Players::forEach);
-
         Events.on(EventType.PlayerLeave.class, event -> {
             Player player = event.player;
             SuperPowers.alphaAbilityLastUseTime.remove(player);

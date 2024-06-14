@@ -247,8 +247,6 @@ public class PluginLogic {
 
         Events.on(EventType.UnitSpawnEvent.class, event -> handleUnitSpawn(event.unit));
 
-        Events.run(EventType.Trigger.update, PluginLogic::checkUnitsWithinRadius);
-
         Events.on(EventType.WorldLoadEndEvent.class, event -> reloadAllTasks());
     }
 
