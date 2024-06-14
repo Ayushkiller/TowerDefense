@@ -6,6 +6,7 @@ import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 import tower.Domain.PlayerData;
 import tower.game.EventLoader;
+import tower.menus.Menu;
 import tower.pathing.TowerPathfinder;
 import useful.Bundle;
 
@@ -16,9 +17,10 @@ public class TowerDefensePlugin extends Plugin {
     public void init() {
         Bundle.load(TowerDefensePlugin.class);
         TowerPathfinder.init();
-        PluginLogic.init(); 
+        PluginLogic.init();
         EventLoader.init();
     }
+
     // Registers server-side chat commands
     public void registerServerCommands(CommandHandler handler) {
         handler.register("death", "<Cash>", "Adds Cash to every player", (String[] args, Player player) -> {
@@ -37,5 +39,9 @@ public class TowerDefensePlugin extends Plugin {
             }
         });
     }
+
+ public void registerClientCommands(CommandHandler handler) {
+        handler.register("menu", "Opens the Special store", (String[] args, Player player) -> Menu.execute(player));
+ }
 
 }
