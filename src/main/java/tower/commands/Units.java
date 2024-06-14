@@ -17,11 +17,20 @@ import tower.Domain.UnitsTable;
 
 public class Units {
     private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
-    private static int tierMenuId;
-    private static int[] tierUnitMenuIds = new int[6];
-    private static int unitMenuId;
-    private static int quantityAdjustmentMenuId;
     private static final Map<Integer, BiConsumer<Player, Integer>> dynamicListeners = new HashMap<>();
+    private static final Map<String, Integer> menuIds = new HashMap<>();
+    
+    private static final String[][] tierButtons = new String[6][1];
+    private static int tierMenuId;
+    @SuppressWarnings("unused")
+    private static int currentTier;
+
+    static {
+        registerTierMenu();
+        for (int i = 0; i < 6; i++) {
+            tierButtons[i][0] = "[cyan]Tier " + i;
+        }
+    }
 
     public static void initUnitsTable() {
         for (Map<String, Object> unitMap : UnitsTable.units) {
@@ -32,49 +41,26 @@ public class Units {
         }
     }
 
-    public static void registerMenus() {
-        // Register the tier menu
-        String[][] tierButtons = new String[6][1];
-        for (int i = 0; i < 6; i++) {
-            tierButtons[i][0] = "[cyan]Tier " + i;
-        }
-        tierMenuId = Menus.registerMenu((player, option) -> {
-            if (option >= 0 && option < 6) {
-                openTierUnitsMenuGui(option, player);
-            } else {
-                player.sendMessage("Invalid selection. Please try again.");
-            }
-        });
-
-        // Register the tier unit menus
-        for (int i = 0; i < 6; i++) {
-            int tier = i;
-            tierUnitMenuIds[i] = Menus.registerMenu((player, option) -> {
-                dynamicListeners.get(tierUnitMenuIds[tier]).accept(player, option);
-            });
-        }
-
-        // Register the unit menu
-        unitMenuId = Menus.registerMenu((player, option) -> {
-            dynamicListeners.get(unitMenuId).accept(player, option);
-        });
-
-        // Register the quantity adjustment menu
-        quantityAdjustmentMenuId = Menus.registerMenu((player, option) -> {
-            dynamicListeners.get(quantityAdjustmentMenuId).accept(player, option);
-        });
-    }
-
     public static void execute(Player player) {
         openTierMenuGui(player);
     }
 
+    public static void registerTierMenu() {
+        tierMenuId = Menus.registerMenu((player, option) -> dynamicListeners.get(tierMenuId).accept(player, option));
+    }
+
     private static void openTierMenuGui(Player player) {
-        String[][] buttons = new String[6][1];
-        for (int i = 0; i < 6; i++) {
-            buttons[i][0] = "[cyan]Tier " + i;
+        dynamicListeners.put(tierMenuId, Units::handleTierMenuOption);
+        Call.menu(player.con, tierMenuId, "Select Tier", "", tierButtons);
+    }
+
+    private static void handleTierMenuOption(Player player, int option) {
+        if (option >= 0 && option < 6) {
+            currentTier = option;
+            openTierUnitsMenuGui(option, player);
+        } else {
+            player.sendMessage("Invalid selection. Please try again.");
         }
-        Call.menu(player.con, tierMenuId, "Select Tier", "", buttons);
     }
 
     private static void openTierUnitsMenuGui(int tier, Player player) {
@@ -90,7 +76,7 @@ public class Units {
             buttons[i][0] = unitType.emoji() + " " + name;
         }
 
-        dynamicListeners.put(tierUnitMenuIds[tier], (player1, option) -> {
+        int menuId = Menus.registerMenu((player1, option) -> {
             if (option >= 0 && option < tierUnits.size()) {
                 Map<String, Object> unitMap = tierUnits.get(option);
                 UnitType unitType = (UnitType) unitMap.get("unit");
@@ -99,8 +85,9 @@ public class Units {
                 player.sendMessage("Invalid selection. Please try again.");
             }
         });
+        menuIds.put("tierUnitsMenu_" + tier, menuId);
 
-        Call.menu(player.con, tierUnitMenuIds[tier], "Select Unit", "", buttons);
+        Call.menu(player.con, menuId, "Select Unit", "", buttons);
     }
 
     private static void openUnitMenuGui(UnitType unitType, Player player) {
@@ -110,28 +97,29 @@ public class Units {
                 Bundle.get("menu.units.info.armor", player.locale) + " " + (int) unitType.armor + "\n" +
                 Bundle.get("menu.units.info.price", player.locale) + " " + price;
 
-        dynamicListeners.put(unitMenuId, (player1, option) -> {
+        int menuId = Menus.registerMenu((player1, option) -> {
             switch (option) {
-                case 0 -> buyUnit(unitType, player, true);
+                case 0 -> buyUnit(unitType, player, true); 
                 case 1 -> openTierMenuGui(player);
-                case 2 -> openQuantityAdjustmentMenu(unitType, player, 1);
+                case 2 -> openQuantityAdjustmentMenu(unitType, player, 1); 
             }
         });
+        menuIds.put("unitMenu_" + unitType, menuId);
 
-        Call.menu(player.con, unitMenuId, Bundle.get("menu.units.title"), message, new String[][] {
+        Call.menu(player.con, menuId, Bundle.get("menu.units.title"), message, new String[][] {
                 { "[lime]Buy" },
                 { "[gray]Back" },
-                { "[blue]Buy Multiple" }
+                { "[blue]Buy Multiple" } 
         });
     }
 
     private static void openQuantityAdjustmentMenu(UnitType unitType, Player player, int defaultQuantity) {
         String title = "[red]Adjust Quantity";
         String[][] buttons = new String[][] { { "-1", "+1", "+10" }, { "[green]Buy", "[grey]Back", "[red]Close" } };
-        int price = unitPrices.get(unitType);
+        int price = unitPrices.get(unitType); 
         String message = "[green]Current Quantity: " + defaultQuantity + "\n[red]Total Price: " + (defaultQuantity * price);
 
-        dynamicListeners.put(quantityAdjustmentMenuId, (p, opt) -> {
+        int menuId = Menus.registerMenu((p, opt) -> {
             if (opt < 3) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
                 int currentQuantity = defaultQuantity + adjustment;
@@ -148,8 +136,9 @@ public class Units {
                 player.sendMessage("Purchase cancelled.");
             }
         });
+        menuIds.put("quantityMenu_" + unitType, menuId);
 
-        Call.menu(player.con, quantityAdjustmentMenuId, title, message, buttons);
+        Call.menu(player.con, menuId, title, message, buttons);
     }
 
     private static void buyUnit(UnitType unitType, Player player, boolean shouldControlUnit) {
@@ -158,8 +147,8 @@ public class Units {
         if (playerData.getCash() >= price) {
             playerData.subtractCash((float) price, player);
             Unit spawned = unitType.spawn(player);
-            if (shouldControlUnit) {
-                Call.unitControl(player, spawned);
+            if(shouldControlUnit){
+                Call.unitControl(player,spawned);
                 player.sendMessage(Bundle.get("unit.bought", player.locale()));
             }
         } else {
@@ -180,5 +169,10 @@ public class Units {
         } else {
             player.sendMessage("[red]You don't have enough funds to buy " + quantity + " units.");
         }
+    }
+    public static void clearMenuIds() {
+        menuIds.clear();
+        dynamicListeners.clear();
+        
     }
 }

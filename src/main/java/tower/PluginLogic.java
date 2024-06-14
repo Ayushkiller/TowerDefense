@@ -38,6 +38,7 @@ import mindustry.world.blocks.units.RepairTurret;
 import mindustry.world.meta.BlockFlag;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
+import tower.commands.Units;
 import tower.pathing.TowerPathfinder;
 import useful.Bundle;
 
@@ -240,9 +241,10 @@ public class PluginLogic {
             }
         });
         Events.on(EventType.WaveEvent.class, event -> adjustMultiplierByWave());
-
-        Events.on(EventType.GameOverEvent.class, event -> resetGame());
-
+        Events.on(EventType.GameOverEvent.class, event -> {
+            Units.clearMenuIds();
+            resetGame();
+        });
         Events.on(EventType.TileChangeEvent.class, event -> updateTiles(event.tile));
 
         Events.on(EventType.UnitSpawnEvent.class, event -> handleUnitSpawn(event.unit));

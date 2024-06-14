@@ -109,4 +109,7 @@ public class Statuseffects {
         player.unit().apply(effect, Float.POSITIVE_INFINITY);
         player.sendMessage(effect.emoji() + " " + Bundle.get("effect.bought.with.additional", player.locale()) + effectPrice + " + " + additionalPrice + " = " + totalPrice);
     }
+    public static void clearMenuIds() {
+        dynamicListeners.clear();
+    }
 }

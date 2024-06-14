@@ -24,7 +24,7 @@ public class EventLoader {
     private static int welcomeMenu;
 
     public static void init() {
-        Units.registerMenus();
+        Units.registerTierMenu();
         Statuseffects.registerMenus();
         Info.registerMenu();
         BuyPoint.registerMenus();

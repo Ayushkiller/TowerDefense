@@ -288,6 +288,10 @@ public class BuyPoint {
         return selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
     }
 
+    public static void clearMenuIds() {
+        selectedItemsQuantities.clear();
+        dynamicListeners.clear();
+    }
     private static void sendMessageToPlayer(Player player, String messageKey) {
         player.sendMessage(Bundle.get(messageKey, player.locale()));
     }
