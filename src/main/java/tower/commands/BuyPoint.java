@@ -2,6 +2,7 @@ package tower.commands;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import mindustry.game.Team;
 import mindustry.gen.Call;
@@ -14,10 +15,26 @@ import tower.Domain.Currency;
 import tower.Domain.PlayerData;
 
 public class BuyPoint {
-    private static Map<Player, Map<Item, Integer>> selectedItemsQuantities = new HashMap<>();
+    private static final Map<Player, Map<Item, Integer>> selectedItemsQuantities = new HashMap<>();
+    private static final Map<Integer, BiConsumer<Player, Integer>> dynamicListeners = new HashMap<>();
+    private static int buySellMenuId;
+    private static int buyMenuId;
+    private static int sellMenuId;
+    private static int quantityAdjustmentMenuId;
+
+    static {
+        registerMenus();
+    }
 
     public static void execute(Player player) {
         openBuySellMenu(player);
+    }
+
+    public static void registerMenus() {
+        buySellMenuId = Menus.registerMenu((player, option) -> dynamicListeners.get(buySellMenuId).accept(player, option));
+        buyMenuId = Menus.registerMenu((player, option) -> dynamicListeners.get(buyMenuId).accept(player, option));
+        sellMenuId = Menus.registerMenu((player, option) -> dynamicListeners.get(sellMenuId).accept(player, option));
+        quantityAdjustmentMenuId = Menus.registerMenu((player, option) -> dynamicListeners.get(quantityAdjustmentMenuId).accept(player, option));
     }
 
     private static void openBuySellMenu(Player player) {
@@ -25,13 +42,15 @@ public class BuyPoint {
                 { "[red]Buy Cash", "[cyan]Buy Items" }
         };
 
-        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
+        dynamicListeners.put(buySellMenuId, (player1, option) -> {
             if (option == 0) { // Buy button
-                openMenu(player);
+                openMenu(player1);
             } else if (option == 1) {
-                openSellMenu(player);
+                openSellMenu(player1);
             }
-        }), "[red]Buy", "", buttons);
+        });
+
+        Call.menu(player.con, buySellMenuId, "[red]Buy", "", buttons);
     }
 
     private static void openSellMenu(Player player) {
@@ -45,9 +64,9 @@ public class BuyPoint {
             buttons[i][0] = String.format("%s (-%d) [gray]Price: %d", item.emoji(), gain, price);
         }
 
-        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            openQuantityAdjustmentMenuForSell(player, option);
-        }), Bundle.get("menu.sellpoint.title", player.locale()), "", buttons);
+        dynamicListeners.put(sellMenuId, (player1, option) -> openQuantityAdjustmentMenuForSell(player1, option));
+
+        Call.menu(player.con, sellMenuId, Bundle.get("menu.sellpoint.title", player.locale()), "", buttons);
     }
 
     private static void openQuantityAdjustmentMenuForSell(Player player, int option) {
@@ -70,10 +89,12 @@ public class BuyPoint {
         int totalCashRequired = calculateTotalCashRequired(quantities);
         description += "\n\n[orange]Total Cash Required: " + totalCashRequired;
 
-        String[][] buttons = new String[][] { { "-2000", "-1000", "-100", "+400", "+1000", "+2000" },
-                { "Sell", "Close", "Back" } };
+        String[][] buttons = new String[][]{
+                {"-2000", "-1000", "-100", "+400", "+1000", "+2000"},
+                {"Sell", "Close", "Back"}
+        };
 
-        Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
+        dynamicListeners.put(quantityAdjustmentMenuId, (p, opt) -> {
             if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
                 int currentQuantity = quantities.getOrDefault(selectedItem, 0);
@@ -112,7 +133,9 @@ public class BuyPoint {
             } else if (opt == 8) { // Back button
                 openSellMenu(player);
             }
-        }), title, description, buttons);
+        });
+
+        Call.menu(player.con(), quantityAdjustmentMenuId, title, description, buttons);
     }
 
     private static int calculateTotalCashRequired(Map<Item, Integer> selectedItems) {
@@ -146,9 +169,9 @@ public class BuyPoint {
             buttons[i][0] = String.format("%s (+%d) [gray]Price: %d", item.emoji(), gain, price);
         }
 
-        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            openQuantityAdjustmentMenu(player, option);
-        }), Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
+        dynamicListeners.put(buyMenuId, (player1, option) -> openQuantityAdjustmentMenu(player1, option));
+
+        Call.menu(player.con, buyMenuId, Bundle.get("menu.buypoint.title", player.locale()), "", buttons);
     }
 
     private static void openQuantityAdjustmentMenu(Player player, int option) {
@@ -168,10 +191,12 @@ public class BuyPoint {
                     + teamQuantity + "\n";
         }
         String description = "Select quantity adjustment\n\n" + updatedQuantities;
-        String[][] buttons = new String[][] { { "-2000", "-1000", "-100", "+400", "+1000", "+2000" },
-                { "Buy", "Close", "Back" } };
+        String[][] buttons = new String[][]{
+                {"-2000", "-1000", "-100", "+400", "+1000", "+2000"},
+                {"Buy", "Close", "Back"}
+        };
 
-        Call.menu(player.con(), Menus.registerMenu((p, opt) -> {
+        dynamicListeners.put(quantityAdjustmentMenuId, (p, opt) -> {
             if (opt < 6) { // Adjustment buttons
                 int adjustment = Integer.parseInt(buttons[0][opt]);
                 int currentQuantity = quantities.getOrDefault(selectedItem, 0);
@@ -205,7 +230,9 @@ public class BuyPoint {
             } else if (opt == 8) { // Back button
                 openMenu(player);
             }
-        }), title, description, buttons);
+        });
+
+        Call.menu(player.con(), quantityAdjustmentMenuId, title, description, buttons);
     }
 
     private static boolean hasEnoughItems(Team team, Player player) {
@@ -241,7 +268,7 @@ public class BuyPoint {
         return totalCash;
     }
 
-    public static void removeItemsFromTeam(Team team, Map<Item, Integer> selectedItems) {
+    private static void removeItemsFromTeam(Team team, Map<Item, Integer> selectedItems) {
         for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
             int quantity = entry.getValue();
@@ -249,7 +276,7 @@ public class BuyPoint {
         }
     }
 
-    public static void addItemsToTeam(Team team, Map<Item, Integer> selectedItems) {
+    private static void addItemsToTeam(Team team, Map<Item, Integer> selectedItems) {
         for (Map.Entry<Item, Integer> entry : selectedItems.entrySet()) {
             Item item = entry.getKey();
             int quantity = entry.getValue();
@@ -257,11 +284,11 @@ public class BuyPoint {
         }
     }
 
-    public static Map<Item, Integer> getSelectedItemsQuantities(Player player) {
+    private static Map<Item, Integer> getSelectedItemsQuantities(Player player) {
         return selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
     }
 
-    public static void sendMessageToPlayer(Player player, String messageKey) {
+    private static void sendMessageToPlayer(Player player, String messageKey) {
         player.sendMessage(Bundle.get(messageKey, player.locale()));
     }
 }

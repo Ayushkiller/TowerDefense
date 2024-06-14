@@ -1,5 +1,9 @@
 package tower.commands;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.ui.Menus;
@@ -7,7 +11,8 @@ import tower.Bundle;
 
 public class Info {
 
-    private static final int menu = Menus.registerMenu(Info::handleMenuOption);
+    private static final Map<Integer, BiConsumer<Player, Integer>> dynamicListeners = new HashMap<>();
+    private static int menu;
     private static final String[][] buttons = {
             { "[gray]Close" },
             { "[accent]Next" }
@@ -15,26 +20,30 @@ public class Info {
     private static int currentMessageIndex = 0;
     private static String[] messages;
 
-    public static void execute(Player player) {
+    static {
+        registerMenu();
+    }
 
+    public static void execute(Player player) {
         initializeMessages(player.locale);
         openGui(player);
     }
 
-    public static void openGui(Player player) {
+    public static void registerMenu() {
+        menu = Menus.registerMenu((player, option) -> dynamicListeners.get(menu).accept(player, option));
+    }
 
-        Call.menu(player.con, menu, Bundle.get("settings.title", player.locale), messages[currentMessageIndex],
-                buttons);
+    public static void openGui(Player player) {
+        dynamicListeners.put(menu, Info::handleMenuOption);
+        Call.menu(player.con, menu, Bundle.get("settings.title", player.locale), messages[currentMessageIndex], buttons);
     }
 
     private static void nextMessage(Player player) {
         currentMessageIndex = (currentMessageIndex + 1) % messages.length;
-
         openGui(player);
     }
 
     private static void initializeMessages(String locale) {
-
         messages = new String[] {
                 Bundle.get("settings.message", locale),
                 Bundle.get("info.Cash", locale),

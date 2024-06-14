@@ -1,6 +1,8 @@
 package tower.commands;
 
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import arc.Events;
 import arc.util.Timer;
@@ -12,9 +14,9 @@ import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
-import mindustry.graphics.Layer;
 import mindustry.type.UnitType;
 import mindustry.ui.Menus;
+import mindustry.ui.Menus.MenuListener;
 import mindustry.world.Tile;
 import tower.Bundle;
 import tower.Players;
@@ -31,40 +33,58 @@ public class SuperPowers {
     private static final int ARC_UNIT_COUNT = 20;
     private static final int ALPHA_COST = 50;
 
+    // Cooldown time for Alpha ability in milliseconds
+    private static final long ALPHA_COOLDOWN = 5000;
+    // Concurrent map to track the last use time of Alpha ability for each player
+    public static final ConcurrentMap<Player, Long> alphaAbilityLastUseTime = new ConcurrentHashMap<>();
+
+    // Concurrent map to track registered players for tap event
+    public static final ConcurrentMap<Player, Boolean> registeredForTapEvent = new ConcurrentHashMap<>();
+
+    // Menu ID for the ability selection menu
+    private static final int abilitySelectionMenuId;
+
+    static {
+        abilitySelectionMenuId = Menus.registerMenu(new MenuListener() {
+            @Override
+            public void get(Player player, int option) {
+                Unit playerUnit = player.unit();
+                if (playerUnit != null) {
+                    float playerX = playerUnit.x;
+                    float playerY = playerUnit.y;
+                    World world = Vars.world;
+
+                    switch (option) {
+                        case 0 -> spawnUnits(player, world, playerX, playerY, UnitTypes.corvus, 6, unitCost);
+                        case 1 -> spawnUnits(player, world, playerX, playerY, UnitTypes.collaris, 6, unitCost);
+                        case 2 -> spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt, ARC_UNIT_COUNT, arcCost);
+                        case 3 -> spawnDisruptUnits(player, world, playerX, playerY);
+                        case 4 -> useAlphaAbility(player);
+                    }
+                } else {
+                    player.sendMessage(Bundle.get("player.unit.not-available", player.locale()));
+                }
+            }
+        });
+    }
+
     public static void execute(Player player) {
-        Unit playerUnit = player.unit(); // Get the player's unit
+        Unit playerUnit = player.unit();
         if (playerUnit != null) {
-            float playerX = playerUnit.x; // Get the player's X position
-            float playerY = playerUnit.y; // Get the player's Y position
-            World world = Vars.world; // Get the World object from the unit
-            openUnitSelectionMenu(player, world, playerX, playerY);
+            Call.menu(player.con, abilitySelectionMenuId, "[lime]Choose an ability to use:", "", new String[][]{
+                    {"Corvus"},
+                    {"Collaris"},
+                    {"Squad"},
+                    {"Magic"},
+                    {"Alpha"}
+            });
         } else {
             player.sendMessage(Bundle.get("player.unit.not-available", player.locale()));
         }
     }
 
-    private static void openUnitSelectionMenu(Player player, World world, float playerX, float playerY) {
-        String[][] buttons = {
-                { "Corvus" },
-                { "Collaris" },
-                { "Squad" },
-                { "Magic" },
-                { "Alfpha" }
-        };
-
-        Call.menu(player.con, Menus.registerMenu((player1, option) -> {
-            switch (option) {
-                case 0 -> spawnUnits(player, world, playerX, playerY, UnitTypes.corvus, 6, unitCost);
-                case 1 -> spawnUnits(player, world, playerX, playerY, UnitTypes.collaris, 6, unitCost);
-                case 2 -> spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt, ARC_UNIT_COUNT, arcCost);
-                case 3 -> spawnDisruptUnits(player, world, playerX, playerY);
-                case 4 -> useAlphaAbility(player);
-            }
-        }), "[lime]Choose an ability to use:", "", buttons);
-    }
-
     private static void spawnUnits(Player player, World world, float playerX, float playerY, UnitType unitType,
-            int unitCount, int cost) {
+                                   int unitCount, int cost) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= cost) {
             playerData.subtractCash(cost);
@@ -86,7 +106,7 @@ public class SuperPowers {
     }
 
     private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType,
-            int unitCount, int cost) {
+                                        int unitCount, int cost) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= cost) {
             playerData.subtractCash(cost);
@@ -118,8 +138,8 @@ public class SuperPowers {
                     float x = playerX + ARC_RADIUS * (float) Math.cos(Math.toRadians(angle));
                     float y = playerY + ARC_RADIUS * (float) Math.sin(Math.toRadians(angle));
 
-                    for (UnitType unitType : new UnitType[] { UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert,
-                            UnitTypes.flare }) {
+                    for (UnitType unitType : new UnitType[]{UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert,
+                            UnitTypes.flare}) {
                         spawnAndConfigureUnit(player, world, x, y, unitType, 10_000);
                     }
                 }, i * 0.1f);
@@ -129,27 +149,27 @@ public class SuperPowers {
         }
     }
 
-    private static final long ALPHA_COOLDOWN = 5000; // Cooldown time in milliseconds
-    private static long lastAlphaAbilityTime = 0; // Variable to store the last time the Alpha ability was used
-
     private static void useAlphaAbility(Player player) {
         PlayerData playerData = Players.getPlayer(player);
-        long currentTime = System.currentTimeMillis(); // Get the current time
+        long currentTime = System.currentTimeMillis();
+        long lastAlphaAbilityTime = alphaAbilityLastUseTime.getOrDefault(player, 0L);
 
-        // Check if enough time has passed since the last use of the ability
         if (currentTime - lastAlphaAbilityTime >= ALPHA_COOLDOWN) {
             if (playerData.getCash() >= ALPHA_COST) {
                 playerData.subtractCash(ALPHA_COST);
                 player.sendMessage(Bundle.get("alpha.ability.tap-target", player.locale()));
 
-                // Register the tap event listener
-                Events.on(EventType.TapEvent.class, event -> {
-                    if (event.player == player) {
-                        sendEMPBullet(player, player.x, player.y, event.tile.worldx(), event.tile.worldy());
-                    }
-                });
+                // Check if the tap event listener is already registered for this player
+                if (!registeredForTapEvent.containsKey(player)) {
+                    Events.on(EventType.TapEvent.class, event -> {
+                        if (event.player == player) {
+                            sendEMPBullet(player, player.x, player.y, event.tile.worldx(), event.tile.worldy());
+                        }
+                    });
+                    registeredForTapEvent.put(player, true);
+                }
 
-                lastAlphaAbilityTime = currentTime; // Update the last ability use time
+                alphaAbilityLastUseTime.put(player, currentTime);
             } else {
                 player.sendMessage(Bundle.get("alpha.ability.not-enough-cash", player.locale()));
             }
@@ -162,8 +182,7 @@ public class SuperPowers {
     private static void sendEMPBullet(Player player, float startX, float startY, float endX, float endY) {
         Unit playerUnit = player.unit();
         if (playerUnit != null) {
-            float angle = (float) Math.toDegrees(Math.atan2(endY - startY, endX - startX)); // Calculate angle in
-                                                                                            // degrees
+            float angle = (float) Math.toDegrees(Math.atan2(endY - startY, endX - startX)); // Calculate angle in degrees
             playerUnit.rotation(angle); // Rotate the player's unit to face the target
             float damage = 1.0f; // Damage of the bullet
             float velocityScl = 1.0f; // Velocity scale
@@ -174,35 +193,24 @@ public class SuperPowers {
     }
 
     private static void spawnAndConfigureUnit(Player player, World world, float x, float y, UnitType unitType,
-            long lifetime) {
+                                              long lifetime) {
         Tile tile = world.tileWorld(x * tileSize, y * tileSize);
         if (tile != null) {
             Unit unit = unitType.spawn(x * tileSize, y * tileSize);
             if (unit != null && unit.isValid()) {
-                unit.type.allowedInPayloads = false;
-                unit.type.playerControllable = false;
-                unit.type.autoFindTarget = true;
-                if (unitType == UnitTypes.corvus || unitType == UnitTypes.collaris) {
-                    unit.type.groundLayer = Layer.flyingUnit;
-                    unit.type.weapons.get(0).reload = 10f;
-                    unit.type.weapons.get(0).cooldownTime = 10f;
-                }
-                Timer.schedule(() -> {
-                    if (unit.isValid()) {
-                        unit.kill();
-                    }
-                }, lifetime / 1000f);
-            } else {
-                player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
-                Players.getPlayer(player).addCash(unitCost);
+                unit.type = unitType;
+                unit.team = player.team();
+                Timer.schedule(unit::kill, lifetime / 1000f);
             }
-        } else {
-            player.sendMessage(Bundle.get("spawn.unit.failed", player.locale()));
-            Players.getPlayer(player).addCash(unitCost);
         }
     }
 
-    private static BulletType getBullet(final UnitType type, final String name) {
-        return Objects.requireNonNull(type.weapons.find(w -> w.name.equals(name)).bullet);
+    private static BulletType getBullet(UnitType unitType, String weaponName) {
+        for (var weapon : unitType.weapons) {
+            if (Objects.equals(weapon.name, weaponName)) {
+                return weapon.bullet;
+            }
+        }
+        return null;
     }
 }

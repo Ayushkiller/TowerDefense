@@ -2,6 +2,7 @@ package tower.commands;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import mindustry.gen.Call;
 import mindustry.gen.Player;
@@ -13,15 +14,17 @@ import tower.Players;
 import tower.Domain.Effects;
 import tower.Domain.PlayerData;
 import tower.Domain.UnitsTable;
-
 public class Statuseffects {
 
     private static final Map<StatusEffect, Integer> effectPrices = new HashMap<>();
+    private static final Map<Integer, BiConsumer<Player, Integer>> dynamicListeners = new HashMap<>();
     private static String[][] buttons;
+    private static int menuId;
 
     static {
         initEffectPrices();
         initEffectsTable();
+        registerMenus();
     }
 
     private static void initEffectPrices() {
@@ -30,6 +33,24 @@ public class Statuseffects {
             int price = (int) effectMap.get("price");
             effectPrices.put(effect, price);
         }
+    }
+
+    private static void initEffectsTable() {
+        int rows = Effects.effects.size();
+        buttons = new String[rows][1];
+
+        for (int i = 0; i < rows; i++) {
+            StatusEffect effect = (StatusEffect) Effects.effects.get(i).get("effect");
+            int effectPrice = effectPrices.get(effect);
+            String effectName = (String) Effects.effects.get(i).get("name");
+            buttons[i][0] = effect.emoji() + " " + effectName + " Total Price: " + effectPrice;
+        }
+    }
+
+    public static void registerMenus() {
+        menuId = Menus.registerMenu((player, option) -> {
+            dynamicListeners.get(menuId).accept(player, option);
+        });
     }
 
     public static void execute(Player player) {
@@ -42,26 +63,15 @@ public class Statuseffects {
         if (buttons == null || buttons.length == 0) {
             initEffectsTable();
         }
-        Call.menu(player.con, menu, Bundle.get("menu.effects.title", player.locale()), "", buttons);
-    }
 
-    private static final int menu = Menus.registerMenu((player, option) -> {
-        if (option >= 0 && option < Effects.effects.size()) {
-            StatusEffect effect = (StatusEffect) Effects.effects.get(option).get("effect");
-            buyEffect(effect, player);
-        }
-    });
+        dynamicListeners.put(menuId, (p, option) -> {
+            if (option >= 0 && option < Effects.effects.size()) {
+                StatusEffect effect = (StatusEffect) Effects.effects.get(option).get("effect");
+                buyEffect(effect, p);
+            }
+        });
 
-    private static void initEffectsTable() {
-        int rows = Effects.effects.size();
-        buttons = new String[rows][1];
-
-        for (int i = 0; i < rows; i++) {
-            StatusEffect effect = (StatusEffect) Effects.effects.get(i).get("effect");
-            int effectPrice = effectPrices.get(effect);
-            String effectName = (String) Effects.effects.get(i).get("name");
-            buttons[i][0] = effect.emoji() + " " + effectName + " Total Price: " + effectPrice;
-        }
+        Call.menu(player.con, menuId, Bundle.get("menu.effects.title", player.locale()), "", buttons);
     }
 
     private static void buyEffect(StatusEffect effect, Player player) {
