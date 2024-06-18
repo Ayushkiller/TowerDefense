@@ -101,7 +101,7 @@ public class SuperPowers {
                 }, i * 0.1f); // Delay each spawn by 0.1 seconds
             }
         } else {
-            player.sendMessage(Bundle.get("spawn.unit.not-enough-cash", player.locale()));
+            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-cash", player.locale()));
         }
     }
 
