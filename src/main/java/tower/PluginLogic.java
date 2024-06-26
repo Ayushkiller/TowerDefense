@@ -2,7 +2,6 @@ package tower;
 
 import static mindustry.Vars.*;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -44,7 +43,6 @@ import useful.Bundle;
 
 public class PluginLogic {
     public static float multiplier = 1f;
-    public static boolean multiplierAdjusted = false;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops = new ObjectMap<>();
     public static ObjectMap<Tile, Block> forceProjectorTiles = new ObjectMap<>();
     public static ObjectMap<Tile, Block> repairPointTiles = new ObjectMap<>();
@@ -60,24 +58,18 @@ public class PluginLogic {
     }
 
     private static void initializeDrops() {
-        for (Map.Entry<UnitType, Seq<ItemStack>> dropEntry : Unitsdrops.drops.entrySet()) {
-            UnitType unit = dropEntry.getKey();
-            Seq<ItemStack> itemStacks = dropEntry.getValue();
-            drops.put(unit, itemStacks);
-        }
+        drops.putAll(Unitsdrops.drops);
     }
 
     private static void setupAdminActionFilters() {
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null)
                 return true;
-            if (action.type == Administration.ActionType.placeBlock) {
-                if (!canBePlaced(action.tile, action.block) &&
-                        !(action.block instanceof ShockMine || action.block instanceof Conduit
-                                || action.block instanceof CoreBlock)) {
-                    Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
-                    return false;
-                }
+            if (action.type == Administration.ActionType.placeBlock && !canBePlaced(action.tile, action.block) &&
+                    !(action.block instanceof ShockMine || action.block instanceof Conduit
+                            || action.block instanceof CoreBlock)) {
+                Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
+                return false;
             }
             if (action.type == Administration.ActionType.dropPayload
                     || action.type == Administration.ActionType.pickupBlock) {
@@ -99,14 +91,18 @@ public class PluginLogic {
     }
 
     private static void applyForceProjectorEffects() {
-        Groups.player.each(player -> {
-            forceProjectorTiles.each((tile, projector) -> {
+        forceProjectorTiles.forEach(entry -> {
+            Tile tile = entry.key;
+            Groups.player.each(player -> {
                 if (player.dst(tile.worldx(), tile.worldy()) <= 100f) {
                     Call.effect(Fx.greenCloud, tile.x, tile.y, 100f, Color.royal);
                     Bundle.label(player, 4f, tile.drawx(), tile.drawy(), "ui.force");
                 }
             });
-            repairPointTiles.each((tile, turret) -> {
+        });
+        repairPointTiles.forEach(entry -> {
+            Tile tile = entry.key;
+            Groups.player.each(player -> {
                 if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
                     Call.effect(Fx.reactorExplosion, tile.x, tile.y, 30f, Color.royal);
                     Bundle.label(player, 4f, tile.drawx(), tile.drawy(), "ui.repair");
@@ -122,21 +118,22 @@ public class PluginLogic {
     }
 
     private static void accumulateRepairPointCash() {
-        repairPointTiles.each((tile, turret) -> {
-            AtomicInteger totalCashGenerated = new AtomicInteger(0);
+        repairPointTiles.forEach(entry -> {
+            Tile tile = entry.key;
+            AtomicInteger totalCashGenerated = new AtomicInteger();
             Groups.player.each(player -> {
                 if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
                     totalCashGenerated.addAndGet(100);
                 }
             });
-            float cashToStore = totalCashGenerated.get() / 100f;
-            repairPointCash.put(tile, cashToStore);
+            repairPointCash.put(tile, totalCashGenerated.get() / 100f);
         });
     }
 
     private static void distributeRepairPointCash() {
         Groups.player.each(player -> {
-            repairPointTiles.each((tile, turret) -> {
+            repairPointTiles.forEach(entry -> {
+                Tile tile = entry.key;
                 if (player.dst(tile.worldx(), tile.worldy()) <= 30f) {
                     float cashToAdd = repairPointCash.get(tile, 0f);
                     if (cashToAdd > 0) {
@@ -153,7 +150,7 @@ public class PluginLogic {
         Groups.player.each(player -> {
             PlayerData playerData = Players.getPlayer(player);
             if (playerData != null && playerData.getCash() < 0) {
-                playerData.setCash(0,player);
+                playerData.setCash(0, player);
             }
         });
     }
@@ -177,7 +174,8 @@ public class PluginLogic {
 
     private static void showMultiplierPopup() {
         Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier",
-                Color.HSVtoRGB(multiplier * 120f, 100f, 100f), Strings.autoFixed(multiplier, 2));
+                Color.HSVtoRGB(multiplier * 120f, 100f, 100f),
+                Strings.autoFixed(multiplier, 2));
     }
 
     private static void addScheduledTask(Runnable task, float delay, float interval) {
@@ -210,8 +208,8 @@ public class PluginLogic {
                     }
                 }
             }
-
         });
+
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam)
                 return;
@@ -221,34 +219,31 @@ public class PluginLogic {
                 return;
             var builder = new StringBuilder();
             drop.each(stack -> {
-                // Adjust the amount based on the multiplierAdjusted flag
-                int amount = (int) (multiplierAdjusted ? (int) (stack.amount * 0.75f)
-                        : Mathf.random(stack.amount - stack.amount / 2, stack.amount * 1.4f + stack.amount / 2));
+                int amount = (int) ((stack.amount - stack.amount / 2)
+                        + (Math.random() * (stack.amount * 1.4f + stack.amount / 2)));
                 builder.append("[accent]+").append(amount).append("[white]").append(stack.item.emoji()).append(" ");
                 Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x,
                         event.unit.y, core);
             });
             Call.labelReliable(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
-            Timer.schedule(() -> multiplierAdjusted = false, 180f);
         });
+
         Events.on(EventType.WorldLoadEvent.class, event -> {
-            // Populate the path cache after the world loads
             for (int x = 0; x < Vars.world.width(); x++) {
                 for (int y = 0; y < Vars.world.height(); y++) {
                     Tile tile = Vars.world.tile(x, y);
-                    isPath(tile); // This will now cache the result
+                    isPath(tile);
                 }
             }
         });
+
         Events.on(EventType.WaveEvent.class, event -> adjustMultiplierByWave());
         Events.on(EventType.GameOverEvent.class, event -> {
             Units.clearMenuIds();
             resetGame();
         });
         Events.on(EventType.TileChangeEvent.class, event -> updateTiles(event.tile));
-
         Events.on(EventType.UnitSpawnEvent.class, event -> handleUnitSpawn(event.unit));
-
         Events.on(EventType.WorldLoadEndEvent.class, event -> reloadAllTasks());
     }
 
@@ -269,11 +264,9 @@ public class PluginLogic {
         } else {
             multiplier = Mathf.clamp(baseValue * 2, multiplier, 100f);
         }
-        multiplierAdjusted = true;
     }
 
     private static void resetGame() {
-        multiplierAdjusted = false;
         multiplier = 1f;
         repairPointCash.clear();
         forceProjectorTiles.clear();
@@ -291,16 +284,16 @@ public class PluginLogic {
             repairPointTiles.remove(tile);
             repairPointCash.remove(tile);
         }
+
+        // Check if the tile is in the path cache and remove it if found
+        if (pathCache.containsKey(tile)) {
+            tile.setAir();
+        }
     }
 
     private static void handleUnitSpawn(Unit unit) {
-        if (unit.type != null) {
-            if (unit.team == state.rules.waveTeam) {
-            if (unit.type.naval || unit.type.flying) {
-                unit.type.speed = 0.95f;
-            } else {
-                unit.type.speed = 1.2f;
-            }
+        if (unit.type != null && unit.team == state.rules.waveTeam) {
+            unit.type.speed = unit.type.naval || unit.type.flying ? 0.95f : 1.2f;
             unit.type.range = -1f;
             unit.type.hovering = true;
             unit.disarmed = true;
@@ -326,11 +319,11 @@ public class PluginLogic {
             }
             unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
         }
-        }
     }
 
     public static void checkUnitsWithinRadius() {
-        forceProjectorTiles.each((tile, forceProjector) -> {
+        forceProjectorTiles.forEach(entry -> {
+            Tile tile = entry.key;
             Groups.unit.each(unit -> {
                 if (unit.team == state.rules.waveTeam && unit.dst(tile.worldx(), tile.worldy()) <= 105f) {
                     unit.type.speed = 1.2f;
@@ -345,24 +338,11 @@ public class PluginLogic {
     }
 
     public static boolean canBePlaced(Tile tile, Block block) {
-        // Check if the tile is already in the cache
-        if (pathCache.containsKey(tile)) {
-            return !pathCache.get(tile);
-        }
-        // If not in cache, perform the original checks and cache the result
-        boolean isPath = tile.getLinkedTilesAs(block, new Seq<>()).contains(PluginLogic::isPath);
-        // Cache the result
-        pathCache.put(tile, !isPath);
-        return !isPath;
+        return !pathCache.computeIfAbsent(tile, PluginLogic::isPath);
     }
 
     public static boolean isPath(Tile tile) {
-        // Check if the result is already cached
-        if (pathCache.containsKey(tile)) {
-            return pathCache.get(tile);
-        }
-        // If not cached, perform the original checks and cache the result
-        boolean isPath = tile.floor() == Vars.world.tile(0, 0).floor()
+        return tile.floor() == Vars.world.tile(0, 0).floor()
                 || tile.floor() == Vars.world.tile(0, 1).floor()
                 || tile.floor() == Vars.world.tile(1, 0).floor()
                 || tile.floor() == Vars.world.tile(1, 1).floor()
@@ -371,10 +351,5 @@ public class PluginLogic {
                 || tile.floor() == Vars.world.tile(2, 1).floor()
                 || tile.floor() == Vars.world.tile(1, 2).floor()
                 || tile.floor() == Vars.world.tile(2, 2).floor();
-
-        // Cache the result
-        pathCache.put(tile, isPath);
-
-        return isPath;
     }
 }
