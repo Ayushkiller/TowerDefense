@@ -42,7 +42,6 @@ public class EventLoader {
         Events.on(EventType.PlayerLeave.class, event -> {
             Player player = event.player;
             SuperPowers.alphaAbilityLastUseTime.remove(player);
-            SuperPowers.registeredForTapEvent.remove(player);
         });
     }
 

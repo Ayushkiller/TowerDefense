@@ -1,47 +1,40 @@
 package tower.commands;
 
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import arc.Events;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
 import mindustry.core.World;
 import mindustry.entities.bullet.BulletType;
-import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.type.UnitType;
+import mindustry.type.Weapon;
 import mindustry.ui.Menus;
 import mindustry.ui.Menus.MenuListener;
 import mindustry.world.Tile;
-import tower.Bundle;
 import tower.Players;
 import tower.Domain.PlayerData;
 
 public class SuperPowers {
-    private static final float tileSize = 1.0f;
-    private static final int unitCost = 100;
-    private static final int unitLife = 50_000;
-    private static final int arcCost = 100;
-    private static final int DISRUPT_unitCost = 40;
+    private static final float TILE_SIZE = 1.0f;
+    private static final int UNIT_COST = 100;
+    private static final int UNIT_LIFE = 50000;
+    private static final int ARC_COST = 100;
+    private static final int DISRUPT_UNIT_COST = 40;
     private static final float ARC_RADIUS = 140f;
     private static final float ARC_ANGLE = 180f;
     private static final int ARC_UNIT_COUNT = 20;
     private static final int ALPHA_COST = 50;
-
-    // Cooldown time for Alpha ability in milliseconds
+    private static final int ALPHA_BULLET_COUNT = 12;
     private static final long ALPHA_COOLDOWN = 5000;
-    // Concurrent map to track the last use time of Alpha ability for each player
+
     public static final ConcurrentMap<Player, Long> alphaAbilityLastUseTime = new ConcurrentHashMap<>();
-
-    // Concurrent map to track registered players for tap event
-    public static final ConcurrentMap<Player, Boolean> registeredForTapEvent = new ConcurrentHashMap<>();
-
-    // Menu ID for the ability selection menu
     private static final int abilitySelectionMenuId;
 
     static {
@@ -55,14 +48,14 @@ public class SuperPowers {
                     World world = Vars.world;
 
                     switch (option) {
-                        case 0 -> spawnUnits(player, world, playerX, playerY, UnitTypes.corvus, 6, unitCost);
-                        case 1 -> spawnUnits(player, world, playerX, playerY, UnitTypes.collaris, 6, unitCost);
-                        case 2 -> spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt, ARC_UNIT_COUNT, arcCost);
+                        case 0 -> spawnUnits(player, world, playerX, playerY, UnitTypes.corvus, 6, UNIT_COST);
+                        case 1 -> spawnUnits(player, world, playerX, playerY, UnitTypes.collaris, 6, UNIT_COST);
+                        case 2 -> spawnArcOfUnits(player, world, playerX, playerY, UnitTypes.disrupt, ARC_UNIT_COUNT, ARC_COST);
                         case 3 -> spawnDisruptUnits(player, world, playerX, playerY);
                         case 4 -> useAlphaAbility(player);
                     }
                 } else {
-                    player.sendMessage(Bundle.get("player.unit.not-available", player.locale()));
+                    player.sendMessage("You don't have a unit available to use abilities.");
                 }
             }
         });
@@ -79,12 +72,11 @@ public class SuperPowers {
                     {"Alpha"}
             });
         } else {
-            player.sendMessage(Bundle.get("player.unit.not-available", player.locale()));
+            player.sendMessage("You don't have a unit available to use abilities.");
         }
     }
 
-    private static void spawnUnits(Player player, World world, float playerX, float playerY, UnitType unitType,
-                                   int unitCount, int cost) {
+    private static void spawnUnits(Player player, World world, float playerX, float playerY, UnitType unitType, int unitCount, int cost) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= cost) {
             playerData.subtractCash(cost, player);
@@ -92,60 +84,49 @@ public class SuperPowers {
             float radius = 100f;
 
             for (int i = 0; i < unitCount; i++) {
-                int finalI = i;
-                Timer.schedule(() -> {
-                    float angle = finalI * angleStep;
-                    float x = playerX + radius * (float) Math.cos(Math.toRadians(angle));
-                    float y = playerY + radius * (float) Math.sin(Math.toRadians(angle));
-                    spawnAndConfigureUnit(player, world, x, y, unitType, unitLife);
-                }, i * 0.1f); // Delay each spawn by 0.1 seconds
+                float angle = i * angleStep;
+                float x = playerX + radius * (float) Math.cos(Math.toRadians(angle));
+                float y = playerY + radius * (float) Math.sin(Math.toRadians(angle));
+                Timer.schedule(() -> spawnAndConfigureUnit(player, world, x, y, unitType, UNIT_LIFE), i * 0.1f);
             }
         } else {
-            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-cash", player.locale()));
+            player.sendMessage("Not enough cash to spawn units.");
         }
     }
 
-    private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType,
-                                        int unitCount, int cost) {
+    private static void spawnArcOfUnits(Player player, World world, float playerX, float playerY, UnitType unitType, int unitCount, int cost) {
         PlayerData playerData = Players.getPlayer(player);
         if (playerData.getCash() >= cost) {
             playerData.subtractCash(cost, player);
             float angleStep = ARC_ANGLE / unitCount;
 
             for (int i = 0; i < unitCount; i++) {
-                int finalI = i;
-                Timer.schedule(() -> {
-                    float angle = finalI * angleStep - ARC_ANGLE / 2;
-                    float x = playerX + ARC_RADIUS * (float) Math.cos(Math.toRadians(angle));
-                    float y = playerY + ARC_RADIUS * (float) Math.sin(Math.toRadians(angle));
-                    spawnAndConfigureUnit(player, world, x, y, unitType, 10_000);
-                }, i * 0.1f);
+                float angle = i * angleStep - ARC_ANGLE / 2;
+                float x = playerX + ARC_RADIUS * (float) Math.cos(Math.toRadians(angle));
+                float y = playerY + ARC_RADIUS * (float) Math.sin(Math.toRadians(angle));
+                Timer.schedule(() -> spawnAndConfigureUnit(player, world, x, y, unitType, 10000), i * 0.1f);
             }
         } else {
-            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-cash", player.locale()));
+            player.sendMessage("Not enough cash to spawn arc of units.");
         }
     }
 
     private static void spawnDisruptUnits(Player player, World world, float playerX, float playerY) {
         PlayerData playerData = Players.getPlayer(player);
-        if (playerData.getCash() >= DISRUPT_unitCost) {
-            playerData.subtractCash(DISRUPT_unitCost, player);
+        if (playerData.getCash() >= DISRUPT_UNIT_COST) {
+            playerData.subtractCash(DISRUPT_UNIT_COST, player);
 
             for (int i = 0; i < ARC_UNIT_COUNT; i++) {
-                int finalI = i;
-                Timer.schedule(() -> {
-                    float angle = finalI * (ARC_ANGLE / ARC_UNIT_COUNT) - ARC_ANGLE / 2;
-                    float x = playerX + ARC_RADIUS * (float) Math.cos(Math.toRadians(angle));
-                    float y = playerY + ARC_RADIUS * (float) Math.sin(Math.toRadians(angle));
+                float angle = i * (ARC_ANGLE / ARC_UNIT_COUNT) - ARC_ANGLE / 2;
+                float x = playerX + ARC_RADIUS * (float) Math.cos(Math.toRadians(angle));
+                float y = playerY + ARC_RADIUS * (float) Math.sin(Math.toRadians(angle));
 
-                    for (UnitType unitType : new UnitType[]{UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert,
-                            UnitTypes.flare}) {
-                        spawnAndConfigureUnit(player, world, x, y, unitType, 10_000);
-                    }
-                }, i * 0.1f);
+                for (UnitType unitType : new UnitType[]{UnitTypes.zenith, UnitTypes.quell, UnitTypes.avert, UnitTypes.flare}) {
+                    Timer.schedule(() -> spawnAndConfigureUnit(player, world, x, y, unitType, 10000), i * 0.1f);
+                }
             }
         } else {
-            player.sendMessage(Bundle.get("spawn.arc-of-units.not-enough-cash", player.locale()));
+            player.sendMessage("Not enough cash to spawn disrupt units.");
         }
     }
 
@@ -157,21 +138,16 @@ public class SuperPowers {
         if (currentTime - lastAlphaAbilityTime >= ALPHA_COOLDOWN) {
             if (playerData.getCash() >= ALPHA_COST) {
                 playerData.subtractCash(ALPHA_COST, player);
-                player.sendMessage(Bundle.get("alpha.ability.tap-target", player.locale()));
+                Random random = new Random();
 
-                // Check if the tap event listener is already registered for this player
-                if (!registeredForTapEvent.containsKey(player)) {
-                    Events.on(EventType.TapEvent.class, event -> {
-                        if (event.player == player) {
-                            sendEMPBullet(player, player.x, player.y, event.tile.worldx(), event.tile.worldy());
-                        }
-                    });
-                    registeredForTapEvent.put(player, true);
+                for (int i = 0; i < ALPHA_BULLET_COUNT; i++) {
+                    float angle = random.nextFloat() * 360;
+                    sendEMPBullet(player, player.unit().x, player.unit().y, angle);
                 }
 
                 alphaAbilityLastUseTime.put(player, currentTime);
             } else {
-                player.sendMessage(Bundle.get("alpha.ability.not-enough-cash", player.locale()));
+                player.sendMessage("Not enough cash to use Alpha ability.");
             }
         } else {
             long remainingCooldown = ALPHA_COOLDOWN - (currentTime - lastAlphaAbilityTime);
@@ -179,24 +155,20 @@ public class SuperPowers {
         }
     }
 
-    private static void sendEMPBullet(Player player, float startX, float startY, float endX, float endY) {
+    private static void sendEMPBullet(Player player, float startX, float startY, float angle) {
         Unit playerUnit = player.unit();
         if (playerUnit != null) {
-            float angle = (float) Math.toDegrees(Math.atan2(endY - startY, endX - startX)); // Calculate angle in degrees
-            playerUnit.rotation(angle); // Rotate the player's unit to face the target
-            float damage = 1.0f; // Damage of the bullet
-            float velocityScl = 1.0f; // Velocity scale
-            float lifetimeScl = 1.0f; // Lifetime scale
-            Call.createBullet(getBullet(UnitTypes.navanax, "emp-cannon-mount"), player.team(), startX, startY, angle,
-                    damage, velocityScl, lifetimeScl);
+            float damage = 1.0f;
+            float velocityScl = 1.0f;
+            float lifetimeScl = 1.0f;
+            Call.createBullet(getBullet(UnitTypes.navanax, "emp-cannon-mount"), player.team(), startX, startY, angle, damage, velocityScl, lifetimeScl);
         }
     }
 
-    private static void spawnAndConfigureUnit(Player player, World world, float x, float y, UnitType unitType,
-                                              long lifetime) {
-        Tile tile = world.tileWorld(x * tileSize, y * tileSize);
+    private static void spawnAndConfigureUnit(Player player, World world, float x, float y, UnitType unitType, long lifetime) {
+        Tile tile = world.tileWorld(x * TILE_SIZE, y * TILE_SIZE);
         if (tile != null) {
-            Unit unit = unitType.spawn(x * tileSize, y * tileSize);
+            Unit unit = unitType.spawn(x * TILE_SIZE, y * TILE_SIZE);
             if (unit != null && unit.isValid()) {
                 unit.type = unitType;
                 unit.team = player.team();
@@ -205,16 +177,16 @@ public class SuperPowers {
         }
     }
 
-    private static BulletType getBullet(UnitType unitType, String weaponName) {
-        for (var weapon : unitType.weapons) {
-            if (Objects.equals(weapon.name, weaponName)) {
-                return weapon.bullet;
-            }
+ private static BulletType getBullet(UnitType unitType, String weaponName) {
+    for (Weapon weapon : unitType.weapons) {
+        if (Objects.equals(weapon.name, weaponName)) {
+            return weapon.bullet;
         }
-        return null;
     }
+    return null;
+}
+
     public static void clearMenuIds() {
         alphaAbilityLastUseTime.clear();
-        registeredForTapEvent.clear();
     }
 }

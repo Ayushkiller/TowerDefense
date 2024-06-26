@@ -9,11 +9,11 @@ import mindustry.gen.Player;
 import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.ui.Menus;
-import tower.Bundle;
 import tower.Players;
 import tower.Domain.Effects;
 import tower.Domain.PlayerData;
 import tower.Domain.UnitsTable;
+
 public class Statuseffects {
 
     private static final Map<StatusEffect, Integer> effectPrices = new HashMap<>();
@@ -28,11 +28,11 @@ public class Statuseffects {
     }
 
     private static void initEffectPrices() {
-        for (Map<String, Object> effectMap : Effects.effects) {
+        Effects.effects.forEach(effectMap -> {
             StatusEffect effect = (StatusEffect) effectMap.get("effect");
             int price = (int) effectMap.get("price");
             effectPrices.put(effect, price);
-        }
+        });
     }
 
     private static void initEffectsTable() {
@@ -49,7 +49,9 @@ public class Statuseffects {
 
     public static void registerMenus() {
         menuId = Menus.registerMenu((player, option) -> {
-            dynamicListeners.get(menuId).accept(player, option);
+            if (dynamicListeners.containsKey(menuId)) {
+                dynamicListeners.get(menuId).accept(player, option);
+            }
         });
     }
 
@@ -71,17 +73,17 @@ public class Statuseffects {
             }
         });
 
-        Call.menu(player.con, menuId, Bundle.get("menu.effects.title", player.locale()), "", buttons);
+        Call.menu(player.con, menuId, "Select an Effect", "", buttons);
     }
 
     private static void buyEffect(StatusEffect effect, Player player) {
         PlayerData playerData = Players.getPlayer(player);
         int effectPrice = effectPrices.get(effect);
         UnitType currentUnitType = player.unit().type();
-
         int currentUnitPrice = getCurrentUnitPrice(currentUnitType);
+
         if (currentUnitPrice == -1) {
-            player.sendMessage("Error: Unit type not found in UnitsTable.");
+            player.sendMessage("Error: Unit type not found.");
             return;
         }
 
@@ -91,24 +93,24 @@ public class Statuseffects {
         if (playerData.getCash() >= totalPrice) {
             applyEffectToPlayer(effect, player, playerData, totalPrice, effectPrice, additionalPrice);
         } else {
-            player.sendMessage(Bundle.get("menu.effects.not-enough", player.locale()));
+            player.sendMessage("Not enough funds to buy this effect.");
         }
     }
 
     private static int getCurrentUnitPrice(UnitType unitType) {
-        for (Map<String, Object> unitMap : UnitsTable.units) {
-            if (unitMap.get("unit") == unitType) {
-                return (int) unitMap.get("price");
-            }
-        }
-        return -1;
+        return UnitsTable.units.stream()
+                .filter(unitMap -> unitMap.get("unit") == unitType)
+                .map(unitMap -> (int) unitMap.get("price"))
+                .findFirst()
+                .orElse(-1);
     }
 
     private static void applyEffectToPlayer(StatusEffect effect, Player player, PlayerData playerData, int totalPrice, int effectPrice, int additionalPrice) {
         playerData.subtractCash(totalPrice, player);
         player.unit().apply(effect, Float.POSITIVE_INFINITY);
-        player.sendMessage(effect.emoji() + " " + Bundle.get("effect.bought.with.additional", player.locale()) + effectPrice + " + " + additionalPrice + " = " + totalPrice);
+        player.sendMessage(effect.emoji() + " Effect purchased for " + effectPrice + " + " + additionalPrice + " = " + totalPrice);
     }
+
     public static void clearMenuIds() {
         dynamicListeners.clear();
     }

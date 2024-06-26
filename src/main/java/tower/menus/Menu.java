@@ -11,17 +11,21 @@ import tower.commands.SuperPowers;
 import tower.commands.Units;
 
 public class Menu {
-    private static final int menu = Menus.registerMenu((player, option) -> {
-        switch (option) {
-            case 0 -> Units.execute(player);
-            case 1 -> Info.execute(player);
-            case 2 -> SuperPowers.execute(player);
-            case 3 -> BuyPoint.execute(player);
-            case 4 -> Statuseffects.execute(player);
-        }
-    });
+    private static final int MENU_ID;
 
-    private static final String[][] buttons = {
+    static {
+        MENU_ID = Menus.registerMenu((player, option) -> {
+            switch (option) {
+                case 0 -> Units.execute(player);
+                case 1 -> Info.execute(player);
+                case 2 -> SuperPowers.execute(player);
+                case 3 -> BuyPoint.execute(player);
+                case 4 -> Statuseffects.execute(player);
+            }
+        });
+    }
+
+    private static final String[][] BUTTONS = {
             { "[lime]Units", "[red]Info", "[lime]Power" },
             { "[cyan]Cash", "[blue]Powerups", "[lightgray]Close" }
     };
@@ -31,6 +35,6 @@ public class Menu {
     }
 
     public static void openGui(Player player) {
-        Call.menu(player.con, menu, Bundle.get("menu.title", player.locale), "", buttons);
+        Call.menu(player.con, MENU_ID, Bundle.get("menu.title", player.locale), "", BUTTONS);
     }
 }

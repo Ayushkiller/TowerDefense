@@ -9,7 +9,7 @@ import mindustry.world.Tile;
 
 public class TowerPathfinder extends Pathfinder {
 
-    public static final int impassable = -1, notPath = 99999999,semiimpassable=1;
+    public static final int impassable = -1, notPath = 99999999, semiimpassable = 2147483647;
 
     public TowerPathfinder() {
         costTypes.setSize(4);
@@ -54,7 +54,7 @@ public class TowerPathfinder extends Pathfinder {
                             (PathTile.damages(tile) ? 1 : 0) +
                             (PathTile.nearSolid(tile) ? 1 : 0) +
                             (PathTile.solid(tile) ? 1 : 0) +
-                            (PathTile.nearLiquid(tile) ? 1: 0);
+                            (PathTile.nearLiquid(tile) ? 1 : 0);
         });
     }
 

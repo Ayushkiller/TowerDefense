@@ -290,7 +290,9 @@ public class PluginLogic {
             tile.setAir();
         }
     }
-
+    public static boolean isInPathCache(Tile tile) {
+        return pathCache.containsKey(tile);
+    }
     private static void handleUnitSpawn(Unit unit) {
         if (unit.type != null && unit.team == state.rules.waveTeam) {
             unit.type.speed = unit.type.naval || unit.type.flying ? 0.95f : 1.2f;
