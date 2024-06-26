@@ -9,7 +9,7 @@ import mindustry.world.Tile;
 
 public class TowerPathfinder extends Pathfinder {
 
-    public static final int impassable = -1, notPath = 99999999, semiimpassable =4 ;
+    public static final int impassable = -1, notPath = 99999999, semiimpassable = 4;
 
     public TowerPathfinder() {
         costTypes.setSize(4);
@@ -48,13 +48,13 @@ public class TowerPathfinder extends Pathfinder {
             if (team != state.rules.waveTeam.id) {
                 return 1; // Default cost for non-waveTeam units
             }
-            return (((PathTile.team(tile) == 0 || PathTile.team(tile) == team) && PathTile.solid(tile))) ? semiimpassable
-                    : 1 +
-                            (PathTile.deep(tile) ? 1 : 0) +
-                            (PathTile.damages(tile) ? 1 : 0) +
-                            (PathTile.nearSolid(tile) ? 1 : 0) +
-                            (PathTile.solid(tile) ? 1 : 0) +
-                            (PathTile.nearLiquid(tile) ? 1 : 0);
+            // Allowing flyers to go over darkened or solid blocks with minimum cost
+            return 1 +
+                    (PathTile.deep(tile) ? 1 : 0) +
+                    (PathTile.damages(tile) ? 1 : 0) +
+                    (PathTile.nearSolid(tile) ? 1 : 0) +
+                    (PathTile.solid(tile) ? 1 : 0) +
+                    (PathTile.nearLiquid(tile) ? 1 : 0);
         });
     }
 
