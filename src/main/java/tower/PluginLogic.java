@@ -10,6 +10,7 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
@@ -126,9 +127,6 @@ public class PluginLogic {
         });
     }
 
-
-
-
     private static void showMultiplierPopup() {
         Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier",
                 Color.HSVtoRGB(multiplier * 120f, 100f, 100f),
@@ -169,12 +167,16 @@ public class PluginLogic {
         });
 
         Events.on(EventType.UnitDestroyEvent.class, event -> {
-            if (event.unit.team != state.rules.waveTeam)
+            if (event.unit.team != state.rules.waveTeam) {
+                Log.info("Unit destroyed by team that is not the wave team; ignoring");
                 return;
+            }
             var core = event.unit.closestEnemyCore();
             var drop = drops.get(event.unit.type);
-            if (core == null || drop == null)
+            if (core == null || drop == null) {
+                Log.info("Core or drop is null for unit destroy event; ignoring");
                 return;
+            }
             var builder = new StringBuilder();
             drop.each(stack -> {
                 int amount = (int) ((stack.amount - stack.amount / 2)
@@ -183,6 +185,7 @@ public class PluginLogic {
                 Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x,
                         event.unit.y, core);
             });
+            Log.info("Unit destroy event successful"+builder.toString());
             Call.labelReliable(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
         });
 
@@ -245,7 +248,6 @@ public class PluginLogic {
             repairPointTiles.remove(tile);
             repairPointCash.remove(tile);
         }
-
         // Update the pathCache for this tile
         pathCache.put(tile, isPath(tile));
     }
