@@ -11,7 +11,6 @@ import mindustry.gen.Player;
 import mindustry.ui.Menus;
 import tower.Bundle;
 import tower.Players;
-import tower.PluginLogic;
 import tower.commands.BuyPoint;
 import tower.commands.Info;
 import tower.commands.Statuseffects;
@@ -36,8 +35,6 @@ public class EventLoader {
             Players.getPlayer(player); // This ensures a new PlayerData is created if necessary
             openWelcomeMenu(player);
         });
-
-        Events.run(EventType.Trigger.update, PluginLogic::checkUnitsWithinRadius);
         Events.run(EventType.Trigger.update, Players::forEach);
         Events.on(EventType.PlayerLeave.class, event -> {
             Player player = event.player;

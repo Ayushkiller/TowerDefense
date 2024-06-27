@@ -15,9 +15,7 @@ import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
-import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
-import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.net.Administration;
@@ -27,7 +25,6 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.RegenProjector;
 import mindustry.world.blocks.defense.ShockMine;
-import mindustry.world.blocks.defense.ShockwaveTower;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.RepairTurret;
@@ -39,7 +36,6 @@ import useful.Bundle;
 public class PluginLogic {
     public static float multiplier = 1f;
     public static ObjectMap<UnitType, Seq<ItemStack>> drops = new ObjectMap<>();
-    public static ObjectMap<Tile, Block> forceProjectorTiles = new ObjectMap<>();
     public static ObjectMap<Tile, Block> repairPointTiles = new ObjectMap<>();
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
     private static Seq<Timer.Task> scheduledTasks = new Seq<>();
@@ -60,7 +56,7 @@ public class PluginLogic {
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null)
                 return true;
-            if (action.type == Administration.ActionType.placeBlock && !canBePlaced(action.tile, action.block) &&
+            if (action.type == Administration.ActionType.placeBlock && !canBePlaced(action.tile) &&
                     !(action.block instanceof ShockMine || action.block instanceof Conduit
                             || action.block instanceof CoreBlock)) {
                 Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
@@ -79,22 +75,11 @@ public class PluginLogic {
         addScheduledTask(PluginLogic::applyForceProjectorEffects, 0f, 2f);
         addScheduledTask(PluginLogic::accumulateRepairPointCash, 0f, 20f);
         addScheduledTask(PluginLogic::distributeRepairPointCash, 0f, 1f);
-        addScheduledTask(PluginLogic::resetNegativePlayerCash, 0f, 2f);
-        addScheduledTask(PluginLogic::damageNearbyEnemyCores, 0f, 1f);
         addScheduledTask(PluginLogic::showMultiplierPopup, 0f, 1f);
         addScheduledTask(PluginLogic::RemindPeople, 0f, 180f);
     }
 
     private static void applyForceProjectorEffects() {
-        forceProjectorTiles.forEach(entry -> {
-            Tile tile = entry.key;
-            Groups.player.each(player -> {
-                if (player.dst(tile.worldx(), tile.worldy()) <= 100f) {
-                    Call.effect(Fx.greenCloud, tile.x, tile.y, 100f, Color.royal);
-                    Bundle.label(player, 4f, tile.drawx(), tile.drawy(), "ui.force");
-                }
-            });
-        });
         repairPointTiles.forEach(entry -> {
             Tile tile = entry.key;
             Groups.player.each(player -> {
@@ -141,31 +126,8 @@ public class PluginLogic {
         });
     }
 
-    private static void resetNegativePlayerCash() {
-        Groups.player.each(player -> {
-            PlayerData playerData = Players.getPlayer(player);
-            if (playerData != null && playerData.getCash() < 0) {
-                playerData.setCash(0, player);
-            }
-        });
-    }
 
-    private static void damageNearbyEnemyCores() {
-        state.rules.waveTeam.data().units.each(unit -> {
-            var core = unit.closestEnemyCore();
-            if (core == null || unit.dst(core) > 80f || core.health <= 0)
-                return;
-            float damage = (unit.health + unit.shield) / Mathf.sqrt(multiplier);
-            damage = Math.min(damage, core.health);
-            core.damage(Team.crux, damage);
-            Call.effect(Fx.healWaveMend, unit.x, unit.y, 40f, Color.crimson);
-            core.damage(1, true);
-            unit.kill();
-            if (core.block.health <= 0) {
-                core.block.health = 1;
-            }
-        });
-    }
+
 
     private static void showMultiplierPopup() {
         Bundle.popup(1f, 20, 50, 20, 450, 0, "ui.multiplier",
@@ -191,10 +153,11 @@ public class PluginLogic {
     private static void setupEventHandlers() {
         Events.on(EventType.WorldLoadEvent.class, event -> {
             multiplier = 0.5f;
+            updatePathCache();
             for (int x = 0; x < Vars.world.width(); x++) {
                 for (int y = 0; y < Vars.world.height(); y++) {
                     Tile tile = Vars.world.tile(x, y);
-                    if (isPath(tile)) {
+                    if (pathCache.getOrDefault(tile, false)) {
                         Block block = tile.block();
                         if (block != null && !(block instanceof ShockMine || block instanceof Conduit
                                 || block instanceof CoreBlock)) {
@@ -263,51 +226,37 @@ public class PluginLogic {
     private static void resetGame() {
         multiplier = 1f;
         repairPointCash.clear();
-        forceProjectorTiles.clear();
         repairPointTiles.clear();
     }
-
+    private static void updatePathCache() {
+        pathCache.clear();
+        for (int x = 0; x < Vars.world.width(); x++) {
+            for (int y = 0; y < Vars.world.height(); y++) {
+                Tile tile = Vars.world.tile(x, y);
+                pathCache.put(tile, isPath(tile));
+            }
+        }
+    }
     private static void updateTiles(Tile tile) {
         Block block = tile.block();
-        if (block instanceof RegenProjector || block instanceof ShockwaveTower) {
-            forceProjectorTiles.put(tile, block);
-        } else if (block instanceof RepairTurret || block instanceof RegenProjector) {
+        if (block instanceof RepairTurret || block instanceof RegenProjector) {
             repairPointTiles.put(tile, block);
         } else {
-            forceProjectorTiles.remove(tile);
             repairPointTiles.remove(tile);
             repairPointCash.remove(tile);
         }
 
-        // Check if the tile is in the path cache and remove it if found
-        if (pathCache.containsKey(tile)) {
-            tile.setAir();
-        }
+        // Update the pathCache for this tile
+        pathCache.put(tile, isPath(tile));
     }
     public static boolean isInPathCache(Tile tile) {
-        return pathCache.containsKey(tile);
-    }
-   
-
-    public static void checkUnitsWithinRadius() {
-        forceProjectorTiles.forEach(entry -> {
-            Tile tile = entry.key;
-            Groups.unit.each(unit -> {
-                if (unit.team == state.rules.waveTeam && unit.dst(tile.worldx(), tile.worldy()) <= 105f) {
-                    unit.type.speed = 1.2f;
-                    unit.healthMultiplier(0.75f);
-                    unit.apply(StatusEffects.electrified, 200f);
-                    unit.apply(StatusEffects.slow, 200f);
-                    unit.apply(StatusEffects.freezing, 200f);
-                    unit.apply(StatusEffects.sporeSlowed, 200f);
-                }
-            });
-        });
+        return pathCache.getOrDefault(tile, false);
     }
 
-    public static boolean canBePlaced(Tile tile, Block block) {
-        return !pathCache.computeIfAbsent(tile, PluginLogic::isPath);
+    public static boolean canBePlaced(Tile tile) {
+        return !pathCache.getOrDefault(tile, false);
     }
+
 
     public static boolean isPath(Tile tile) {
         return tile.floor() == Vars.world.tile(0, 0).floor()
