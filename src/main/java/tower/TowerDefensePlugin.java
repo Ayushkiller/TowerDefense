@@ -7,7 +7,6 @@ import mindustry.mod.Plugin;
 import tower.Domain.PlayerData;
 import tower.game.EventLoader;
 import tower.menus.Menu;
-import tower.pathing.TowerPathfinder;
 import useful.Bundle;
 
 public class TowerDefensePlugin extends Plugin {
@@ -16,7 +15,6 @@ public class TowerDefensePlugin extends Plugin {
     @Override
     public void init() {
         Bundle.load(TowerDefensePlugin.class);
-        TowerPathfinder.init();
         PluginLogic.init();
         EventLoader.init();
     }

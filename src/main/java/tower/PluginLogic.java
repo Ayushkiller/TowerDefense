@@ -13,16 +13,13 @@ import arc.struct.Seq;
 import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
-import mindustry.ai.types.GroundAI;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
-import mindustry.content.UnitTypes;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
-import mindustry.gen.Unit;
 import mindustry.net.Administration;
 import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
@@ -34,11 +31,9 @@ import mindustry.world.blocks.defense.ShockwaveTower;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.RepairTurret;
-import mindustry.world.meta.BlockFlag;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
 import tower.commands.Units;
-import tower.pathing.TowerPathfinder;
 import useful.Bundle;
 
 public class PluginLogic {
@@ -243,7 +238,6 @@ public class PluginLogic {
             resetGame();
         });
         Events.on(EventType.TileChangeEvent.class, event -> updateTiles(event.tile));
-        Events.on(EventType.UnitSpawnEvent.class, event -> handleUnitSpawn(event.unit));
         Events.on(EventType.WorldLoadEndEvent.class, event -> reloadAllTasks());
     }
 
@@ -293,35 +287,7 @@ public class PluginLogic {
     public static boolean isInPathCache(Tile tile) {
         return pathCache.containsKey(tile);
     }
-    private static void handleUnitSpawn(Unit unit) {
-        if (unit.type != null && unit.team == state.rules.waveTeam) {
-            unit.type.speed = unit.type.naval || unit.type.flying ? 0.95f : 1.2f;
-            unit.type.range = -1f;
-            unit.type.hovering = true;
-            unit.disarmed = true;
-            if (unit.type == UnitTypes.omura || unit.type == UnitTypes.aegires || unit.type == UnitTypes.navanax) {
-                unit.kill();
-            }
-            unit.apply(StatusEffects.disarmed, Float.POSITIVE_INFINITY);
-            unit.type.crashDamageMultiplier = 0f;
-            unit.type.crushDamage = 0f;
-            unit.shield(unit.shield * multiplier);
-            unit.health(unit.health * multiplier);
-            unit.type.mineWalls = false;
-            unit.type.mineFloor = false;
-            unit.type.targetAir = false;
-            unit.type.targetGround = false;
-            unit.type.payloadCapacity = 0f;
-            unit.type.legSplashDamage = 0f;
-            unit.type.maxRange = 0f;
-            unit.type.mineRange = 0f;
-            unit.type.aiController = GroundAI::new;
-            if (unit.type.flying) {
-                unit.type.pathCost = TowerPathfinder.costTypes.get(3);
-            }
-            unit.type.targetFlags = new BlockFlag[] { BlockFlag.core };
-        }
-    }
+   
 
     public static void checkUnitsWithinRadius() {
         forceProjectorTiles.forEach(entry -> {
