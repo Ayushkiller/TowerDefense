@@ -175,6 +175,10 @@ public class PluginLogic {
             }
             var core = event.unit.closestEnemyCore();
             var drop = drops.get(event.unit.type);
+            if (drop == null) {
+                Log.info("No drops found for unit type: " + event.unit.type);
+                return;
+            }
             var builder = new StringBuilder();
             drop.each(stack -> {
                 int amount = (int) ((stack.amount - stack.amount / 2)

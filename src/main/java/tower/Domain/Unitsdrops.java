@@ -1,7 +1,6 @@
 package tower.Domain;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import arc.struct.Seq;
 import mindustry.content.Items;
@@ -10,7 +9,7 @@ import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
 
 public class Unitsdrops {
-    public static Map<UnitType, Seq<ItemStack>> drops = new HashMap<>();
+    public static HashMap<UnitType, Seq<ItemStack>> drops = new HashMap<>();
 
     static {
         addDrop(UnitTypes.crawler, Seq.with(new ItemStack(Items.copper, 20), new ItemStack(Items.lead, 15), new ItemStack(Items.silicon, 5)));
@@ -74,7 +73,8 @@ public class Unitsdrops {
         addDrop(UnitTypes.conquer, Seq.with(new ItemStack(Items.beryllium, 300), new ItemStack(Items.graphite, 300), new ItemStack(Items.silicon, 300), new ItemStack(Items.tungsten, 200), new ItemStack(Items.thorium, 100), new ItemStack(Items.oxide, 80), new ItemStack(Items.carbide, 40), new ItemStack(Items.surgeAlloy, 10), new ItemStack(Items.phaseFabric, 10)));
 
         // Air Erekir units
-        addDrop(UnitTypes.elude, Seq.with(new ItemStack(Items.beryllium, 20), new ItemStack(Items.silicon, 25)));
+        addDrop(UnitTypes.elude,
+         Seq.with(new ItemStack(Items.beryllium, 20), new ItemStack(Items.silicon, 25)));
         addDrop(UnitTypes.avert, Seq.with(new ItemStack(Items.beryllium, 20), new ItemStack(Items.graphite, 20), new ItemStack(Items.silicon, 20), new ItemStack(Items.tungsten, 15)));
         addDrop(UnitTypes.obviate, Seq.with(new ItemStack(Items.beryllium, 40), new ItemStack(Items.graphite, 40), new ItemStack(Items.silicon, 40), new ItemStack(Items.tungsten, 40), new ItemStack(Items.oxide, 15)));
         addDrop(UnitTypes.quell, Seq.with(new ItemStack(Items.beryllium, 120), new ItemStack(Items.graphite, 100), new ItemStack(Items.silicon, 100), new ItemStack(Items.tungsten, 80), new ItemStack(Items.oxide, 40), new ItemStack(Items.carbide, 20)));
