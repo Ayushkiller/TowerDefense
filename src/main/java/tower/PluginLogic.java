@@ -51,8 +51,10 @@ public class PluginLogic {
 
     private static void initializeDrops() {
         drops.putAll(Unitsdrops.drops);
+        // Add logging to verify drops are initialized
+        Log.info("Drops initialized: " + drops);
     }
-
+    
     private static void setupAdminActionFilters() {
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null)
