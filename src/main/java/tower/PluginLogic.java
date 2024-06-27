@@ -2,6 +2,7 @@ package tower;
 
 import static mindustry.Vars.*;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -10,7 +11,6 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
@@ -36,25 +36,33 @@ import useful.Bundle;
 
 public class PluginLogic {
     public static float multiplier = 1f;
-    public static ObjectMap<UnitType, Seq<ItemStack>> drops = new ObjectMap<>();
     public static ObjectMap<Tile, Block> repairPointTiles = new ObjectMap<>();
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
     private static Seq<Timer.Task> scheduledTasks = new Seq<>();
     private static final ConcurrentHashMap<Tile, Boolean> pathCache = new ConcurrentHashMap<>();
+    public static ObjectMap<UnitType, Seq<ItemStack>> drops;
 
     public static void init() {
-        initializeDrops();
         setupAdminActionFilters();
         scheduleTimers();
         setupEventHandlers();
+        intializedrops();
     }
 
-    private static void initializeDrops() {
-        drops.putAll(Unitsdrops.drops);
-        // Add logging to verify drops are initialized
-        Log.info("Drops initialized: " + drops);
+    private static void intializedrops() {
+        drops = new ObjectMap<>();
+        for (Map<String, Object> dropEntry : Unitsdrops.drops) {
+            UnitType unit = (UnitType) dropEntry.get("unit");
+            Object dropsObject = dropEntry.get("drops");
+            if (dropsObject instanceof Seq<?>) {
+                @SuppressWarnings("unchecked")
+                Seq<ItemStack> itemStacks = (Seq<ItemStack>) dropsObject;
+                drops.put(unit, itemStacks);
+            } else {
+            }
+        }
     }
-    
+
     private static void setupAdminActionFilters() {
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null)
@@ -167,30 +175,22 @@ public class PluginLogic {
                 }
             }
         });
-
         Events.on(EventType.UnitDestroyEvent.class, event -> {
-            if (event.unit.team != state.rules.waveTeam) {
-                Log.info("Unit destroyed by team that is not the wave team; ignoring");
+            if (event.unit.team != state.rules.waveTeam)
                 return;
-            }
             var core = event.unit.closestEnemyCore();
             var drop = drops.get(event.unit.type);
-            if (drop == null) {
-                Log.info("No drops found for unit type: " + event.unit.type);
+            if (core == null || drop == null)
                 return;
-            }
             var builder = new StringBuilder();
             drop.each(stack -> {
-                int amount = (int) ((stack.amount - stack.amount / 2)
-                        + (Math.random() * (stack.amount * 1.4f + stack.amount / 2)));
+                int amount = Mathf.random(stack.amount - stack.amount / 2, stack.amount + stack.amount / 2);
                 builder.append("[accent]+").append(amount).append("[white]").append(stack.item.emoji()).append(" ");
                 Call.transferItemTo(event.unit, stack.item, core.acceptStack(stack.item, amount, core), event.unit.x,
                         event.unit.y, core);
             });
-            Log.info("Unit destroy event successful"+builder.toString());
             Call.labelReliable(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
         });
-
         Events.on(EventType.WorldLoadEvent.class, event -> {
             for (int x = 0; x < Vars.world.width(); x++) {
                 for (int y = 0; y < Vars.world.height(); y++) {
@@ -233,6 +233,7 @@ public class PluginLogic {
         repairPointCash.clear();
         repairPointTiles.clear();
     }
+
     private static void updatePathCache() {
         pathCache.clear();
         for (int x = 0; x < Vars.world.width(); x++) {
@@ -242,6 +243,7 @@ public class PluginLogic {
             }
         }
     }
+
     private static void updateTiles(Tile tile) {
         Block block = tile.block();
         if (block instanceof RepairTurret || block instanceof RegenProjector) {
@@ -253,6 +255,7 @@ public class PluginLogic {
         // Update the pathCache for this tile
         pathCache.put(tile, isPath(tile));
     }
+
     public static boolean isInPathCache(Tile tile) {
         return pathCache.getOrDefault(tile, false);
     }
@@ -260,7 +263,6 @@ public class PluginLogic {
     public static boolean canBePlaced(Tile tile) {
         return !pathCache.getOrDefault(tile, false);
     }
-
 
     public static boolean isPath(Tile tile) {
         return tile.floor() == Vars.world.tile(0, 0).floor()
