@@ -173,10 +173,6 @@ public class PluginLogic {
             }
             var core = event.unit.closestEnemyCore();
             var drop = drops.get(event.unit.type);
-            if (core == null || drop == null) {
-                Log.info("Core or drop is null for unit destroy event; ignoring");
-                return;
-            }
             var builder = new StringBuilder();
             drop.each(stack -> {
                 int amount = (int) ((stack.amount - stack.amount / 2)
