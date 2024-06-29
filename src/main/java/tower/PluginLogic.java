@@ -31,6 +31,8 @@ import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.RepairTurret;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
+import tower.commands.BuyPoint;
+import tower.commands.Statuseffects;
 import tower.commands.Units;
 import useful.Bundle;
 
@@ -38,7 +40,7 @@ public class PluginLogic {
     public static float multiplier = 1f;
     public static ObjectMap<Tile, Block> repairPointTiles = new ObjectMap<>();
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
-    private static Seq<Timer.Task> scheduledTasks = new Seq<>();
+    private static final Seq<Timer.Task> scheduledTasks = new Seq<>();
     private static final ConcurrentHashMap<Tile, Boolean> pathCache = new ConcurrentHashMap<>();
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
 
@@ -58,7 +60,6 @@ public class PluginLogic {
                 @SuppressWarnings("unchecked")
                 Seq<ItemStack> itemStacks = (Seq<ItemStack>) dropsObject;
                 drops.put(unit, itemStacks);
-            } else {
             }
         }
     }
@@ -83,11 +84,11 @@ public class PluginLogic {
     }
 
     private static void scheduleTimers() {
-        addScheduledTask(PluginLogic::applyForceProjectorEffects, 0f, 2f);
-        addScheduledTask(PluginLogic::accumulateRepairPointCash, 0f, 20f);
-        addScheduledTask(PluginLogic::distributeRepairPointCash, 0f, 1f);
-        addScheduledTask(PluginLogic::showMultiplierPopup, 0f, 1f);
-        addScheduledTask(PluginLogic::RemindPeople, 0f, 180f);
+        addScheduledTask(PluginLogic::applyForceProjectorEffects, 2f);
+        addScheduledTask(PluginLogic::accumulateRepairPointCash, 20f);
+        addScheduledTask(PluginLogic::distributeRepairPointCash, 1f);
+        addScheduledTask(PluginLogic::showMultiplierPopup, 1f);
+        addScheduledTask(PluginLogic::RemindPeople, 180f);
     }
 
     private static void applyForceProjectorEffects() {
@@ -143,8 +144,8 @@ public class PluginLogic {
                 Strings.autoFixed(multiplier, 2));
     }
 
-    private static void addScheduledTask(Runnable task, float delay, float interval) {
-        Timer.Task timerTask = Timer.schedule(task, delay, interval);
+    private static void addScheduledTask(Runnable task, float interval) {
+        Timer.Task timerTask = Timer.schedule(task, (float) 0.0, interval);
         scheduledTasks.add(timerTask);
     }
 
@@ -191,18 +192,12 @@ public class PluginLogic {
             });
             Call.labelReliable(builder.toString(), 1f, event.unit.x + Mathf.range(4f), event.unit.y + Mathf.range(4f));
         });
-        Events.on(EventType.WorldLoadEvent.class, event -> {
-            for (int x = 0; x < Vars.world.width(); x++) {
-                for (int y = 0; y < Vars.world.height(); y++) {
-                    Tile tile = Vars.world.tile(x, y);
-                    isPath(tile);
-                }
-            }
-        });
 
         Events.on(EventType.WaveEvent.class, event -> adjustMultiplierByWave());
         Events.on(EventType.GameOverEvent.class, event -> {
             Units.clearMenuIds();
+            BuyPoint.clearMenuIds();
+            Statuseffects.clearMenuIds();
             resetGame();
         });
         Events.on(EventType.TileChangeEvent.class, event -> updateTiles(event.tile));
@@ -256,9 +251,6 @@ public class PluginLogic {
         pathCache.put(tile, isPath(tile));
     }
 
-    public static boolean isInPathCache(Tile tile) {
-        return pathCache.getOrDefault(tile, false);
-    }
 
     public static boolean canBePlaced(Tile tile) {
         return !pathCache.getOrDefault(tile, false);

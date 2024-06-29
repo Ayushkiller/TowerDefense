@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import mindustry.gen.Call;
 import mindustry.gen.Player;
@@ -62,7 +61,7 @@ public class Units {
     private static void openTierUnitsMenuGui(int tier, Player player) {
         List<Map<String, Object>> tierUnits = UnitsTable.units.stream()
                 .filter(unit -> (int) unit.get("tier") == tier)
-                .collect(Collectors.toList());
+                .toList();
 
         String[][] buttons = new String[tierUnits.size()][1];
         for (int i = 0; i < tierUnits.size(); i++) {
