@@ -185,8 +185,4 @@ public class SuperPowers {
     }
     return null;
 }
-
-    public static void clearMenuIds() {
-        alphaAbilityLastUseTime.clear();
-    }
 }

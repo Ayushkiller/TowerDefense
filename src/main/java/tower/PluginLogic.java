@@ -179,9 +179,6 @@ public class PluginLogic {
 
         Events.on(EventType.WaveEvent.class, event -> adjustMultiplierByWave());
         Events.on(EventType.GameOverEvent.class, event -> {
-            Units.clearMenuIds();
-            BuyPoint.clearMenuIds();
-            Statuseffects.clearMenuIds();
             resetGame();
         });
         Events.on(EventType.TileChangeEvent.class, event -> updateTiles(event.tile));

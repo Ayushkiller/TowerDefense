@@ -69,48 +69,24 @@ public class BuyPoint {
         dynamicListeners.put(sellMenuId, (p, option) -> openQuantityAdjustmentMenu(p, option, false));
         Call.menu(player.con, sellMenuId, "Sell Items", "", buttons);
     }
-
-    private static void openQuantityAdjustmentMenu(Player player, int option, boolean isBuy) {
-        logger.log(Level.INFO, "Opening Quantity Adjustment menu for player: {0}, option: {1}, isBuy: {2}", 
-                   new Object[]{player.name, option, isBuy});
-        if (option < 0 || option >= Currency.items.size()) {
-            player.sendMessage("Invalid selection. Please try again.");
-            return;
-        }
-        Map<String, Object> selectedItemMap = Currency.items.get(option);
-        Item selectedItem = (Item) selectedItemMap.get("item");
-
-        String title = "Adjust Quantity";
-        Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
-        String description = generateDescription(quantities, player, isBuy);
-
-        String[][] buttons = { 
-            { "-2000", "-1000", "-100", "+400", "+1000", "+2000" },
-            { isBuy ? "Buy" : "Sell", "Close", "Back" }
-        };
-
-        dynamicListeners.put(quantityAdjustmentMenuId, (p, opt) -> handleQuantityAdjustmentMenu(p, opt, selectedItem, option, isBuy));
-        Call.menu(player.con, quantityAdjustmentMenuId, title, description, buttons);
-    }
-
     private static void handleQuantityAdjustmentMenu(Player player, int opt, Item selectedItem, int option, boolean isBuy) {
-        logger.log(Level.INFO, "Handling Quantity Adjustment menu for player: {0}, option: {1}, selectedItem: {2}, isBuy: {3}", 
-                   new Object[]{player.name, opt, selectedItem.name, isBuy});
+        logger.log(Level.INFO, "Handling Quantity Adjustment menu for player: {0}, option: {1}, selectedItem: {2}, isBuy: {3}",
+                new Object[]{player.name, opt, selectedItem.name, isBuy});
         Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
-        if (opt < 6) { 
+        if (opt < 6) {
             adjustItemQuantity(player, selectedItem, quantities, opt);
             openQuantityAdjustmentMenu(player, option, isBuy);
-        } else if (opt == 6) { 
+        } else if (opt == 6) {
             if (isBuy) {
                 handleBuyAction(player, quantities);
             } else {
                 handleSellAction(player, quantities);
             }
-        } else if (opt == 7) { 
+        } else if (opt == 7) {
             player.sendMessage("[grey]Transaction closed.");
             selectedItemsQuantities.remove(player);
             logger.log(Level.INFO, "Transaction closed for player: {0}", player.name);
-        } else if (opt == 8) { 
+        } else if (opt == 8) {
             if (isBuy) {
                 openBuyMenu(player);
             } else {
@@ -119,23 +95,15 @@ public class BuyPoint {
         }
     }
 
-    private static void adjustItemQuantity(Player player, Item item, Map<Item, Integer> quantities, int opt) {
-        int adjustment = Integer.parseInt(new String[] { "-2000", "-1000", "-100", "+400", "+1000", "+2000" }[opt]);
-        int currentQuantity = quantities.getOrDefault(item, 0);
-        int newQuantity = currentQuantity + adjustment;
-        if (newQuantity < 0) {
-            player.sendMessage("Quantity cannot be negative.");
-            logger.log(Level.WARNING, "Player {0} attempted to set a negative quantity for item: {1}", new Object[]{player.name, item.name});
-        } else {
-            quantities.put(item, newQuantity);
-            logger.log(Level.INFO, "Player {0} adjusted quantity for item: {1} to {2}", new Object[]{player.name, item.name, newQuantity});
-        }
-    }
-
     private static void handleBuyAction(Player player, Map<Item, Integer> selectedItems) {
         logger.log(Level.INFO, "Handling Buy action for player: {0}", player.name);
+        if (selectedItems.isEmpty()) {
+            player.sendMessage("[red]No items selected.");
+            logger.log(Level.WARNING, "Player {0} attempted to buy with no items selected.", player.name);
+            return;
+        }
         int totalCash = calculateTotalCash(selectedItems);
-        if (selectedItems.isEmpty() || totalCash == 0) {
+        if (totalCash == 0) {
             player.sendMessage("[red]No items selected.");
             logger.log(Level.WARNING, "Player {0} attempted to buy with no items selected.", player.name);
             return;
@@ -156,6 +124,11 @@ public class BuyPoint {
 
     private static void handleSellAction(Player player, Map<Item, Integer> selectedItems) {
         logger.log(Level.INFO, "Handling Sell action for player: {0}", player.name);
+        if (selectedItems.isEmpty()) {
+            player.sendMessage("[red]No items selected.");
+            logger.log(Level.WARNING, "Player {0} attempted to sell with no items selected.", player.name);
+            return;
+        }
         int totalQuantity = selectedItems.values().stream().mapToInt(Integer::intValue).sum();
         if (totalQuantity <= 0) {
             player.sendMessage("[red]Quantity cannot be negative or zero.");
@@ -181,6 +154,47 @@ public class BuyPoint {
         logger.log(Level.INFO, "Player {0} sold items successfully.", player.name);
     }
 
+    private static void adjustItemQuantity(Player player, Item item, Map<Item, Integer> quantities, int opt) {
+        int adjustment = Integer.parseInt(new String[] { "-2000", "-1000", "-100", "+400", "+1000", "+2000" }[opt]);
+        int currentQuantity = quantities.getOrDefault(item, 0);
+        int newQuantity = currentQuantity + adjustment;
+        if (newQuantity < 0) {
+            player.sendMessage("Quantity cannot be negative.");
+            logger.log(Level.WARNING, "Player {0} attempted to set a negative quantity for item: {1}", new Object[]{player.name, item.name});
+        } else {
+            quantities.put(item, newQuantity);
+            logger.log(Level.INFO, "Player {0} adjusted quantity for item: {1} to {2}", new Object[]{player.name, item.name, newQuantity});
+        }
+    }
+
+    // Ensure the map is correctly initialized
+    private static Map<Item, Integer> getSelectedItemsQuantities(Player player) {
+        return selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
+    }
+
+    private static void openQuantityAdjustmentMenu(Player player, int option, boolean isBuy) {
+        logger.log(Level.INFO, "Opening Quantity Adjustment menu for player: {0}, option: {1}, isBuy: {2}", 
+                   new Object[]{player.name, option, isBuy});
+        if (option < 0 || option >= Currency.items.size()) {
+            player.sendMessage("Invalid selection. Please try again.");
+            return;
+        }
+        Map<String, Object> selectedItemMap = Currency.items.get(option);
+        Item selectedItem = (Item) selectedItemMap.get("item");
+
+        String title = "Adjust Quantity";
+        Map<Item, Integer> quantities = getSelectedItemsQuantities(player);
+        String description = generateDescription(quantities, player);
+
+        String[][] buttons = { 
+            { "-2000", "-1000", "-100", "+400", "+1000", "+2000" },
+            { isBuy ? "Buy" : "Sell", "Close", "Back" }
+        };
+
+        dynamicListeners.put(quantityAdjustmentMenuId, (p, opt) -> handleQuantityAdjustmentMenu(p, opt, selectedItem, option, isBuy));
+        Call.menu(player.con, quantityAdjustmentMenuId, title, description, buttons);
+    }
+
     private static String[][] createButtons(List<Map<String, Object>> items, boolean isBuy) {
         String[][] buttons = new String[items.size()][1];
         for (int i = 0; i < items.size(); i++) {
@@ -193,7 +207,7 @@ public class BuyPoint {
         return buttons;
     }
 
-    private static String generateDescription(Map<Item, Integer> quantities, Player player, boolean isBuy) {
+    private static String generateDescription(Map<Item, Integer> quantities, Player player) {
         StringBuilder description = new StringBuilder("Select quantity adjustment\n\n");
         for (Map.Entry<Item, Integer> entry : quantities.entrySet()) {
             int teamQuantity = player.team().items().get(entry.getKey()); 
@@ -231,15 +245,5 @@ public class BuyPoint {
 
     private static void addItemsToTeam(Team team, Map<Item, Integer> selectedItems) {
         selectedItems.forEach((item, quantity) -> team.items().add(item, quantity));
-    }
-
-    private static Map<Item, Integer> getSelectedItemsQuantities(Player player) {
-        return selectedItemsQuantities.computeIfAbsent(player, k -> new HashMap<>());
-    }
-
-    public static void clearMenuIds() {
-        selectedItemsQuantities.clear();
-        dynamicListeners.clear();
-        logger.log(Level.INFO, "Cleared all menu IDs and listeners.");
     }
 }

@@ -111,7 +111,4 @@ public class Statuseffects {
         player.sendMessage(effect.emoji() + " Effect purchased for " + effectPrice + " + " + additionalPrice + " = " + totalPrice);
     }
 
-    public static void clearMenuIds() {
-        dynamicListeners.clear();
-    }
 }

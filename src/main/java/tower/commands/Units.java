@@ -188,9 +188,4 @@ public class Units {
         }
     }
 
-    public static void clearMenuIds() {
-        menuIds.clear();
-        dynamicListeners.clear();
-        logger.log(Level.INFO, "Cleared all menu IDs and listeners.");
-    }
 }
