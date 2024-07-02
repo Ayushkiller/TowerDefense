@@ -3,7 +3,6 @@ package tower;
 import static mindustry.Vars.*;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import arc.Events;
@@ -14,7 +13,6 @@ import arc.struct.Seq;
 import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
-import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
@@ -41,7 +39,6 @@ public class PluginLogic {
     public static ObjectMap<Tile, Block> repairPointTiles = new ObjectMap<>();
     public static ObjectMap<Tile, Float> repairPointCash = new ObjectMap<>();
     private static final Seq<Timer.Task> scheduledTasks = new Seq<>();
-    private static final ConcurrentHashMap<Tile, Boolean> pathCache = new ConcurrentHashMap<>();
     public static ObjectMap<UnitType, Seq<ItemStack>> drops;
 
     public static void init() {
@@ -68,7 +65,7 @@ public class PluginLogic {
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null)
                 return true;
-            if (action.type == Administration.ActionType.placeBlock && !canBePlaced(action.tile) &&
+            if (action.type == Administration.ActionType.placeBlock && isPath(action.tile) &&
                     !(action.block instanceof ShockMine || action.block instanceof Conduit
                             || action.block instanceof CoreBlock)) {
                 Bundle.label(action.player, 4f, action.tile.drawx(), action.tile.drawy(), "ui.forbidden");
@@ -162,19 +159,6 @@ public class PluginLogic {
     private static void setupEventHandlers() {
         Events.on(EventType.WorldLoadEvent.class, event -> {
             multiplier = 0.5f;
-            updatePathCache();
-            for (int x = 0; x < Vars.world.width(); x++) {
-                for (int y = 0; y < Vars.world.height(); y++) {
-                    Tile tile = Vars.world.tile(x, y);
-                    if (pathCache.getOrDefault(tile, false)) {
-                        Block block = tile.block();
-                        if (block != null && !(block instanceof ShockMine || block instanceof Conduit
-                                || block instanceof CoreBlock)) {
-                            tile.setBlock(Blocks.air);
-                        }
-                    }
-                }
-            }
         });
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam)
@@ -229,16 +213,6 @@ public class PluginLogic {
         repairPointTiles.clear();
     }
 
-    private static void updatePathCache() {
-        pathCache.clear();
-        for (int x = 0; x < Vars.world.width(); x++) {
-            for (int y = 0; y < Vars.world.height(); y++) {
-                Tile tile = Vars.world.tile(x, y);
-                pathCache.put(tile, isPath(tile));
-            }
-        }
-    }
-
     private static void updateTiles(Tile tile) {
         Block block = tile.block();
         if (block instanceof RepairTurret || block instanceof RegenProjector) {
@@ -247,13 +221,10 @@ public class PluginLogic {
             repairPointTiles.remove(tile);
             repairPointCash.remove(tile);
         }
-        // Update the pathCache for this tile
-        pathCache.put(tile, isPath(tile));
-    }
-
-
-    public static boolean canBePlaced(Tile tile) {
-        return !pathCache.getOrDefault(tile, false);
+        if(isPath(tile) && tile.solid()){
+            tile.setAir();
+            Bundle.label( 4f, tile.drawx(),tile.drawy(), "ui.forbidden");
+        }
     }
 
     public static boolean isPath(Tile tile) {

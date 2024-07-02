@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import mindustry.gen.Call;
 import mindustry.gen.Player;
@@ -15,17 +17,19 @@ import tower.Domain.PlayerData;
 import tower.Domain.UnitsTable;
 
 public class Units {
-  private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
-    private static final Map<Integer, BiConsumer<Player, Integer>> dynamicListeners =  new HashMap<>();
-    private static final Map<String, Integer> menuIds =  new HashMap<>();
-
+    private static final Logger logger = Logger.getLogger(Units.class.getName());
+    private static final Map<UnitType, Integer> unitPrices = new HashMap<>();
+    private static final Map<Integer, BiConsumer<Player, Integer>> dynamicListeners = new HashMap<>();
+    private static final Map<String, Integer> menuIds = new HashMap<>();
     private static final String[][] tierButtons = new String[6][1];
     private static int tierMenuId;
+
     static {
         registerTierMenu();
         for (int i = 0; i < 6; i++) {
             tierButtons[i][0] = "[cyan]Tier " + i;
         }
+        initUnitsTable();
     }
 
     public static void initUnitsTable() {
@@ -35,26 +39,32 @@ public class Units {
             price = (int) (price * 1.4);
             unitPrices.put(unitType, price);
         }
+        logger.log(Level.INFO, "Initialized units table with prices: {0}", unitPrices);
     }
 
     public static void execute(Player player) {
+        logger.log(Level.INFO, "Executing Units command for player: {0}", player.name);
         openTierMenuGui(player);
     }
 
     public static void registerTierMenu() {
         tierMenuId = Menus.registerMenu((player, option) -> dynamicListeners.getOrDefault(tierMenuId, (p, o) -> p.sendMessage("Error: Invalid menu handler")).accept(player, option));
         dynamicListeners.put(tierMenuId, Units::handleTierMenuOption);
+        logger.log(Level.INFO, "Tier menu registered with ID: {0}", tierMenuId);
     }
 
     private static void openTierMenuGui(Player player) {
+        logger.log(Level.INFO, "Opening Tier menu GUI for player: {0}", player.name);
         Call.menu(player.con, tierMenuId, "Select Tier", "", tierButtons);
     }
 
     private static void handleTierMenuOption(Player player, int option) {
         if (option >= 0 && option < 6) {
+            logger.log(Level.INFO, "Player {0} selected Tier {1}", new Object[]{player.name, option});
             openTierUnitsMenuGui(option, player);
         } else {
             player.sendMessage("Invalid selection. Please try again.");
+            logger.log(Level.WARNING, "Invalid tier selection by player: {0}", player.name);
         }
     }
 
@@ -79,6 +89,7 @@ public class Units {
                     openUnitMenuGui(unitType, player);
                 } else {
                     player.sendMessage("Invalid selection. Please try again.");
+                    logger.log(Level.WARNING, "Invalid unit selection by player: {0}", player.name);
                 }
             })
         );
@@ -99,6 +110,7 @@ public class Units {
                     case 0 -> buyUnit(unitType, player, true);
                     case 1 -> openTierMenuGui(player);
                     case 2 -> openQuantityAdjustmentMenu(unitType, player, 1);
+                    default -> player.sendMessage("Invalid option. Please try again.");
                 }
             })
         );
@@ -123,6 +135,7 @@ public class Units {
                     int currentQuantity = defaultQuantity + adjustment;
                     if (currentQuantity < 1) {
                         player.sendMessage("[red]Quantity cannot be less than 1.");
+                        logger.log(Level.WARNING, "Player {0} attempted to set quantity less than 1 for unit: {1}", new Object[]{player.name, unitType});
                         openQuantityAdjustmentMenu(unitType, player, 1); // Reset to minimum 1
                         return;
                     }
@@ -133,6 +146,7 @@ public class Units {
                     openUnitMenuGui(unitType, player);
                 } else if (opt == 5) { // Close button
                     player.sendMessage("Purchase cancelled.");
+                    logger.log(Level.INFO, "Purchase cancelled by player: {0}", player.name);
                 }
             })
         );
@@ -149,9 +163,11 @@ public class Units {
             if (shouldControlUnit) {
                 Call.unitControl(player, spawned);
                 player.sendMessage("Unit bought successfully.");
+                logger.log(Level.INFO, "Player {0} bought unit: {1}", new Object[]{player.name, unitType});
             }
         } else {
             player.sendMessage("Not enough funds.");
+            logger.log(Level.WARNING, "Player {0} attempted to buy unit with insufficient funds: {1}", new Object[]{player.name, unitType});
         }
     }
 
@@ -165,13 +181,16 @@ public class Units {
             }
             playerData.subtractCash(totalCost, player);
             player.sendMessage("[green]Units purchased successfully.");
+            logger.log(Level.INFO, "Player {0} bought multiple units: {1} (quantity: {2})", new Object[]{player.name, unitType, quantity});
         } else {
             player.sendMessage("[red]You don't have enough funds to buy " + quantity + " units.");
+            logger.log(Level.WARNING, "Player {0} attempted to buy multiple units with insufficient funds: {1} (quantity: {2})", new Object[]{player.name, unitType, quantity});
         }
     }
 
     public static void clearMenuIds() {
         menuIds.clear();
         dynamicListeners.clear();
+        logger.log(Level.INFO, "Cleared all menu IDs and listeners.");
     }
 }
