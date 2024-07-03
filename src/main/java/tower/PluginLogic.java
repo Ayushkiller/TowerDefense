@@ -157,9 +157,6 @@ public class PluginLogic {
     }
 
     private static void setupEventHandlers() {
-        Events.on(EventType.WorldLoadEvent.class, event -> {
-            multiplier = 0.5f;
-        });
         Events.on(EventType.UnitDestroyEvent.class, event -> {
             if (event.unit.team != state.rules.waveTeam)
                 return;
@@ -218,7 +215,7 @@ public class PluginLogic {
             repairPointTiles.remove(tile);
             repairPointCash.remove(tile);
         }
-        if(isPath(tile) && tile.solid()){
+        if(isPath(tile)){
             tile.setAir();
             Bundle.label( 4f, tile.drawx(),tile.drawy(), "ui.forbidden");
         }
