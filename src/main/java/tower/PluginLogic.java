@@ -29,9 +29,6 @@ import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.RepairTurret;
 import tower.Domain.PlayerData;
 import tower.Domain.Unitsdrops;
-import tower.commands.BuyPoint;
-import tower.commands.Statuseffects;
-import tower.commands.Units;
 import useful.Bundle;
 
 public class PluginLogic {
@@ -215,7 +212,7 @@ public class PluginLogic {
             repairPointTiles.remove(tile);
             repairPointCash.remove(tile);
         }
-        if(isPath(tile)&&(!tile.block().isAir()||!tile.solid())){
+        if(isPath(tile)&&(!tile.block().isAir()||tile.solid())){
             tile.setAir();
             Bundle.label( 4f, tile.drawx(),tile.drawy(), "ui.forbidden");
         }
