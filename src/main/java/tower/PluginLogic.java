@@ -212,10 +212,6 @@ public class PluginLogic {
             repairPointTiles.remove(tile);
             repairPointCash.remove(tile);
         }
-        if(isPath(tile)&&(!tile.block().isAir()||tile.solid())){
-            tile.setAir();
-            Bundle.label( 4f, tile.drawx(),tile.drawy(), "ui.forbidden");
-        }
     }
 
     public static boolean isPath(Tile tile) {
