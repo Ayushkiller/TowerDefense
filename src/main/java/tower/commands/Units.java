@@ -94,6 +94,7 @@ public class Units {
             })
         );
 
+        logger.log(Level.INFO, "Opening Tier Units menu GUI for player: {0}, tier: {1}, menuId: {2}", new Object[]{player.name, tier, menuId});
         Call.menu(player.con, menuId, "Select Unit", "", buttons);
     }
 
@@ -115,6 +116,7 @@ public class Units {
             })
         );
 
+        logger.log(Level.INFO, "Opening Unit menu GUI for player: {0}, unitType: {1}, menuId: {2}", new Object[]{player.name, unitType, menuId});
         Call.menu(player.con, menuId, "Unit Info", message, new String[][] {
                 { "[lime]Buy" },
                 { "[gray]Back" },
@@ -151,6 +153,7 @@ public class Units {
             })
         );
 
+        logger.log(Level.INFO, "Opening Quantity Adjustment menu GUI for player: {0}, unitType: {1}, menuId: {2}", new Object[]{player.name, unitType, menuId});
         Call.menu(player.con, menuId, title, message, buttons);
     }
 
@@ -187,5 +190,4 @@ public class Units {
             logger.log(Level.WARNING, "Player {0} attempted to buy multiple units with insufficient funds: {1} (quantity: {2})", new Object[]{player.name, unitType, quantity});
         }
     }
-
 }
